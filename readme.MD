@@ -1,5 +1,5 @@
-#  Python code to Analyze Telemetry from the Ballon Experimental Twin Telescope for Infrared Inferferometry (BETTII)
-This software is developed for the BETTII (NASA Goddard Space Flight Center)
+#  Python code to Analyze Telemetry data from the BETTII.
+This software is developed for the Ballon Experimental Twin Telescope for Infrared Inferferometry project (BETTII), at NASA Goddard Space Flight Center.
 
 ![Flight Data Analysis](bettii.png)
 
