@@ -61,7 +61,10 @@ def getFormat(fieldName,folder):
          'UINT8':'u1',
          'FLOAT32':'f4',
          'FLOAT64':'f8'}
-    for line in formatFile:
-        if fieldName in line:
-            dtype=dic[line.split()[2]]
-            return dtype
+    try:
+        for line in formatFile:
+            if fieldName in line:
+                dtype=dic[line.split()[2]]
+                return dtype
+    finally:
+        formatFile.close()

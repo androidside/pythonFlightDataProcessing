@@ -1,43 +1,66 @@
 '''
 Created on 28 abr. 2017
 
+Main script
+
 @author: Marc Casalprim
 '''
 print 'Imports...'
+import pandas as pd
 from utils.dataset import DataSet
 from utils.field import *
+import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 
 if __name__ == '__main__':
-
-    folder = "X:/17-04-24_19_02_57/"
+    folder = "C:/17-04-24_19_02_57/"
+    #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-02_18_01_58\\"
     
+    fieldsList=[]
+     
+    fieldsList.append(Field('bettii.RTHighPriority.crossElevation'))
+    fieldsList.append(Field('bettii.RTHighPriority.elevation'))
+    fieldsList.append(Field('bettii.RTHighPriority.TelescopeDecDeg'))
+    fieldsList.append(Field('bettii.RTHighPriority.TelescopeRaDeg'))
+    fieldsList.append(Field('bettii.RTHighPriority.targetDEC'))
+    fieldsList.append(Field('bettii.RTHighPriority.targetRA'))
+      
     #===========================================================================
-    # fieldsList=[]
-    # 
-    # fieldsList.append(Field('bettii.RTHighPriority.crossElevation'))
-    # fieldsList.append(Field('bettii.RTHighPriority.elevation'))
-    # fieldsList.append(Field('bettii.RTHighPriority.TelescopeDecDeg'))
-    # fieldsList.append(Field('bettii.RTHighPriority.TelescopeRaDeg'))
-    #  
     # fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
     # fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
     # fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
     #===========================================================================
     
-    fieldsList = getFieldsContaining('bettii.ThermometersOutput.A',folder)   
+    
+
+      
+    
+    #fieldsList = getFieldsContaining('CCMG',folder)   
     
     #fieldsList = getFieldsRegex('bettii.[U-Z]+',folder)   
       
-    ds = DataSet(folder,fieldsList=fieldsList,min=28315)
+    ds = DataSet(folder,fieldsList=fieldsList,min=100)
     
     print 'Dataframe shape:', ds.df.shape
+    data=ds.df.dropna()
+    matplotlib.style.use('ggplot')
+    plt.figure(1)
+    ax1=plt.subplot(211)
+    ax2=plt.subplot(212)
     
-    f=ds.simplePlot('AI0')
+    data[['targetDEC','TelescopeDecDeg']].plot(ax=ax1)
+    data[['targetRA','TelescopeRaDeg']].plot(ax=ax2)
+
+
     
-    g=ds.multiPSD(['AI0','AI2','AI7'])
+    #===========================================================================
+    # f=ds.simplePlot('AI0')
+    # 
+    # g=ds.multiPSD(['AI0','AI2','AI7'])
+    #===========================================================================
+    
     #print 'Plotting scatter plot...'
     #g = sns.pairplot(ds.df.dropna())
  
@@ -76,3 +99,12 @@ if __name__ == '__main__':
     # ds.scatterPlots(['gyroY','gyroZ'],show=show)
     #===========================================================================
     plt.show()
+#===============================================================================
+#     
+#     ind=ds.df.index
+# us=[i*2500 for i in ds.df.index]
+# dic={'year': [2017] * len(us), 'month': [04] * len(us), 'day': [24] * len(us), 'us': us}
+# dfdt=ds.df.set_index(pd.to_datetime(pd.DataFrame(dic)).values)
+# rs=dfdt.resample('1ms')
+#===============================================================================
+    

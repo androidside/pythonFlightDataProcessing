@@ -24,19 +24,21 @@ from quat import Quat
 
 
 # plotting parameters
-mpl.rcParams['xtick.labelsize'] = 11
-mpl.rcParams['xtick.major.size'] = 5
-mpl.rcParams['ytick.major.size'] = 5
-mpl.rcParams['xtick.minor.size'] = 5
-mpl.rcParams['ytick.minor.size'] = 5
-mpl.rcParams['ytick.labelsize'] = 11
-mpl.rcParams['axes.labelsize'] = 11
-mpl.rcParams['legend.fontsize'] = 11
-mpl.rcParams['font.size'] = 11
-mpl.rcParams['font.weight'] = 100
-#mpl.rcParams['lines.linewidth'] = 2
-mpl.rcParams['font.family'] = 'serif'
-mpl.rcParams['font.serif'] = 'Times New Roman'
+#===============================================================================
+# mpl.rcParams['xtick.labelsize'] = 11
+# mpl.rcParams['xtick.major.size'] = 5
+# mpl.rcParams['ytick.major.size'] = 5
+# mpl.rcParams['xtick.minor.size'] = 5
+# mpl.rcParams['ytick.minor.size'] = 5
+# mpl.rcParams['ytick.labelsize'] = 11
+# mpl.rcParams['axes.labelsize'] = 11
+# mpl.rcParams['legend.fontsize'] = 11
+# mpl.rcParams['font.size'] = 11
+# mpl.rcParams['font.weight'] = 100
+# #mpl.rcParams['lines.linewidth'] = 2
+# mpl.rcParams['font.family'] = 'serif'
+# mpl.rcParams['font.serif'] = 'Times New Roman'
+#===============================================================================
 
 red = sns.xkcd_rgb['pale red']
 blue = sns.xkcd_rgb['denim blue']
@@ -117,7 +119,7 @@ class DataSet():
             if timeName in self.times.keys(): time=self.times[timeName]
             else:
                 print 'Time reference '+timeName+' not loaded in local dataset yet. Adding...',
-                time = load_single_field(folder+timeName,timeType)
+                time = load_single_field(folder+timeName,timeType)[:len(field_data)]
                 self.times[timeName]=time
             
             label=field.label
