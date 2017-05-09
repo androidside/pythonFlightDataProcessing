@@ -6,17 +6,17 @@ Main script
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import pandas as pd
-from utils.dataset import DataSet
-from utils.field import *
 import matplotlib
-import matplotlib.pyplot as plt
-import seaborn as sns
+from utils.dataset import DataSet,plt,sns
+from utils.field import Field#,getFieldsContaining,getFieldsRegex
+
 
 
 if __name__ == '__main__':
-    folder = "C:/17-04-24_19_02_57/"
+    #folder = "C:/17-04-24_19_02_57/"
     #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-02_18_01_58\\"
+    
+    folder='C:/16-09-28_21_58_34-/'
     
     fieldsList=[]
      
@@ -32,26 +32,61 @@ if __name__ == '__main__':
     # fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
     # fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
     #===========================================================================
-    
-    
-
-      
-    
+   
     #fieldsList = getFieldsContaining('CCMG',folder)   
     
-    #fieldsList = getFieldsRegex('bettii.[U-Z]+',folder)   
-      
-    ds = DataSet(folder,fieldsList=fieldsList,min=100)
+    #fieldsList = getFieldsRegex('bettii.[U-Z]+',folder)
+    
+    #target 1
+    
+    initial_time=5147000 #in frame number
+    final_time = 5149000 #in frame number
+    
+    #target 2
+    #===========================================================================
+    # initial_time=6301000 #in frame number
+    # final_time = 6303000 #in frame number
+    #===========================================================================
+    
+    #===========================================================================
+    # initial_time=None #in frame number
+    # final_time = None #in frame number
+    #===========================================================================
+    
+    ds = DataSet(folder,fieldsList=fieldsList,min=initial_time,max=final_time,verbose=True)
     
     print 'Dataframe shape:', ds.df.shape
     data=ds.df.dropna()
+    #data.index=data.index/ds.freq #index in seconds
     matplotlib.style.use('ggplot')
+    #plotting RA and DEC target vs estimated
     plt.figure(1)
-    ax1=plt.subplot(211)
-    ax2=plt.subplot(212)
+    ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC (deg)')
+    ax2=plt.subplot(212,xlabel='Time (frames)',ylabel='RA (deg)')
     
     data[['targetDEC','TelescopeDecDeg']].plot(ax=ax1)
     data[['targetRA','TelescopeRaDeg']].plot(ax=ax2)
+    
+    #plotting RA and DEC estimated-target  estimated
+    plt.figure(2)
+    ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC error (deg)')
+    ax2=plt.subplot(212,xlabel='Time (frames)',ylabel='RA error (deg)')
+    errDEC=(data.TelescopeDecDeg.subtract(data.targetDEC))
+    errDEC.plot(ax=ax1)
+    errRA=(data.TelescopeRaDeg.subtract(data.targetRA))
+    errRA.plot(ax=ax2)
+
+    
+    #plotting elevation and crossElevation
+    plt.figure(3)
+    ax1=plt.subplot(221,xlabel='Time (frames)',ylabel='elevation (arcsec)')
+    ax2=plt.subplot(223,xlabel='Time (frames)',ylabel='crossElevation (arcsec)')
+    ax3=plt.subplot(122,xlabel='CrossElevation (arcsec)',ylabel='Elevation (arcsec)')
+    data['elevation'].plot(ax=ax1)
+    data['crossElevation'].plot(ax=ax2)
+    data.plot(ax=ax3,x='crossElevation',y='elevation',legend=None)
+    ax3.set_xlabel('CrossElevation(arcsec)')
+    
 
 
     

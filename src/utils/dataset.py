@@ -7,15 +7,14 @@ The DataSet class is very similar, but using 'outer' merges
 @author: Marc Casalprim
 '''
 #===============================================================================
-# import os
 # from itertools import combinations
 # from itertools import groupby
 # from numpy import sin,cos,arctan2,arcsin
 #===============================================================================
+import os
 import pandas as pd
 import numpy as np
 import seaborn.apionly as sns
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 from scipy.signal.spectral import periodogram
@@ -45,24 +44,32 @@ blue = sns.xkcd_rgb['denim blue']
 lt_blue = sns.xkcd_rgb['pastel blue']
 colors = [blue,'g',red]
 
-def load_single_field(fieldname,datatype):
+def load_single_field(fieldname,datatype,nValues=None,start=None):
     type_str_native = ">"+datatype
     type_str_final = "<"+datatype # change endianness
-    # this is a temporary fix, necessary because Steve is padding the archive for KST display.
-    # if using data directly from ford, we can just write:
-    field = np.fromfile(fieldname,dtype=np.dtype(type_str_native))
     
-    ## NOTE: this breaks theflow when consecutive MEASURED values follow each other, e.g. if the wheels stay at the same angle for a while, 
-    # this would delete all repeated values even if they are actual values.
-    #field = np.array([x[0] for x in groupby(np.fromfile(fieldname,dtype=np.dtype(type_str_native)))])
+    if nValues is None:
+        f=fieldname
+        nValues=-1
+    else:
+        bpv=int(datatype[-1]) #bytes per value
+        f = open(fieldname, "rb")
+        if start is None:
+            nBytes=nValues*bpv 
+            f.seek(-nBytes, os.SEEK_END)
+        else:
+            nBytes=start*bpv
+            f.seek(nBytes, os.SEEK_SET)
+
+    
+    field = np.fromfile(f,dtype=np.dtype(type_str_native),count=nValues) 
+
     field = field.astype(type_str_final)
     return field
 
 class DataSet():
-    
-    FREQ=400.
-    
-    def __init__(self,folder,freq=100,min=None,max=None,folder_export = None,estimator=False,starcam=False,fieldsList=[],droplist = []):
+        
+    def __init__(self,folder,freq=400.,min=None,max=None,folder_export = None, nValues=None, start=None, verbose=False, rpeaks=True,estimator=False,starcam=False,fieldsList=[],droplist = []):
         '''
         return a DataSet object containing df, a Pandas data frame indexed on the mceFramenumber
         Loads a list of fields fieldsList, the estimator data or the starcamera data dpeending on the correct parameters
@@ -71,9 +78,10 @@ class DataSet():
         self.folder = folder
         self.times=dict() #dict storing np.arrays of the different indexes, to avoid loading them every time               
         self.df = pd.DataFrame()
-        
-            
-        self.readListFields(fieldsList)
+        self.freq = freq
+        self.min=min
+        self.max=max
+        self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start)
         
         if estimator:
             self.readEstimator()
@@ -81,57 +89,71 @@ class DataSet():
             self.readStarcamera()
         
         if not self.df.empty:
-            self.df.drop_duplicates(inplace=True)
             self.df = self.df.dropna(axis=0,how='all')
             self.df = self.df.drop(droplist)
+            self.df = self.df.loc[self.min:self.max,:]
+            if rpeaks: #remove peaks
+                self.df=self.df.loc[(self.df.abs()>=1).any(1)]  #remove rows were all fields have a value <1           
         
-        if self.df.empty or (min == None and max==None):
-            pass
-        elif min == None and max!=None:
-            self.df = self.df.loc[:max*self.FREQ,:]
-        elif max == None and min!=None:
-            self.df = self.df.loc[min*self.FREQ:,:]
-        else:
-            self.df = self.df.loc[min*self.FREQ:max*self.FREQ,:]
-        
-        self.freq = freq
-        self.length = len(self.df)
-
         if folder_export == None: self.folder_export = self.folder.split('/')[-1]
         else: self.folder_export = folder_export
         
-    def readListFields(self,fieldsList,folder=None,timeDivider=1):
+    def readListFields(self,fieldsList,folder=None,timeDivider=1,rpeaks=True, verbose=False, nValues=None,start=None):
         i=0
-        print 'Reading list of '+str(len(fieldsList))+' fields.'
+        if verbose: print 'Reading list of '+str(len(fieldsList))+' fields.'
         for field in fieldsList:
             i=i+1
-            print str(100*i/len(fieldsList))+'%', 
-            self.readField(field, folder=folder,timeDivider=timeDivider)
-        print ''
-    def readField(self,field,folder=None,timeDivider=1):
+            if verbose: print str(100*i/len(fieldsList))+'%', 
+            self.readField(field, folder=folder,timeDivider=timeDivider,rpeaks=rpeaks,verbose=verbose,nValues=nValues,start=start)
+        if verbose: print ''
+        self.df = self.df.dropna(axis=0,how='all')
+        self.df = self.df.loc[self.min:self.max,:]
+        if rpeaks: #remove peaks
+            self.df=self.df.loc[(self.df.abs()>=1).any(1)]  #remove rows were all fields have a value <1
+            
+    def readField(self,field,folder=None,timeDivider=1,rpeaks=True,verbose=False,nValues=None,start=None):
         if folder is None: folder=self.folder
         
         try:
-            field_data = load_single_field(folder+field.fieldName,field.dtype)*field.conversion
+            field_data = load_single_field(folder+field.fieldName,field.dtype,nValues=nValues,start=start)*field.conversion
             
             timeName=field.indexName
             timeType=field.indexType
-            if timeName in self.times.keys(): time=self.times[timeName]
+            if nValues is None:
+                if timeName in self.times.keys(): time=self.times[timeName]
+                else:
+                    print 'Time reference '+timeName+' not loaded in local dataset yet. Adding...',
+                    time = load_single_field(folder+timeName,timeType)
+                    self.times[timeName]=time
             else:
-                print 'Time reference '+timeName+' not loaded in local dataset yet. Adding...',
-                time = load_single_field(folder+timeName,timeType)[:len(field_data)]
-                self.times[timeName]=time
+                if timeName in self.times.keys():
+                    d=(start+nValues)-len(self.times[timeName]) #number of values we need
+                    if d>0:
+                        if verbose: print 'Expanding time index '+timeName+' in local dataset...'
+                        time = load_single_field(folder+timeName,timeType,nValues=d,start=len(self.times[timeName]))
+                        self.times[timeName]= np.concatenate((self.times[timeName],time))                    
+                else:
+                    if verbose: print 'Time reference '+timeName+' not loaded in local dataset yet. Adding...'
+                    time = load_single_field(folder+timeName,timeType,nValues=start+nValues,start=0)
+                    self.times[timeName]=time
+                
+                time=(self.times[timeName])[start:start+nValues]
             
             label=field.label
             
             if label in self.df.keys() and len(self.df[label].as_matrix())==len(field_data):
-                print label+' already in dataframe.'
+                if verbose: print label+' already in dataframe.'
             else:
                 df_tmp = pd.DataFrame({label:field_data},index=time/timeDivider)
-                df_tmp.drop_duplicates(inplace=True)
-                self.df = pd.merge(self.df,df_tmp,how='outer',left_index=True,right_index=True) 
-                print field.fieldName+' read. '+str(len(field_data))+' values. '+str(len(df_tmp))+' whitout duplicates.'
+                df_tmp = df_tmp[~df_tmp.index.duplicated(keep='first')] #remove values with duplicated index
+                df_tmp=df_tmp[np.abs(df_tmp[label].as_matrix())<= 1e10] #keep only the ones that are within +1e10 to -1e10.
+
+                if self.df.empty: self.df = df_tmp
+                elif label in self.df: self.df = self.df.combine_first(df_tmp)
+                else: self.df =        pd.merge(self.df,df_tmp,how='outer',left_index=True,right_index=True) 
+                if verbose: print field.fieldName+' read. '+str(len(field_data))+' raw values. '+str(len(df_tmp))+' deduplicated values.'
         except Exception as e:
+            raise
             print 'ERROR reading '+field.fieldName+':', e
 
     def readEstimator(self,folder=None,timeDivider=1):
@@ -245,7 +267,7 @@ class DataSet():
         ax.set_xlabel("Time (s)")
         ax.set_ylabel(ylabel)
         ax.grid(True)
-        if realTime: ax.plot(data.index/self.FREQ-origin,data,label=val,color=color)
+        if realTime: ax.plot(data.index/self.freq-origin,data,label=val,color=color)
         else: ax.plot(data.index-origin,data,label=val,color=color)
         if minMax != []:
             ax.set_xlim = minMax
@@ -365,3 +387,4 @@ class DataSet():
             if show: plt.draw()
             #plt.close(fig)
         print "Done."
+        
