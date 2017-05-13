@@ -81,7 +81,7 @@ class DataSet():
         self.freq = freq
         self.min=min
         self.max=max
-        self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start)
+        self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start,verbose=verbose)
         
         if estimator:
             self.readEstimator()
@@ -91,10 +91,10 @@ class DataSet():
         if not self.df.empty:
             self.df = self.df.dropna(axis=0,how='all')
             self.df = self.df.drop(droplist)
-            self.df = self.df.loc[self.min:self.max,:]
             if rpeaks: #remove peaks
                 self.df=self.df.loc[(self.df.abs()>=1).any(1)]  #remove rows were all fields have a value <1           
-        
+            self.df = self.df.loc[self.min:self.max,:]
+                
         if folder_export == None: self.folder_export = self.folder.split('/')[-1]
         else: self.folder_export = folder_export
         
@@ -122,8 +122,12 @@ class DataSet():
             if nValues is None:
                 if timeName in self.times.keys(): time=self.times[timeName]
                 else:
-                    print 'Time reference '+timeName+' not loaded in local dataset yet. Adding...',
+                    if verbose: print 'Time reference '+timeName+' not loaded in local dataset yet. Adding...',
                     time = load_single_field(folder+timeName,timeType)
+                    self.times[timeName]=time
+            elif start is None:
+                    if verbose: print 'Time reference '+timeName+' not loaded in local dataset yet. Adding...',
+                    time = load_single_field(folder+timeName,timeType,nValues=nValues) #reading last nValues from the end
                     self.times[timeName]=time
             else:
                 if timeName in self.times.keys():
@@ -176,6 +180,7 @@ class DataSet():
         biasY = load_single_field(folder+'bettii.RTHighPriority.estimatedBiasYarcsec','f8')
         biasZ = load_single_field(folder+'bettii.RTHighPriority.estimatedBiasZarcsec','f8')
         
+        self.times['bettii.RTLowPriority.mceFrameNumber'] = load_single_field(folder+'bettii.RTLowPriority.mceFrameNumber','i8')
 
         # estimator
         qr_list = load_single_field(folder+'bettii.RTLowPriority.qr','f8')
@@ -189,7 +194,7 @@ class DataSet():
 
         estimatorData = {'Cov00':Cov00,'Cov11':Cov11,'Cov22':Cov22,
                         'Q00':Q00,'Q11':Q11,'Q22':Q22,'Q33':Q33,'Q44':Q44,'Q55':Q55,
-                        'ra':est_ra,'dec':est_dec,'roll':est_roll,
+                        'ra':est_ra,'dec':est_dec,'roll':est_roll,'est_q':estimated_quatlist
                         }
         biasData = {'biasX':biasX,'biasY':biasY,'biasZ':biasZ}
         df_estimator = pd.DataFrame(estimatorData,index = self.times['bettii.RTLowPriority.mceFrameNumber']/timeDivider)
@@ -206,6 +211,8 @@ class DataSet():
         # Load star camera trigger number
         # this is the mceFrameNumber at which the starcamera trigger occurred, and which is processed by the starFinder
         starcam_trigger = load_single_field(folder+'bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered','i8')
+        
+        self.times['bettii.RTLowPriority.mceFrameNumber'] = load_single_field(folder+'bettii.RTLowPriority.mceFrameNumber','i8')
         
         meas_qr_list = load_single_field(folder+'bettii.RTLowPriority.StarCameraRotatedqr','f8')
         meas_qi_list = load_single_field(folder+'bettii.RTLowPriority.StarCameraRotatedqi','f8')
@@ -237,6 +244,7 @@ class DataSet():
         meas_radecroll = {'ra_sc':meas_ra_calc,
                         'dec_sc':meas_dec_calc,
                         'roll_sc':meas_roll_calc,
+                        'meas_q': measured_quatlist
                         }
         df_solution = pd.merge(df_solution,pd.DataFrame(meas_radecroll,index=df_solution.index),how='inner',left_index=True,right_index=True)
         df_solution = df_solution.drop(['meas_qi','meas_qj','meas_qk','meas_qr'],1)
@@ -244,20 +252,24 @@ class DataSet():
         # trigger pulses (aligned with mceFrameNmber); this tells us how long the exposure time was, in number of frames (400Hz)
         #position given by the star camera corresponds should be compared to the estimated position at the 
         # at the location of the trigger (the index of this pulse) + half the amount of this pulse's value
-        starcam_trigger_pulses =load_single_field(folder+'bettii.RTHighPriority.StarCameraTriggerStatus','i8')
         
-        
-        # sort out the triggers and bad data lines
-        pulses = pd.DataFrame({'duration': starcam_trigger_pulses},index = self.times['bettii.RTLowPriority.mceFrameNumber']/timeDivider)
-        pulses.drop_duplicates(inplace=True)
-        durations = self.pulses.loc[df_solution['triggers']]
-        durations = pd.DataFrame(durations,index = durations.index)
-        df_solution = pd.merge(df_solution,durations,how='inner',left_on='triggers',right_index=True)
-        df_solution = df_solution.dropna(axis=0)
-        df_solution['trigger_center'] = df_solution['triggers']+np.round(df_solution['duration']/8)*4
+        #=======================================================================
+        # starcam_trigger_pulses =load_single_field(folder+'bettii.RTHighPriority.StarCameraTriggerStatus','i8')
+        # 
+        # 
+        # #sort out the triggers and bad data lines
+        # pulses = pd.DataFrame({'duration': starcam_trigger_pulses},index = self.times['bettii.RTHighPriority.mceFrameNumber']/timeDivider)
+        # pulses.drop_duplicates(inplace=True)
+        # durations = self.pulses.loc[df_solution['triggers']]
+        # durations = pd.DataFrame(durations,index = durations.index)
+        # df_solution = pd.merge(df_solution,durations,how='inner',left_on='triggers',right_index=True)
+        # df_solution = df_solution.dropna(axis=0)
+        # df_solution['trigger_center'] = df_solution['triggers']+np.round(df_solution['duration']/8)*4
+        #=======================================================================
         
         # what are the estimated values?
-        self.df = pd.merge(self.df,df_solution,how='outer',left_on='trigger_center',right_index=True) 
+        #self.df = pd.merge(self.df,df_solution,how='outer',left_on='trigger_center',right_index=True)
+        self.df = pd.merge(self.df,df_solution,how='outer',left_index=True,right_index=True)
 
     def simplePlot(self,val,minMax = [],ylabel="",origin=0,ax_key=None,save=False,draw=True,realTime=True,name=None,color=sns.xkcd_rgb['denim blue']):
         print "simplePlot, Loading %s data..." %val

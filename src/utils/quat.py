@@ -70,7 +70,11 @@ class Quat(object):
             elif attitude.shape == (3, 3):
                 self._set_transform(attitude)
             elif attitude.shape == (3,):
-                self._set_equatorial(attitude)
+                ra,dec,roll=attitude
+                qYaw = Quat((0.0,0.0,sin(ra*np.pi/180./2.0),cos(ra*np.pi/180./2.0)))
+                qPitch = Quat((0.0,sin(-dec*np.pi/180./2.0),0.0,cos(dec*np.pi/180./2.0)))
+                qRoll = Quat((sin(roll*np.pi/180./2.0),0.0,0.0,cos(roll*np.pi/180./2.0)))
+                self._set_q((qRoll*qPitch*qYaw).q)
             elif attitude.shape == (2,):
                 self._set_latlon(attitude)
             else:
@@ -355,7 +359,14 @@ class Quat(object):
         q[3] = Czd2 * Cyd2
 
         return q
-
+    def __abs__(self):
+        """
+        Norm of the quaternion 
+        :returns: norm
+        :rtype: Quat
+        """
+        return np.sqrt(np.dot(self.q, self.q))
+  
     def __div__(self, quat2):
         """
         Divide one quaternion by another.

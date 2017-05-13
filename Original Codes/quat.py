@@ -396,7 +396,6 @@ class Quat(object):
       :rtype: Quat
       """
       return Quat([-self.q[0], -self.q[1], -self.q[2], self.q[3]])
-
         
         
 

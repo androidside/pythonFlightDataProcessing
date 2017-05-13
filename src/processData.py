@@ -26,7 +26,13 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTHighPriority.TelescopeRaDeg'))
     fieldsList.append(Field('bettii.RTHighPriority.targetDEC'))
     fieldsList.append(Field('bettii.RTHighPriority.targetRA'))
-      
+    fieldsList.append(Field('bettii.RTHighPriority.GondolaDecDeg'))
+    fieldsList.append(Field('bettii.RTHighPriority.GondolaRaDeg'))
+    fieldsList.append(Field('bettii.GriffinsGalil.griffinAAngleDegrees'))
+    fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasXarcsec',label='biasX'))
+    fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='biasY')) 
+    fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='biasZ')) 
+    
     #===========================================================================
     # fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
     # fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
@@ -42,6 +48,11 @@ if __name__ == '__main__':
     initial_time=5147000 #in frame number
     final_time = 5149000 #in frame number
     
+    #===========================================================================
+    # initial_time=5047000 #in frame number
+    # final_time = 5244000 #in frame number
+    #===========================================================================
+    
     #target 2
     #===========================================================================
     # initial_time=6301000 #in frame number
@@ -53,10 +64,10 @@ if __name__ == '__main__':
     # final_time = None #in frame number
     #===========================================================================
     
-    ds = DataSet(folder,fieldsList=fieldsList,min=initial_time,max=final_time,verbose=True)
+    ds = DataSet(folder,fieldsList=fieldsList,starcam=True,min=initial_time,max=final_time,verbose=True)
     
     print 'Dataframe shape:', ds.df.shape
-    data=ds.df.dropna()
+    data=ds.df.interpolate(method='values')
     #data.index=data.index/ds.freq #index in seconds
     matplotlib.style.use('ggplot')
     #plotting RA and DEC target vs estimated
@@ -66,7 +77,7 @@ if __name__ == '__main__':
     
     data[['targetDEC','TelescopeDecDeg']].plot(ax=ax1)
     data[['targetRA','TelescopeRaDeg']].plot(ax=ax2)
-    
+
     #plotting RA and DEC estimated-target  estimated
     plt.figure(2)
     ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC error (deg)')
@@ -86,6 +97,15 @@ if __name__ == '__main__':
     data['crossElevation'].plot(ax=ax2)
     data.plot(ax=ax3,x='crossElevation',y='elevation',legend=None)
     ax3.set_xlabel('CrossElevation(arcsec)')
+    
+    plt.figure(4)
+    data=ds.df[['biasX','biasY','biasZ']].dropna()
+    ax1=plt.subplot(311,ylabel='biasX (arcsec)')
+    ax2=plt.subplot(312,ylabel='biasY (arcsec)')
+    ax3=plt.subplot(313,xlabel='Time (frames)',ylabel='biasZ (arcsec)')
+    data['biasX'].plot(ax=ax1)
+    data['biasY'].plot(ax=ax2)
+    data['biasZ'].plot(ax=ax3)
     
 
 
@@ -134,6 +154,7 @@ if __name__ == '__main__':
     # ds.scatterPlots(['gyroY','gyroZ'],show=show)
     #===========================================================================
     plt.show()
+    plt.pause(1)
 #===============================================================================
 #     
 #     ind=ds.df.index

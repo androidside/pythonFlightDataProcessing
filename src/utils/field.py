@@ -3,12 +3,13 @@ Created on 01 may 2017
 
 @author: Marc Casalprim
 '''
+import os
 
 class Field(object):
     '''
     Class describing a field
     '''
-
+    DTYPES = None
 
     def __init__(self, fieldName,dtype='f8',indexName=None,indexType='i8',label=None,conversion=1):
         '''
@@ -20,16 +21,17 @@ class Field(object):
             label=fieldName
             dtype=indexType
             indexName=fieldName
-
+        if self.DTYPES is None or fieldName not in self.DTYPES: self.dtype= dtype 
+        else: self.dtype = self.DTYPES[fieldName]
         self.fieldName = fieldName
-        self.dtype = dtype
+        
         self.indexName = indexName
         self.indexType = indexType
         self.label = label
         self.conversion = conversion #multiplying factor, to convert the units if we want
 
 
-import os
+
 def getFieldsContaining(substring,folder):
     """ Return a list of fields in the folder containing substring """
     print 'Generating fields list...'
@@ -66,5 +68,26 @@ def getFormat(fieldName,folder):
             if fieldName in line:
                 dtype=dic[line.split()[2]]
                 return dtype
+        #return 'f8'    
     finally:
         formatFile.close()
+def getDtypes(folder):
+    """ Return the dtype of the fieldName using the format file in folder """
+    formatFile= open(folder+'format')
+    dic={'INT32':'i4',
+         'INT64':'i8',
+         'UINT8':'u1',
+         'FLOAT32':'f4',
+         'FLOAT64':'f8'}
+    dtypes={}
+    try:
+        for line in formatFile:
+            try:
+                fieldName,typ=line.split()[0:3:2]
+                dtypes[fieldName]=dic[typ] 
+            except: pass
+
+    finally:
+        formatFile.close()
+        return dtypes
+        
