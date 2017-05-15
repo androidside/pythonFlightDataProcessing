@@ -398,7 +398,7 @@ class Quat(object):
         mult[2] = q2 * p1 - q1 * p2 + q4 * p3 + q3 * p4  # z
         mult[3] = -q1 * p1 - q2 * p2 - q3 * p3 + q4 * p4  # w
         
-        return Quat(mult)
+        return Quat(mult).normalize()
 
     def inv(self):
         """
@@ -407,7 +407,22 @@ class Quat(object):
         :rtype: Quat
         """
         return Quat([-self.q[0], -self.q[1], -self.q[2], self.q[3]])
-
+    
+    def normalize(self):
+        """
+        Normalize the quaternion 
+        :returns: normalized quaternion
+        :rtype: Quat
+        """
+        return Quat(self.q/abs(self))
+    
+    def __repr__(self):
+        """
+        Represent a quaternion
+        :returns: string with the 3 equatorial angles
+        :rtype: str
+        """
+        return str(self.equatorial)
           
           
 

@@ -9,15 +9,17 @@ print 'Imports...'
 import matplotlib
 import numpy as np
 from utils.quat import Quat,normalize,sin,cos
-from utils.dataset import DataSet,plt,sns,load_single_field,pd
+from utils.dataset import DataSet,plt,sns,load_single_field
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-from itertools import izip_longest
+
 
 
 if __name__ == '__main__':
-
+    #folder = "C:/17-04-24_19_02_57/"
+    #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-02_18_01_58\\"
     
     folder='C:/16-09-28_21_58_34-/'
+    #folder='C:/17-05-12_21_13_14/'
     
     Field.DTYPES=getDtypes(folder)
     
@@ -47,7 +49,6 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRaDeg',label='ra_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraAzDeg',label='az_sc',conversion=1))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraElDeg',label='el_sc',conversion=1))
-    fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered',label='triggers'))
     
     #===========================================================================
     # fieldsList.append(Field('bettii.RTHighPriority.SCAnglesInertialGondolaRefFrameArcsecDec',label='dec_sc',conversion=1/3600.))
@@ -56,6 +57,7 @@ if __name__ == '__main__':
     #===========================================================================
     
     fieldsList.append(Field('bettii.GriffinsGalil.griffinBAngleDegrees',label='griffin_angle')) #44.114721
+    griffin_angle=44.114721
     
     
     #===========================================================================
@@ -69,96 +71,64 @@ if __name__ == '__main__':
     #fieldsList = getFieldsRegex('bettii.[U-Z]+',folder)
     
     #target 1    
-    initial_time=5147500 #in frame number
-    final_time = 5153400 #in frame number
-    
-    #target 2
-    #===========================================================================
-    # initial_time=6301000 #in frame number
-    # final_time = 6303000 #in frame number
-    #===========================================================================
+    initial_time=5145000 #in frame number
+    final_time = 5149000 #in frame number
     
     #===========================================================================
     # initial_time=None #in frame number
     # final_time = None #in frame number
     #===========================================================================
     
+    
+    ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=False)
+    
+    print 'Dataframe shape:', ds.df.shape
+    t=5145804 #interesting time
+    d=ds.df.loc[t].dropna()
+
+    qI2Starcam=Quat(d[['ra_sc','dec_sc','roll_sc']])
+    q_sc=Quat(d[['qi_sc','qj_sc','qk_sc','qr_sc']]) #meas_q qI2Gyros
+    
     #array([ -0.15321407, -44.77279865,  19.87575523])
     dYaw=-0.15321407
     dPitch=44.77279865
     dRoll=-3.99
+    errRoll=4#19.87575523+3.99
      
     qdYaw = Quat((dYaw,0,0)); #quat = Quat((ra,dec,roll)) in degrees
     qdPitch = Quat((0.0,sin(dPitch*np.pi/180./2.0),0.0,cos(dPitch*np.pi/180./2.0))) #quat = Quat((ra,dec,roll)) in degrees
-    qdRoll = Quat((0,0,dRoll)) #quat = Quat((ra,dec,roll)) in degrees
-    
-    #qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
-    qStarcam2Gyros_new =  Quat((dYaw,-dPitch,0))*qdRoll
-    qStarcam2Gyros_old =  qdYaw*qdPitch*qdRoll
-    
-    ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=False)
-    ds.df=ds.df.interpolate(method='values').dropna()
-    q_est_list=[Quat(normalize(ds.df.loc[mceFN][['qi','qj','qk','qr']])) for mceFN in ds.df.index]
-    
-    q_sc_list=[Quat((ds.df.loc[mceFN][['qi_sc','qj_sc','qk_sc','qr_sc']])) for mceFN in ds.df.index]
-    qI2Starcam_list=[qStarcam2Gyros_old.inv()*q_sc for q_sc in q_sc_list]
-    
-    qStarcam2Est_list=[ q_est*qI2Starcam.inv() for q_est,qI2Starcam in izip_longest(q_est_list,qI2Starcam_list)] #q_est=qStarcam2Est*qI2Starcam
-    
-    
-    #qStarcam2Est=qGyros2Est*qStarcam2Gyros_old
-    qGyros2Est_list= [ qStarcam2Est*qStarcam2Gyros_old.inv() for qStarcam2Est in qStarcam2Est_list] #the correction the estimator is applying to the measure (any better way to do that?)
-    
-    q_est_new_list = [ qGyros2Est*qStarcam2Gyros_new*qI2Starcam for qGyros2Est,qI2Starcam in izip_longest(qGyros2Est_list,qI2Starcam_list)]
-    q_sc_new_list = [ qStarcam2Gyros_new*qI2Starcam for qI2Starcam in qI2Starcam_list]
-    q_tel_new_list = [Quat((0,griffin_angle,0))*q_est_new for q_est_new,griffin_angle in izip_longest(q_est_new_list,ds.df['griffin_angle'])]
-    q_tel2_new_list = [Quat((0,griffin_angle,0))*q_sc_new for q_sc_new,griffin_angle in izip_longest(q_sc_new_list,ds.df['griffin_angle'])]
-    
-    #q_tel_new_list=q_tel2_new_list
-    
-    d={'TelRA corrected' : [q.ra for q in q_tel_new_list],
-       'TelDEC corrected' : [q.dec for q in q_tel_new_list],
-       'tel_roll' : [q.roll for q in q_tel_new_list],
-       'ra_s2e' : [q.ra for q in qStarcam2Est_list],
-       'dec_s2e' : [q.dec for q in qStarcam2Est_list],
-       'roll_s2e' : [q.roll for q in qStarcam2Est_list]}
-    
-    teldata= pd.DataFrame(d,index = ds.df.index)
-    ds.df=pd.merge(ds.df,teldata,how='outer',left_index=True,right_index=True)
+    qdRoll = Quat((0,0,dRoll+errRoll)) #quat = Quat((ra,dec,roll)) in degrees
 
-    data=ds.df.dropna()
+    qStarcam2Gyros =  Quat((-dYaw,dPitch,-(dRoll+errRoll))) #
     
-         
-    print 'Dataframe shape:', ds.df.shape
-    
-    
-    matplotlib.style.use('ggplot')
-    
-    plt.ion()
-    
-    plt.figure(1)
-    ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC (deg)')
-    ax2=plt.subplot(212,xlabel='Time (frames)',ylabel='RA (deg)')
-    
-    data[['targetDEC','TelescopeDecDeg','TelDEC corrected']].plot(ax=ax1)
-    data[['targetRA','TelescopeRaDeg','TelRA corrected']].plot(ax=ax2)
-    
-    plt.figure(2)
-    ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC (deg)')
-    ax2=plt.subplot(212,xlabel='Time (frames)',ylabel='RA (deg)')
-    
-    data['ra_s2e'].plot(ax=ax1)
-    data['dec_s2e'].plot(ax=ax2)
-    
-    
-    plt.draw()
 
-    plt.pause(0.1)
-    errDEC=(data['TelDEC corrected'].subtract(data.targetDEC))
-    errRA=(data['TelRA corrected'].subtract(data.targetRA))
-    print errDEC[errDEC.abs()<1e-3]
-    print errRA[errRA.abs()<1e-3]
+    qI2Gyros =  qStarcam2Gyros*qI2Starcam
+    
+    qGyros2Tel = Quat((0,griffin_angle,0))
+    
+    q_est=Quat(d[['qi','qj','qk','qr']])
+    #q_sc = d['meas_q'];
+
+    print 'qI2Starcam: ', qI2Starcam.equatorial
+    print 'qStarcam2Gyros: ', qStarcam2Gyros.equatorial
+    print
+    print 'q_est :', q_est.equatorial
+    print 'q_sc  :', q_sc.equatorial
+    print
+    print 'Without error in roll:'
+    print 'qI2Gyros: ', (Quat((-dYaw,dPitch,-dRoll)).inv()*qI2Starcam).equatorial
+    print
+    print 'With error in roll:',errRoll,'deg'
+    print 'qI2Gyros : ', qI2Gyros.equatorial
+    print
+    print 'qGyros2Tel: ', qGyros2Tel.equatorial
+    print
+    print 'qI2Tel :',(qGyros2Tel*qI2Gyros).equatorial
+    print 'qI2Tel_sc :',(qGyros2Tel*q_sc).equatorial
+    print 'qI2Tel_est:',(qGyros2Tel*q_est).equatorial
+    print 'Telescope RA DEC :',d['TelescopeRaDeg'],d['TelescopeDecDeg']
+    print 'Target RA DEC :',d['targetRA'],d['targetDEC']
+    
+    
     a=1
-    plt.ioff()
-    plt.show()
     

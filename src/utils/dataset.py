@@ -244,7 +244,7 @@ class DataSet():
         meas_radecroll = {'ra_sc':meas_ra_calc,
                         'dec_sc':meas_dec_calc,
                         'roll_sc':meas_roll_calc,
-                        'meas_q': measured_quatlist
+                        'q_sc': measured_quatlist
                         }
         df_solution = pd.merge(df_solution,pd.DataFrame(meas_radecroll,index=df_solution.index),how='inner',left_index=True,right_index=True)
         df_solution = df_solution.drop(['meas_qi','meas_qj','meas_qk','meas_qr'],1)

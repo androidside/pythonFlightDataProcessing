@@ -8,7 +8,7 @@ Main script
 print 'Imports...'
 import matplotlib
 from utils.dataset import DataSet,plt,sns
-from utils.field import Field#,getFieldsContaining,getFieldsRegex
+from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
 
@@ -16,7 +16,10 @@ if __name__ == '__main__':
     #folder = "C:/17-04-24_19_02_57/"
     #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-02_18_01_58\\"
     
+    
     folder='C:/16-09-28_21_58_34-/'
+    
+    Field.DTYPES=getDtypes(folder)
     
     fieldsList=[]
      
@@ -54,6 +57,7 @@ if __name__ == '__main__':
     #===========================================================================
     
     #target 2
+    
     #===========================================================================
     # initial_time=6301000 #in frame number
     # final_time = 6303000 #in frame number
@@ -153,8 +157,7 @@ if __name__ == '__main__':
     # ds.scatterPlots(['gyroX','gyroZ'],show=show)
     # ds.scatterPlots(['gyroY','gyroZ'],show=show)
     #===========================================================================
-    plt.show()
-    plt.pause(1)
+
 #===============================================================================
 #     
 #     ind=ds.df.index
@@ -163,4 +166,8 @@ if __name__ == '__main__':
 # dfdt=ds.df.set_index(pd.to_datetime(pd.DataFrame(dic)).values)
 # rs=dfdt.resample('1ms')
 #===============================================================================
-    
+    print errRA[errRA.abs()<1e-3]
+    print errDEC[errDEC.abs()<1e-3]
+        
+    plt.show()
+    plt.pause(1)
