@@ -5,17 +5,18 @@ Main script
 
 @author: Marc Casalprim
 '''
+from test._mock_backport import inplace
 print 'Imports...'
-import matplotlib
-from utils.dataset import DataSet,plt,sns
+import matplotlib as mpl
+import numpy as np
+from utils.dataset import pd,DataSet,plt
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-
+from utils.quat import Quat,sin,cos
 
 
 if __name__ == '__main__':
-    #folder = "C:/17-04-24_19_02_57/"
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-15_02_09_25\\"
-    
+    folder = "C:/17-05-16_03_06_46/"
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-17_00_36_34\\"
     Field.DTYPES=getDtypes(folder)
 
     
@@ -24,18 +25,30 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraDecDeg',label='dec_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRollDeg',label='roll_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRaDeg',label='ra_sc'))  
-    matplotlib.style.use('ggplot') 
-    
+    mpl.style.use('classic') 
+    mpl.rcParams['toolbar'] = 'None'
     initial_time=None #in frame number
     final_time = None #in frame number
     
     ds = DataSet(folder,min=initial_time,max=final_time,rpeaks=True)
+    
+    dYaw = -0.367
+    dPitch = 44.9828
+    dRoll = -0.79
+    qdYaw = Quat((dYaw,0,0)); #quat = Quat((ra,dec,roll)) in degrees
+    qdPitch = Quat((0.0,sin(dPitch*np.pi/180./2.0),0.0,cos(dPitch*np.pi/180./2.0))) #quat = Quat((ra,dec,roll)) in degreesq
+    qdRoll = Quat((0,0,dRoll)) #quat = Quat((ra,dec,roll)) in degrees
+    qStarcam2Gyros_old=qdYaw*qdPitch*qdRoll
+    qStarcam2Gyros_mid=qdPitch*qdYaw*qdRoll
+    qStarcam2Gyros_new=qdRoll*qdPitch*qdYaw
+    
+    
     fig=[]
     ax=[]
     fig.append(plt.figure(1)) 
-    ax.append(plt.subplot(311,xlabel='Time (frames)',ylabel='DEC (deg)'))
-    ax.append(plt.subplot(312,xlabel='Time (frames)',ylabel='RA (deg)'))
-    ax.append(plt.subplot(313,xlabel='Time (frames)',ylabel='ROLL (deg)'))
+    ax.append(plt.subplot(311))
+    ax.append(plt.subplot(312))
+    ax.append(plt.subplot(313))
     
     plt.ion()
     
@@ -48,24 +61,54 @@ if __name__ == '__main__':
         data=ds.df.dropna().loc[max(ds.df.index)-lastNValues:,:]
         #data=ds.df.dropna().tail(lastNValues) #we get the last values of the dataframe
         
-        #data.index=data.index/ds.freq #index in seconds
+        d={
+            'ra_old': [],
+            'dec_old': [],
+            'roll_old': [],
+            'ra_mid': [],
+            'dec_mid': [],
+            'roll_mid': [],
+            'ra_new': [],
+            'dec_new': [],
+            'roll_new': []}
+        
+        for mceFN in data.index:
+            qI2Starcam=Quat((data.loc[mceFN][['ra_sc','dec_sc','roll_sc']]))
+            #data.index=data.index/ds.freq #index in seconds
+            
+            q_old=qStarcam2Gyros_old*qI2Starcam
+            q_mid=qStarcam2Gyros_mid*qI2Starcam
+            q_new=qStarcam2Gyros_new*qI2Starcam
+            
+            d['ra_old'].append(q_old.ra)
+            d['dec_old'].append(q_old.dec)
+            d['roll_old'].append(q_old.roll)
+            
+            d['ra_mid'].append(q_mid.ra)
+            d['dec_mid'].append(q_mid.dec)
+            d['roll_mid'].append(q_mid.roll)
+            
+            d['ra_new'].append(q_new.ra)
+            d['dec_new'].append(q_new.dec)
+            d['roll_new'].append(q_new.roll)
 
+        qs = pd.DataFrame(d,index = data.index)
 
         for axis in ax: axis.clear()
   
         #plotting elevation and crossElevation
         
-        data['dec_sc'].plot(ax=ax[0])
-        data['ra_sc'].plot(ax=ax[1])
-        data['roll_sc'].plot(ax=ax[2])
+        qs[['dec_old','dec_mid','dec_new']].plot(ax=ax[0])
+        qs[['ra_old','ra_mid','ra_new']].plot(ax=ax[1])
+        qs[['roll_old','roll_mid','roll_new']].plot(ax=ax[2])
         
-        for axis in ax[:3]: axis.set_xlabel('Time (frames)')
+        ax[2].set_xlabel('Time (frames)')
          
         ax[0].set_ylabel('DEC (deg)')
         ax[1].set_ylabel('RA (deg)')
         ax[2].set_ylabel('ROLL (deg)')      
         
-        #plt.draw()
+        plt.tight_layout()
         plt.pause(0.01)
         del ds.df
         ds.df=data #we delete some memory

@@ -48,8 +48,8 @@ if __name__ == '__main__':
     
     #target 1
     
-    initial_time=5147000 #in frame number
-    final_time = 5149000 #in frame number
+    initial_time=4950000 #in frame number
+    final_time = None #in frame number
     
     #===========================================================================
     # initial_time=5047000 #in frame number

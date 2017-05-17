@@ -4,7 +4,6 @@ Quaternion provides a class for manipulating quaternion objects.  This class pro
          to/from quaternions
     - class methods to multiply and divide quaternions 
 """
-
 """Copyright 2009 Smithsonian Astrophysical Observatory
     Released under New BSD / 3-Clause BSD License
     All rights reserved
@@ -142,6 +141,9 @@ class Quat(object):
             elif self._T is not None:
                 self._q = self._transform2quat()
                 self._equatorial = self._quat2equatorial()
+        if self._equatorial[0]>180: self._equatorial[0]=self._equatorial[0]-360
+        if self._equatorial[2]>180: self._equatorial[2]=self._equatorial[2]-360
+        
         return self._equatorial
 
     equatorial = property(_get_equatorial, _set_equatorial)
@@ -437,3 +439,68 @@ def normalize(array):
     """
     quat = np.array(array)
     return quat / np.sqrt(np.dot(quat, quat))
+
+matrix =[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]
+
+def DCM2FordAngles(matrix,rollArnab=0,prVersions=False):
+    trace = matrix [0][0] + matrix [1][1] + matrix [2][2];
+
+    if(trace > 0):  # positive trace
+        sr = np.sqrt(1 + trace);
+        sr2 = 2 * sr;
+        x = (matrix[1][2] - matrix[2][1]) / sr2;
+        y = (matrix[2][0] - matrix[0][2]) / sr2;
+        z = (matrix[0][1] - matrix[1][0]) / sr2;
+        r = 0.5 * sr;
+    
+    else:  # negative trace
+        if((matrix[0][0] > matrix[1][1]) and (matrix[0][0] > matrix[2][2])):
+            # Maximum Value at matrix[0][0]
+            sr = sqrt(1 + (matrix[0][0] - (matrix[1][1] + matrix[2][2])));
+            sr2 = 2 * sr;
+            x = 0.5 * sr;
+            y = (matrix[1][0] + matrix[0][1]) / sr2;
+            z = (matrix[2][0] + matrix[0][2]) / sr2;
+            r = (matrix[1][2] - matrix[2][1]) / sr2;
+        
+        elif (matrix[1][1] > matrix[2][2]) :
+            # Maximum Value at matrix[1][1]
+            sr = sqrt(1 + (matrix[1][1] - (matrix[2][2] + matrix[0][0])));
+            sr2 = 2 * sr;
+            x = (matrix[1][0] + matrix[0][1]) / sr2;
+            y = 0.5 * sr;
+            z = (matrix[1][2] + matrix[2][1]) / sr2;
+            r = (matrix[2][0] - matrix[0][2]) / sr2;
+        
+        else:
+            # Maximum Value at matrix[2][2]
+            sr = sqrt(1 + (matrix[2][2] - (matrix[0][0] + matrix[1][1])));
+            sr2 = 2 * sr;
+            x = (matrix[2][0] + matrix[0][2]) / sr2;
+            y = (matrix[1][2] + matrix[2][1]) / sr2;
+            z = 0.5 * sr;
+            r = (matrix[0][1] - matrix[1][0]) / sr2;
+        
+    q=Quat(x, y, z, r).inv();
+    if prVersions:
+        dYaw=q.ra
+        dPitch = -q.dec
+        qdYaw = Quat((dYaw,0,0)); #quat = Quat((ra,dec,roll)) in degrees
+        qdPitch = Quat((0.0,sin(dPitch*np.pi/180./2.0),0.0,cos(dPitch*np.pi/180./2.0))) #quat = Quat((ra,dec,roll)) in degreesq
+        qdRoll = Quat((0,0,-rollArnab)) #quat = Quat((ra,dec,roll)) in degrees
+        
+    qStarcam2Gyros_old=qdYaw*qdPitch*qdRoll
+    qStarcam2Gyros_mid=qdPitch*qdYaw*qdRoll
+    qStarcam2Gyros_new=qdRoll*qdPitch*qdYaw
+    
+    print "\tYAW\tPITCH\tROLL"
+    print "old\t",qStarcam2Gyros_old.ra,'\t',-qStarcam2Gyros_old.dec,'\t',qStarcam2Gyros_old.roll
+    print "mid\t",qStarcam2Gyros_mid.ra,'\t',-qStarcam2Gyros_mid.dec,'\t',qStarcam2Gyros_mid.roll
+    print "new\t",qStarcam2Gyros_new.ra,'\t',-qStarcam2Gyros_new.dec,'\t',qStarcam2Gyros_new.roll
+    
+    return q
+
+

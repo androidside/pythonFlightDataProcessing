@@ -18,8 +18,7 @@ import seaborn.apionly as sns
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 from scipy.signal.spectral import periodogram
-import quat
-from quat import Quat
+from quat import Quat,normalize
 
 
 # plotting parameters
@@ -187,7 +186,7 @@ class DataSet():
         qi_list = load_single_field(folder+'bettii.RTLowPriority.qi','f8')
         qj_list = load_single_field(folder+'bettii.RTLowPriority.qj','f8')
         qk_list = load_single_field(folder+'bettii.RTLowPriority.qk','f8')
-        estimated_quatlist = [Quat(quat.normalize((qi_list[i],qj_list[i],qk_list[i],qr_list[i]))) for i in range(len(qr_list))]
+        estimated_quatlist = [Quat(normalize((qi_list[i],qj_list[i],qk_list[i],qr_list[i]))) for i in range(len(qr_list))]
         est_ra = [q.ra*3600. for q in estimated_quatlist]
         est_dec = [q.dec*3600. for q in estimated_quatlist]
         est_roll = [q.roll*3600. for q in estimated_quatlist]
@@ -236,7 +235,7 @@ class DataSet():
         
         # convert to ra/dec/roll
         #print df_solution.iloc[5][['meas_qi','meas_qj','meas_qk','meas_qr']]
-        measured_quatlist = [Quat(quat.normalize(df_solution.loc[mceFN][['meas_qi','meas_qj','meas_qk','meas_qr']])) for mceFN in df_solution.index]
+        measured_quatlist = [Quat(normalize(df_solution.loc[mceFN][['meas_qi','meas_qj','meas_qk','meas_qr']])) for mceFN in df_solution.index]
         meas_ra_calc = [q.ra*3600. for q in measured_quatlist]
         meas_dec_calc = [q.dec*3600. for q in measured_quatlist]
         meas_roll_calc = [q.roll*3600. for q in measured_quatlist]
