@@ -13,8 +13,8 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
 if __name__ == '__main__':
-    #folder = "C:/17-04-24_19_02_57/"
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-17_01_37_35\\"
+    folder = "C:/17-05-17_00_36_34/"
+    #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-17_01_37_35\\"
     
     Field.DTYPES=getDtypes(folder)
 
@@ -35,8 +35,13 @@ if __name__ == '__main__':
 
     mpl.style.use('classic') 
     mpl.rcParams['toolbar'] = 'None'
+
     
     ds = DataSet(folder,rpeaks=True)
+    ds.readListFields(fieldsList, nValues=1000,start=1000,verbose=True)   
+    #ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
+    data=ds.df
+    #initial plot
     fig=[]
     ax={}
     fig.append(plt.figure(1)) 
@@ -50,52 +55,64 @@ if __name__ == '__main__':
     
     ax['pid_wheels']=(plt.subplot(414,ylabel='wheels angle'))
     
-    plt.ion()
+
     
-    lastNValues=48000
+    data['ccmg_ut'].plot(ax=ax['pid_ccmg1'])
+    data['ccmg_et'].plot(ax=ax['pid_ccmg2'])
+    data[['P CCMG','I CCMG','D CCMG']].plot(ax=ax['pid_ccmg3'])
+    
+    data['mom_ut'].plot(ax=ax['pid_mom1'])
+    data['mom_et'].plot(ax=ax['pid_mom2'])
+    data[['P MomDump','I MomDump','D MomDump']].plot(ax=ax['pid_mom3'])
+    
+    data['wheels_angle'].plot(ax=ax['pid_wheels'])  
+    
+    m={} #map axes to columns
+    for a in ax.keys(): m[a]=[l.get_label() for l in ax[a].get_lines()]
+    
+    plt.ion()
+     
+    plt.draw()
+    fig[0].tight_layout()
+    lastNValues=40000
     nValues=12000
     i=-1
     while True:
         #i=i+1
         #print 'Reading bytes from '+str(nValues*i)+' to '+str(nValues*(i+1)) 
-        ds.readListFields(fieldsList, nValues=nValues,verbose=False)   
-        #ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
+        #ds.readListFields(fieldsList, nValues=nValues,verbose=False)   
+        i=i+1;ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
         data=ds.df.loc[max(ds.df.index)-lastNValues:,:]
 
-
-        for axis in ax.values(): axis.clear()
-                         
-        ax['pid_ccmg1'].set_ylabel('ut')
-        ax['pid_ccmg2'].set_ylabel('et')
-        ax['pid_ccmg3'].set_ylabel('PID CCMG')
-        
-        ax['pid_mom1'].set_ylabel('ut')
-        ax['pid_mom2'].set_ylabel('et')
-        ax['pid_mom3'].set_ylabel('PID MomDump')
-        
-        ax['pid_wheels'].set_ylabel('wheels angle')
         #plotting elevation and crossElevation
         try:
-            data['ccmg_ut'].dropna().plot(ax=ax['pid_ccmg1'])
-            data['ccmg_et'].dropna().plot(ax=ax['pid_ccmg2'])
-            data[['P CCMG','I CCMG','D CCMG']].dropna().plot(ax=ax['pid_ccmg3'])
-             
-            data['mom_ut'].dropna().plot(ax=ax['pid_mom1'])
-            data['mom_et'].dropna().plot(ax=ax['pid_mom2'])
-            data[['P MomDump','I MomDump','D MomDump']].dropna().plot(ax=ax['pid_mom3'])
-            
-            data['wheels_angle'].dropna().plot(ax=ax['pid_wheels'])         
-            
+            x=data.index
+            xlims=(min(x),max(x))
+            for key in ax.keys():
+                columns=m[key]
+                axis=ax[key]
+                lines=axis.get_lines()
+                ylims=[+1e30,-1e30]
+                for k in range(len(lines)) :
+                    line=lines[k]
+                    column=columns[k]
+                    y=data[column].dropna()
+                    x=y.index
+                    y=y.values
+                    line.set_data(x,y)
+                    ylims[0]=min(min(y),ylims[0])
+                    ylims[1]=max(max(y),ylims[1])
+                axis.set_xlim(xlims)
+                axis.set_ylim(ylims)
+                #axis.autoscale()
 
         except Exception, err:
-            print err
-        
-        plt.tight_layout()
-        
-        plt.draw()
-        plt.pause(0.01)
+            print err      
+
         del ds.df
         ds.df=data #we delete some memory
+        #plt.draw()
+        plt.pause(0.01)
     plt.show()
 
     
