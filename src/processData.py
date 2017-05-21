@@ -35,26 +35,27 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasXarcsec',label='biasX'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='biasY')) 
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='biasZ')) 
-    
-    #===========================================================================
-    # fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
-    # fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
-    # fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
-    #===========================================================================
+    fieldsList.append(Field('bettii.PIDOutputCCMG.et',label='et_ccmg'))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
    
+    fieldsList.append(Field('bettii.RTHighPriority.EstimatorErrorRespectLastSCAzArcsec',label='err_az'))
+    fieldsList.append(Field('bettii.RTHighPriority.EstimatorErrorRespectLastSCElArcsec',label='err_el'))
+    fieldsList.append(Field('bettii.RTHighPriority.EstimatorErrorRespectLastSCRollArcsec',label='err_roll'))
     #fieldsList = getFieldsContaining('CCMG',folder)   
     
     #fieldsList = getFieldsRegex('bettii.[U-Z]+',folder)
     
     #target 1
     
-    initial_time=4950000 #in frame number
-    final_time = None #in frame number
+    #===========================================================================
+    # initial_time=None #in frame number
+    # final_time = None #in frame number
+    #===========================================================================
     
-    #===========================================================================
-    # initial_time=5047000 #in frame number
-    # final_time = 5244000 #in frame number
-    #===========================================================================
+    initial_time=5145000 #in frame number
+    final_time = 5149000 #in frame number
     
     #target 2
     
@@ -63,17 +64,15 @@ if __name__ == '__main__':
     # final_time = 6303000 #in frame number
     #===========================================================================
     
-    #===========================================================================
-    # initial_time=None #in frame number
-    # final_time = None #in frame number
-    #===========================================================================
+    initial_time=1000 #in frame number
+    final_time = None #in frame number
     
     ds = DataSet(folder,fieldsList=fieldsList,starcam=True,min=initial_time,max=final_time,verbose=True)
     
     print 'Dataframe shape:', ds.df.shape
     data=ds.df.interpolate(method='values')
     #data.index=data.index/ds.freq #index in seconds
-    matplotlib.style.use('ggplot')
+    matplotlib.style.use('classic')
     #plotting RA and DEC target vs estimated
     plt.figure(1)
     ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC (deg)')
@@ -111,6 +110,19 @@ if __name__ == '__main__':
     data['biasY'].plot(ax=ax2)
     data['biasZ'].plot(ax=ax3)
     
+    plt.figure(5)
+    data=ds.df['et_ccmg'].dropna()
+    ax1=plt.subplot(111,ylabel='CCMG et')
+    data.plot(ax=ax1)
+    
+    plt.figure(6)
+    data=ds.df[['err_az','err_el','err_roll']].dropna()
+    ax1=plt.subplot(311,ylabel='Error Az (arcsec)')
+    ax2=plt.subplot(312,ylabel='Error El (arcsec)')
+    ax3=plt.subplot(313,xlabel='Time (frames)',ylabel='Error Roll (arcsec)')
+    data['err_az'].plot(ax=ax1)
+    data['err_el'].plot(ax=ax2)
+    data['err_roll'].plot(ax=ax3)
 
 
     
@@ -140,32 +152,9 @@ if __name__ == '__main__':
     #plt.draw()
     #print ds.df
     #ds.simplePlot('elevation')
-    #===========================================================================
-    # gyros = ['gyroX','gyroY','gyroZ']
-    # 
-    # ds.plotGyros(show=show)
-    # fig,axlist = plt.subplots(3,figsize=(5.9,8),dpi=120)
-    # for i in range(3):
-    #     ax = axlist[i]
-    #     ax.scatter(ds.df.index/400.,ds.df[gyros[i]],color=blue)
-    # plt.show()
-    # ds.multiPSD(gyros,show=show,loglog=True)
-    # ds.multiPSD(gyros,show=show,loglog=False,name="multiPSD_no_loglog")
-    # ds.multiPSD(gyros,show=show,loglog=False,name="multiPSD_no_loglog_zoom",minMax=[24,28])
-    # 
-    # ds.scatterPlots(['gyroX','gyroY'],show=show)
-    # ds.scatterPlots(['gyroX','gyroZ'],show=show)
-    # ds.scatterPlots(['gyroY','gyroZ'],show=show)
-    #===========================================================================
 
-#===============================================================================
-#     
-#     ind=ds.df.index
-# us=[i*2500 for i in ds.df.index]
-# dic={'year': [2017] * len(us), 'month': [04] * len(us), 'day': [24] * len(us), 'us': us}
-# dfdt=ds.df.set_index(pd.to_datetime(pd.DataFrame(dic)).values)
-# rs=dfdt.resample('1ms')
-#===============================================================================
+     
+
     print errRA[errRA.abs()<1e-3]
     print errDEC[errDEC.abs()<1e-3]
         

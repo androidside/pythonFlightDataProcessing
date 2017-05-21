@@ -48,20 +48,22 @@ def load_single_field(fieldname,datatype,nValues=None,start=None):
     type_str_final = "<"+datatype # change endianness
     
     if nValues is None:
-        f=fieldname
-        nValues=-1
+        field = np.fromfile(fieldname,dtype=np.dtype(type_str_native))
     else:
         bpv=int(datatype[-1]) #bytes per value
         f = open(fieldname, "rb")
-        if start is None:
-            nBytes=nValues*bpv 
-            f.seek(-nBytes, os.SEEK_END)
-        else:
-            nBytes=start*bpv
-            f.seek(nBytes, os.SEEK_SET)
-
+        try:
+            if start is None:
+                nBytes=nValues*bpv 
+                f.seek(-nBytes, os.SEEK_END)
+            else:
+                nBytes=start*bpv
+                f.seek(nBytes, os.SEEK_SET)
     
-    field = np.fromfile(f,dtype=np.dtype(type_str_native),count=nValues) 
+        
+            field = np.fromfile(f,dtype=np.dtype(type_str_native),count=nValues)
+        finally:
+            f.close()
 
     field = field.astype(type_str_final)
     return field
@@ -344,8 +346,8 @@ class DataSet():
         else: ax = ax_key
         print "Calculating power spectral density..."
         f, Pxx_den = periodogram(data, self.freq)
-        if loglog: ax.loglog(f,Pxx_den,color=blue,label=column)
-        else:ax.plot(f,Pxx_den,color=blue,label=column)
+        if loglog: ax.loglog(f,Pxx_den,label=column)
+        else:ax.plot(f,Pxx_den,label=column)
         ax.set_xlabel('Frequency [Hz]')
         ax.set_ylabel('PSD ['+units+']')
         if minPlot !=None and minMax==[]: ax.set_xlim([minPlot,max(f)])

@@ -14,7 +14,7 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 if __name__ == '__main__':
     folder = "C:/17-05-17_00_36_34/"
-    #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-17_01_37_35\\"
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-19_20_57_10\\"
     
     Field.DTYPES=getDtypes(folder)
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     
     ds = DataSet(folder,rpeaks=True)
-    ds.readListFields(fieldsList, nValues=1000,start=1000,verbose=True)   
+    ds.readListFields(fieldsList, nValues=1000,verbose=True)   
     #ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
     data=ds.df
     #initial plot
@@ -74,14 +74,14 @@ if __name__ == '__main__':
      
     plt.draw()
     fig[0].tight_layout()
-    lastNValues=40000
-    nValues=12000
+    lastNValues=4000
+    nValues=1200
     i=-1
     while True:
         #i=i+1
         #print 'Reading bytes from '+str(nValues*i)+' to '+str(nValues*(i+1)) 
-        #ds.readListFields(fieldsList, nValues=nValues,verbose=False)   
-        i=i+1;ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
+        ds.readListFields(fieldsList, nValues=nValues,verbose=False)   
+        #i=i+1;ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
         data=ds.df.loc[max(ds.df.index)-lastNValues:,:]
 
         #plotting elevation and crossElevation
@@ -111,8 +111,9 @@ if __name__ == '__main__':
 
         del ds.df
         ds.df=data #we delete some memory
-        #plt.draw()
-        plt.pause(0.01)
+        plt.draw()
+        fig[0].tight_layout()
+        plt.pause(0.1)
     plt.show()
 
     

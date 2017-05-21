@@ -31,8 +31,8 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTHighPriority.targetRA'))
     fieldsList.append(Field('bettii.RTHighPriority.GondolaDecDeg'))
     fieldsList.append(Field('bettii.RTHighPriority.GondolaRaDeg'))
-    fieldsList.append(Field('bettii.RTHighPriority.GondolaRaDeg'))
-    fieldsList.append(Field('bettii.RTHighPriority.GondolaRaDeg'))
+    #fieldsList.append(Field('bettii.PIDOutputMomDump.et',label='mom_et'))
+    ##fieldsList.append(Field('bettii.PIDOutputCCMG.et',label='ccmg_et'))
     fieldsList.append(Field('bettii.RTLowPriority.qr'))
     fieldsList.append(Field('bettii.RTLowPriority.qi'))
     fieldsList.append(Field('bettii.RTLowPriority.qj'))
@@ -48,29 +48,11 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraAzDeg',label='az_sc',conversion=1))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraElDeg',label='el_sc',conversion=1))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered',label='triggers'))
-    
-    #===========================================================================
-    # fieldsList.append(Field('bettii.RTHighPriority.SCAnglesInertialGondolaRefFrameArcsecDec',label='dec_sc',conversion=1/3600.))
-    # fieldsList.append(Field('bettii.RTHighPriority.SCAnglesInertialGondolaRefFrameArcsecRa',label='ra_sc',conversion=1/3600.))
-    # fieldsList.append(Field('bettii.RTHighPriority.SCAnglesInertialGondolaRefFrameArcsecRoll',label='roll_sc',conversion=1/3600.))
-    #===========================================================================
-    
     fieldsList.append(Field('bettii.GriffinsGalil.griffinBAngleDegrees',label='griffin_angle')) #44.114721
     
-    
-    #===========================================================================
-    # fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
-    # fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
-    # fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
-    #===========================================================================
-   
-    #fieldsList = getFieldsContaining('CCMG',folder)   
-    
-    #fieldsList = getFieldsRegex('bettii.[U-Z]+',folder)
-    
     #target 1    
-    initial_time=5147500 #in frame number
-    final_time = 5153400 #in frame number
+    initial_time=5145000 #in frame number
+    final_time = 5149000 #in frame number
     
     #target 2
     #===========================================================================
@@ -91,69 +73,80 @@ if __name__ == '__main__':
     qdRoll = Quat((0,0,dRoll)) #quat = Quat((ra,dec,roll)) in degrees
     
     #qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
-    qStarcam2Gyros_new =  Quat((dYaw,-dPitch,qdRoll))
+
     qStarcam2Gyros_old =  qdYaw*qdPitch*qdRoll
+    qStarcam2Gyros_mid =  qdPitch*qdYaw*qdRoll
+    qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
+    
+    qStarcam2Gyros=[qStarcam2Gyros_old,qStarcam2Gyros_mid,qStarcam2Gyros_new]
     
     ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=False)
     ds.df=ds.df.interpolate(method='values').dropna()
+    
+    q_est_list=[]    
+    q_sc_list=[]
+    qI2Starcam_list=[]
+    qStarcam2Est_list=[]
+    qGyros2Est_list=[]
+    for mceFN in ds.df.index:
+        q_est=Quat(normalize(ds.df.loc[mceFN][['qi','qj','qk','qr']]))
+        q_sc=Quat((ds.df.loc[mceFN][['qi_sc','qj_sc','qk_sc','qr_sc']]))
+        q_est_list.append(q_est)
+        q_sc_list.append(q_sc)
     q_est_list=[Quat(normalize(ds.df.loc[mceFN][['qi','qj','qk','qr']])) for mceFN in ds.df.index]
     
     q_sc_list=[Quat((ds.df.loc[mceFN][['qi_sc','qj_sc','qk_sc','qr_sc']])) for mceFN in ds.df.index]
-    qI2Starcam_list=[qStarcam2Gyros_old.inv()*q_sc for q_sc in q_sc_list]
+    qI2Starcam_list=[qStarcam2Gyros_old.inv()*q_sc for q_sc in q_sc_list] #my bet but who knows.. :(
     
     qStarcam2Est_list=[ q_est*qI2Starcam.inv() for q_est,qI2Starcam in izip_longest(q_est_list,qI2Starcam_list)] #q_est=qStarcam2Est*qI2Starcam
-    
-    
+
     #qStarcam2Est=qGyros2Est*qStarcam2Gyros_old
     qGyros2Est_list= [ qStarcam2Est*qStarcam2Gyros_old.inv() for qStarcam2Est in qStarcam2Est_list] #the correction the estimator is applying to the measure (any better way to do that?)
     
-    q_est_new_list = [ qGyros2Est*qStarcam2Gyros_new*qI2Starcam for qGyros2Est,qI2Starcam in izip_longest(qGyros2Est_list,qI2Starcam_list)]
-    q_sc_new_list = [ qStarcam2Gyros_new*qI2Starcam for qI2Starcam in qI2Starcam_list]
-    q_tel_new_list = [Quat((0,griffin_angle,0))*q_est_new for q_est_new,griffin_angle in izip_longest(q_est_new_list,ds.df['griffin_angle'])]
-    q_tel2_new_list = [Quat((0,griffin_angle,0))*q_sc_new for q_sc_new,griffin_angle in izip_longest(q_sc_new_list,ds.df['griffin_angle'])]
+    q_est_corrected={'ra':[],'dec':[],'roll':[]}
+    for qS2G in qStarcam2Gyros:
+        q_est = [Quat((0,ds.df['griffin_angle'].iloc[i],0))*qGyros2Est_list[i]*qS2G*qI2S for i,qI2S in enumerate(qI2Starcam_list)]
+        q_est_corrected['ra'].append([q.ra for i,q in enumerate(q_est)])
+        q_est_corrected['dec'].append([q.dec for i,q in enumerate(q_est)])
+        q_est_corrected['roll'].append([q.roll for i,q in enumerate(q_est)])
     
-    #q_tel_new_list=q_tel2_new_list
-    
-    d={'TelRA corrected' : [q.ra for q in q_tel_new_list],
-       'TelDEC corrected' : [q.dec for q in q_tel_new_list],
-       'tel_roll' : [q.roll for q in q_tel_new_list],
-       'ra_s2e' : [q.ra for q in qStarcam2Est_list],
-       'dec_s2e' : [q.dec for q in qStarcam2Est_list],
-       'roll_s2e' : [q.roll for q in qStarcam2Est_list]}
-    
-    teldata= pd.DataFrame(d,index = ds.df.index)
+    d={'ra_old' : q_est_corrected['ra'][0],
+       'ra_mid' : q_est_corrected['ra'][1],
+       'ra_new' : q_est_corrected['ra'][2],
+       'dec_old' : q_est_corrected['dec'][0],
+       'dec_mid' : q_est_corrected['dec'][1],
+       'dec_new' : q_est_corrected['dec'][2],
+       'roll_old' : q_est_corrected['roll'][0],
+       'roll_mid' : q_est_corrected['roll'][1],
+       'roll_new' : q_est_corrected['roll'][2]}
+    teldata= pd.DataFrame(d,index = ds.df.index).dropna()
     ds.df=pd.merge(ds.df,teldata,how='outer',left_index=True,right_index=True)
-
     data=ds.df.dropna()
-    
-         
     print 'Dataframe shape:', ds.df.shape
     
     
     matplotlib.style.use('ggplot')
-    
     plt.ion()
     
     plt.figure(1)
-    ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC (deg)')
-    ax2=plt.subplot(212,xlabel='Time (frames)',ylabel='RA (deg)')
+    ax1=plt.subplot(211,ylabel='RA (deg)')
+    ax2=plt.subplot(212,xlabel='Time (frames)',ylabel='DEC (deg)')
     
-    data[['targetDEC','TelescopeDecDeg','TelDEC corrected']].plot(ax=ax1)
-    data[['targetRA','TelescopeRaDeg','TelRA corrected']].plot(ax=ax2)
+    plt.figure()
+    ax3=plt.subplot(111,xlabel='Time (frames)',ylabel='ROLL (deg)')
     
-    plt.figure(2)
-    ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC (deg)')
-    ax2=plt.subplot(212,xlabel='Time (frames)',ylabel='RA (deg)')
+    data[['ra_old','ra_mid','targetRA']].plot(ax=ax1)
+    data[['dec_old','dec_mid','targetDEC']].plot(ax=ax2)
+    data[['roll_old','roll_mid','roll_new']].plot(ax=ax3)
     
-    data['ra_s2e'].plot(ax=ax1)
-    data['dec_s2e'].plot(ax=ax2)
+   
     
     
     plt.draw()
 
     plt.pause(0.1)
-    errDEC=(data['TelDEC corrected'].subtract(data.targetDEC))
-    errRA=(data['TelRA corrected'].subtract(data.targetRA))
+    errDEC=(data['dec_new'].subtract(data.targetDEC))
+    errRA=(data['ra_new'].subtract(data.targetRA))
     print errDEC[errDEC.abs()<1e-3]
     print errRA[errRA.abs()<1e-3]
     a=1

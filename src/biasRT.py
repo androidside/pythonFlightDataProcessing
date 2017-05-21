@@ -13,8 +13,8 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
 if __name__ == '__main__':
-    #folder = "C:/17-04-24_19_02_57/"
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-17_00_36_34\\"
+    folder = "C:/17-05-17_00_36_34/"
+    #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-17_00_36_34\\"
     
     Field.DTYPES=getDtypes(folder)
 
@@ -25,8 +25,8 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='bias_y'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='bias_z'))
 
-    mpl.style.use('dark_background') 
-    mpl.rcParams['toolbar'] = 'None'
+    mpl.style.use('classic') 
+    #mpl.rcParams['toolbar'] = 'None'
     
     ds = DataSet(folder,rpeaks=True)
     fig=[]
@@ -38,13 +38,13 @@ if __name__ == '__main__':
     
     plt.ion()
     
-    lastNValues=48000
-    nValues=12000
+    lastNValues=900000
+    nValues=lastNValues
     i=-1
     while True:
         #i=i+1
         #print 'Reading bytes from '+str(nValues*i)+' to '+str(nValues*(i+1)) 
-        ds.readListFields(fieldsList, nValues=nValues,verbose=False,rpeaks=False)   
+        ds.readListFields(fieldsList, nValues=nValues,verbose=True,rpeaks=False)   
         #ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
         data=ds.df.loc[max(ds.df.index)-lastNValues:,:]
 
@@ -71,6 +71,8 @@ if __name__ == '__main__':
         plt.pause(0.01)
         del ds.df
         ds.df=data #we delete some memory
+        break
+    
+    plt.ioff()
     plt.show()
-
     

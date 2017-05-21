@@ -8,8 +8,7 @@ Main script
 from test._mock_backport import inplace
 print 'Imports...'
 import matplotlib as mpl
-import numpy as np
-from utils.dataset import pd,DataSet,plt
+from utils.dataset import pd,DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from utils.quat import Quat,sin,cos
 

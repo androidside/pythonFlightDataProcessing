@@ -17,7 +17,7 @@ from itertools import izip_longest
 if __name__ == '__main__':
 
     
-    folder='C:/17-05-16_03_06_46/'
+    folder='C:/17-05-17_00_36_34/'
     
     print "Getting data types..."
     Field.DTYPES=getDtypes(folder)
@@ -76,25 +76,25 @@ if __name__ == '__main__':
     # final_time = 6303000 #in frame number
     #===========================================================================
     #2975744
-    initial_time=2975744 #in frame number
-    final_time = 2976744 #in frame number
+    initial_time=1000000 #in frame number
+    final_time = 2000000 #in frame number
     
     #array([ -0.15321407, -44.77279865,  19.87575523])
-    dYaw=-0.367
-    dPitch=44.9828
-    dRoll=-0.79
-     
+    dYaw = -0.367
+    dPitch = 44.9828
+    dRoll = -0.79
     qdYaw = Quat((dYaw,0,0)); #quat = Quat((ra,dec,roll)) in degrees
     qdPitch = Quat((0.0,sin(dPitch*np.pi/180./2.0),0.0,cos(dPitch*np.pi/180./2.0))) #quat = Quat((ra,dec,roll)) in degreesq
     qdRoll = Quat((0,0,dRoll)) #quat = Quat((ra,dec,roll)) in degrees
-    
-    #qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
-    qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
-    qStarcam2Gyros_old =  qdYaw*qdPitch*qdRoll
+    qStarcam2Gyros_old=qdYaw*qdPitch*qdRoll
+    qStarcam2Gyros_mid=qdPitch*qdYaw*qdRoll
+    qStarcam2Gyros_new=qdRoll*qdPitch*qdYaw
     
     ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=True)
     ds.df=ds.df.interpolate(method='values').dropna()
     
+    data=ds.df.triggers.drop_duplicates()
+    ds.df=ds.df.loc[data.index]
     L=len(ds.df.index)
     
     print L," values"
@@ -110,8 +110,8 @@ if __name__ == '__main__':
         mceFN=ds.df.index[i]
         q_est_list[i]=Quat((ds.df.loc[mceFN][['qi','qj','qk','qr']]))
         q_sc_list[i]=Quat((ds.df.loc[mceFN][['qi_sc','qj_sc','qk_sc','qr_sc']]))
-        qI2Starcam_list[i]=qStarcam2Gyros_old.inv()*q_sc_list[i]
-        #qStarcam2Gyros_list[i]=q_sc_list[i]*qI2Starcam_list[i].inv() #when we have the good roll in the telemetries!!
+        qI2Starcam_list[i]=Quat((ds.df.loc[mceFN][['ra_sc','dec_sc','roll_sc']]))
+        qStarcam2Gyros_list[i]=q_sc_list[i]*qI2Starcam_list[i].inv() #when we have the good roll in the telemetries!!
         qStarcam2Est_list[i]=q_est_list[i]*qI2Starcam_list[i].inv() #q_est=qStarcam2Est*qI2Starcam
         if (i*100/L %10)==0: print 'quat', i,'of',L,",", i*100./L,'%'
 
