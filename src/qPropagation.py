@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     
     folder='C:/16-09-28_21_58_34-/'
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_02_46_56\\"
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_01_42_03\\"
     Field.DTYPES=getDtypes(folder)
     
     fieldsList=[]
@@ -28,13 +28,16 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqj',label='qj_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqk',label='qk_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqr',label='qr_sc'))
-     
+    fieldsList.append(Field('bettii.RTLowPriority.qr'))
+    fieldsList.append(Field('bettii.RTLowPriority.qi'))
+    fieldsList.append(Field('bettii.RTLowPriority.qj'))
+    fieldsList.append(Field('bettii.RTLowPriority.qk'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraDecDeg',label='dec_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRaDeg',label='ra_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered',label='triggers'))
     #fieldsList.append(Field('bettii.GriffinsGalil.griffinBAngleDegrees',label='griffin_angle')) #44.114721
-    fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
-    fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=-0.0006304))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=-0.0006437))
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
     
 
@@ -58,7 +61,7 @@ if __name__ == '__main__':
     
     qStarcam2Gyros=qStarcam2Gyros_old#[qStarcam2Gyros_old,qStarcam2Gyros_mid,qStarcam2Gyros_new]
     
-    ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,nValues=200000,min=initial_time,max=final_time,verbose=True)
+    ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,nValues=300000,min=initial_time,max=final_time,verbose=True)
     ds.df=ds.df.interpolate(method='values').dropna()
     print 'Dataframe shape:', ds.df.shape
     
@@ -70,63 +73,66 @@ if __name__ == '__main__':
     qI2Starcam_list=[]
     print "Generating quaternions..."
     for mceFN in ds.df.index:
-        q_est=Quat(normalize(ds.df.loc[mceFN][['qi','qj','qk','qr']]))
+        q_est=Quat((ds.df.loc[mceFN][['qi','qj','qk','qr']]))
         q_sc=Quat((ds.df.loc[mceFN][['qi_sc','qj_sc','qk_sc','qr_sc']]))
         q_est_list.append(q_est)
         q_sc_list.append(q_sc)
         qI2Starcam_list.append(qStarcam2Gyros.inv()*q_sc) #no other way to get the SC solution :(
     triggers=ds.df['triggers'].drop_duplicates()
-    i2s=pd.DataFrame({'qI2S': qI2Starcam_list},index=ds.df.index)
+    i2s=pd.DataFrame({'qI2S': qI2Starcam_list,'qI2G': q_sc_list, 'qest':q_est_list},index=ds.df.index)
     i2s=i2s.loc[triggers.index]
     i2s.index=triggers.values
     meas=pd.merge(ds.df[['gyroX','gyroY','gyroZ']], i2s, how='outer',left_index=True,right_index=True)
-    difs=[]
-    props=[]
-    scs=[]
-    for i in range(len(triggers.values)-1):
-        t_start=triggers.iloc[i]
-        t_end=triggers.iloc[i+1]
-        gyros=meas.loc[t_start:t_end].dropna(subset=['gyroX'])
-        M=np.eye(4)
-        for j in range(len(gyros.index)):
-            dt=(meas.index[j+1]-meas.index[j])/400.
-            bias=[0, 0, 0]#-0.04,-0.17,0.04] #in arcsec
-            w=(gyros.iloc[j,:3].as_matrix()-bias)*(1/3600.*np.pi/180) #arcsec2rad conversion
-            wx=w[0];wy=w[1];wz=w[2]
-            Ow=np.matrix([[0,wz,-wy,wy],[-wz,0,wx,wy],[wy,-wx,0,wz],[-wx,-wy,-wz,0]]) #Omega(omega)
-            M=scipy.linalg.expm(0.5*Ow*dt).dot(M)
-        
-        q_old=qStarcam2Gyros*meas['qI2S'].loc[t_start]
-        q_new=qStarcam2Gyros*meas['qI2S'].loc[t_end]
-        q_prop=Quat(M.dot(q_old.q))
-        q_dif=q_prop*q_new.inv()
+
+    
+
+    q_old=q_sc_list[0]
+    i_old=i2s.index[0]
+    q_prop=q_old
+    props=[q_prop]
+    i_prop=[i_old]
+    
+    gyros=meas.loc[i_old:].dropna(subset=['gyroX'])
+    M=np.eye(4)
+    print "Propagating..."
+    for j in range(len(gyros.index)-1):
+        dt=(gyros.index[j+1]-gyros.index[j])/400.
+        bias=[0, 0, 0]#-0.04,-0.17,0.04] #in arcsec
+        w=(gyros.iloc[j,:3].as_matrix()-bias)*(1/3600.*np.pi/180) #arcsec2rad conversion
+        wx=w[0];wy=w[1];wz=w[2]
+        Ow=np.matrix([[0,wz,-wy,wy],[-wz,0,wx,wy],[wy,-wx,0,wz],[-wx,-wy,-wz,0]]) #Omega(omega)
+        A=scipy.linalg.expm(0.5*Ow*dt)
+        M=A.dot(M)
+        q_prop=Quat(A.dot(q_prop.q))
         props.append(q_prop)
-        scs.append(q_new)
-        difs.append(q_dif)
+        i_prop.append(gyros.index[j+1])
+
     
-    
-    print difs
+    print "Plotting..."
     fig=plt.figure()
     ax=plt.subplot(111)
-    plt.plot(triggers.index[:-1],[q.ra for q in props])
-    plt.plot(triggers.index[1:],[q.ra for q in scs])
-    ax.legend(['Propagated','Starcamera'])                         
+    plt.plot(i_prop,[q.ra for q in props])
+    plt.plot(i2s.index,[q.ra for q in i2s.qI2G.values])
+    plt.plot(ds.df.index,[q.ra for q in q_est_list])
+    ax.legend(['Propagated','Starcamera','Estimated'])                         
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('RA (deg)')
         
     fig=plt.figure()
     ax=plt.subplot(111)
-    plt.plot(triggers.index[:-1],[q.dec for q in props])
-    plt.plot(triggers.index[1:],[q.dec for q in scs])
-    ax.legend(['Propagated','Starcamera'])  
+    plt.plot(i_prop,[q.dec for q in props])
+    plt.plot(i2s.index,[q.dec for q in i2s.qI2G.values])
+    plt.plot(ds.df.index,[q.dec for q in q_est_list])
+    ax.legend(['Propagated','Starcamera','Estimated'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('DEC (deg)')
         
     fig=plt.figure()
     ax=plt.subplot(111)
-    plt.plot(triggers.index[:-1],[q.roll for q in props])
-    plt.plot(triggers.index[1:],[q.roll for q in scs])
-    ax.legend(['Propagated','Starcamera'])  
+    plt.plot(i_prop,[q.roll for q in props])
+    plt.plot(i2s.index,[q.roll for q in i2s.qI2G.values])
+    plt.plot(ds.df.index,[q.roll for q in i2s.q_est_list])
+    ax.legend(['Propagated','Starcamera','Estimated'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('ROLL (deg)')
     plt.show()
