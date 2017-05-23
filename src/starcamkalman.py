@@ -36,28 +36,36 @@ if __name__ == '__main__':
     
     ds = DataSet(folder,fieldsList=fieldsList,min=initial_time,max=final_time,rpeaks=False,verbose=True)
     
-    dYaw=-0.367
+    dYaw=0.367
     dPitch=44.9828
-    dRoll=-0.79
+    dRoll=0.79
      
     qdYaw = Quat((dYaw,0,0)); #quat = Quat((ra,dec,roll)) in degrees
     qdPitch = Quat((0.0,sin(dPitch*np.pi/180./2.0),0.0,cos(dPitch*np.pi/180./2.0))) #quat = Quat((ra,dec,roll)) in degrees
     qdRoll = Quat((0,0,dRoll)) #quat = Quat((ra,dec,roll)) in degrees
     
     #qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
-
+    
     qStarcam2Gyros =  qdYaw*qdPitch*qdRoll
     
     fig=[]
     ax=[]
-    fig.append(plt.figure(1)) 
-    ax.append(plt.subplot(311))
-    ax.append(plt.subplot(312))
-    ax.append(plt.subplot(313))
-    fig.append(plt.figure(2)) 
-    ax.append(plt.subplot(311))
-    ax.append(plt.subplot(312))
-    ax.append(plt.subplot(313))
+    fig.append(plt.figure(1))
+    ax.append(fig[0].add_subplot(621))
+    ax.append(fig[0].add_subplot(623))
+    ax.append(fig[0].add_subplot(625))
+    #fig.append(plt.figure(2)) 
+    ax.append(fig[0].add_subplot(627))
+    ax.append(fig[0].add_subplot(629))
+    ax.append(fig[0].add_subplot(6,2,11))
+    #fig.append(plt.figure(3)) 
+    ax.append(fig[0].add_subplot(222))
+    #fig.append(plt.figure(4)) 
+    ax.append(fig[0].add_subplot(224))
+    fig.append(plt.figure(6)) 
+    ax.append(fig[1].add_subplot(311))
+    ax.append(fig[1].add_subplot(312))
+    ax.append(fig[1].add_subplot(313))
     
     plt.ion()
     
@@ -77,8 +85,12 @@ if __name__ == '__main__':
         'roll_sc_SC': [],
         'ra_est_SC': [],
         'dec_est_SC': [],
-        'roll_est_SC': []}
-    for mceFN in data.index:
+        'roll_est_SC': [],
+        'ra_e2sc': [],
+        'dec_e2sc': [],
+        'roll_e2sc': []}
+    m=100
+    for mceFN in data.index[::m]:
         q_est=Quat((data.loc[mceFN][['qi','qj','qk','qr']]))
         q_sc=Quat((data.loc[mceFN][['qi_sc','qj_sc','qk_sc','qr_sc']]))
         
@@ -92,6 +104,7 @@ if __name__ == '__main__':
         
         q_est_sc=qStarcam2Gyros.inv()*q_est
         q_sc_sc=qStarcam2Gyros.inv()*q_sc
+        q_e2sc=q_sc_sc*q_est.inv()
         
         d['ra_est_SC'].append(q_est_sc.ra)
         d['dec_est_SC'].append(q_est_sc.dec)
@@ -101,8 +114,12 @@ if __name__ == '__main__':
         d['dec_sc_SC'].append(q_sc_sc.dec)
         d['roll_sc_SC'].append(q_sc_sc.roll)
         
+        d['ra_e2sc'].append(q_e2sc.ra)
+        d['dec_e2sc'].append(q_e2sc.dec)
+        d['roll_e2sc'].append(q_e2sc.roll)
+        
     
-    qs = pd.DataFrame(d,index = data.index)
+    qs = pd.DataFrame(d,index = data.index[::m])
     
     for axis in ax: axis.clear()
     
@@ -119,6 +136,11 @@ if __name__ == '__main__':
         qs[['dec_sc_SC','dec_est_SC']].plot(ax=ax[3])
         qs[['ra_sc_SC','ra_est_SC']].plot(ax=ax[4])
         qs[['roll_sc_SC','roll_est_SC']].plot(ax=ax[5])
+        qs.plot(ax=ax[6],x='ra_sc_SC',y='dec_sc_SC',legend=None)
+        qs.plot(ax=ax[7],x='ra_est_SC',y='dec_est_SC',legend=None)
+        qs[['dec_e2sc']].plot(ax=ax[8])
+        qs[['ra_e2sc']].plot(ax=ax[9])
+        qs[['roll_e2sc']].plot(ax=ax[10])
     else:
         print ds.df.shape
         print data.shape
@@ -129,17 +151,22 @@ if __name__ == '__main__':
     ax[1].set_ylabel('RA (deg)')
     ax[2].set_ylabel('ROLL (deg)')
     
-    ax[2].set_xlabel('Time (frames)')
+    ax[5].set_xlabel('Time (frames)')
      
-    ax[0].set_ylabel('DEC (deg)')
-    ax[1].set_ylabel('RA (deg)')
-    ax[2].set_ylabel('ROLL (deg)')   
+    ax[3].set_ylabel('DEC (deg)')
+    ax[4].set_ylabel('RA (deg)')
+    ax[5].set_ylabel('ROLL (deg)')  
     
-    plt.tight_layout()
+    ax[6].set_xlabel('RA sc (deg)')
+    ax[6].set_ylabel('DEC sc (deg)')
+    
+    ax[7].set_xlabel('RA est (deg)')
+    ax[7].set_ylabel('DEC est (deg)')  
+    
+    #plt.tight_layout()
     plt.pause(0.01)
     del ds.df
     ds.df=data #we delete some memory
-    plt.ioff()
     plt.show()
-
+    a=1
     
