@@ -19,7 +19,8 @@ if __name__ == '__main__':
 
     
     folder='C:/16-09-28_21_58_34-/'
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_01_42_03\\"
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_02_46_56\\"
+    folder='C:/17-05-23_19_49_39/'
     Field.DTYPES=getDtypes(folder)
     
     fieldsList=[]
@@ -41,8 +42,11 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
     
 
-    initial_time=None #in frame number
-    final_time = None #in frame number
+    initial_time=4000000 #in frame number
+    final_time = 5100000 #in frame number
+    
+    initial_time=1150000 #in frame number
+    final_time = 1200000 #in frame number
     
     #array([ -0.15321407, -44.77279865,  19.87575523])
     dYaw=-0.367
@@ -61,8 +65,9 @@ if __name__ == '__main__':
     
     qStarcam2Gyros=qStarcam2Gyros_old#[qStarcam2Gyros_old,qStarcam2Gyros_mid,qStarcam2Gyros_new]
     
-    ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,nValues=300000,min=initial_time,max=final_time,verbose=True)
+    ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=True)
     ds.df=ds.df.interpolate(method='values').dropna()
+    ds.df=ds.df.loc[initial_time:final_time]
     print 'Dataframe shape:', ds.df.shape
     
     q_est_list=[]    
@@ -81,40 +86,41 @@ if __name__ == '__main__':
     triggers=ds.df['triggers'].drop_duplicates()
     i2s=pd.DataFrame({'qI2S': qI2Starcam_list,'qI2G': q_sc_list, 'qest':q_est_list},index=ds.df.index)
     i2s=i2s.loc[triggers.index]
-    i2s.index=triggers.values
-    meas=pd.merge(ds.df[['gyroX','gyroY','gyroZ']], i2s, how='outer',left_index=True,right_index=True)
+    i2s.index=triggers.values  
 
-    
-
-    q_old=q_sc_list[0]
-    i_old=i2s.index[0]
+    q_old=q_est_list[0]
+    i_old=ds.df.index[0]
     q_prop=q_old
     props=[q_prop]
     i_prop=[i_old]
     
-    gyros=meas.loc[i_old:].dropna(subset=['gyroX'])
-    M=np.eye(4)
+    gyros=ds.df[['gyroX','gyroY','gyroZ']].loc[i_old:].dropna()
+    C=np.eye(4)
     print "Propagating..."
     for j in range(len(gyros.index)-1):
         dt=(gyros.index[j+1]-gyros.index[j])/400.
         bias=[0, 0, 0]#-0.04,-0.17,0.04] #in arcsec
         w=(gyros.iloc[j,:3].as_matrix()-bias)*(1/3600.*np.pi/180) #arcsec2rad conversion
         wx=w[0];wy=w[1];wz=w[2]
-        Ow=np.matrix([[0,wz,-wy,wy],[-wz,0,wx,wy],[wy,-wx,0,wz],[-wx,-wy,-wz,0]]) #Omega(omega)
+        Ow=np.matrix([[0,wz,-wy,wx],[-wz,0,wx,wy],[wy,-wx,0,wz],[-wx,-wy,-wz,0]]) #Omega(omega)
         A=scipy.linalg.expm(0.5*Ow*dt)
-        M=A.dot(M)
+        C=A.dot(C)
         q_prop=Quat(A.dot(q_prop.q))
         props.append(q_prop)
         i_prop.append(gyros.index[j+1])
 
     
     print "Plotting..."
+    matplotlib.style.use('classic')
+    matplotlib.rcParams['axes.grid']=True
+    
     fig=plt.figure()
     ax=plt.subplot(111)
     plt.plot(i_prop,[q.ra for q in props])
     plt.plot(i2s.index,[q.ra for q in i2s.qI2G.values])
     plt.plot(ds.df.index,[q.ra for q in q_est_list])
-    ax.legend(['Propagated','Starcamera','Estimated'])                         
+    plt.plot(ds.df.index,[q.ra for q in q_sc_list])
+    ax.legend(['Propagated','Starcamera','Estimated','SC'])                         
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('RA (deg)')
         
@@ -123,7 +129,8 @@ if __name__ == '__main__':
     plt.plot(i_prop,[q.dec for q in props])
     plt.plot(i2s.index,[q.dec for q in i2s.qI2G.values])
     plt.plot(ds.df.index,[q.dec for q in q_est_list])
-    ax.legend(['Propagated','Starcamera','Estimated'])  
+    plt.plot(ds.df.index,[q.dec for q in q_sc_list])
+    ax.legend(['Propagated','Starcamera','Estimated','SC'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('DEC (deg)')
         
@@ -131,8 +138,9 @@ if __name__ == '__main__':
     ax=plt.subplot(111)
     plt.plot(i_prop,[q.roll for q in props])
     plt.plot(i2s.index,[q.roll for q in i2s.qI2G.values])
-    plt.plot(ds.df.index,[q.roll for q in i2s.q_est_list])
-    ax.legend(['Propagated','Starcamera','Estimated'])  
+    plt.plot(ds.df.index,[q.roll for q in q_est_list])
+    plt.plot(ds.df.index,[q.roll for q in q_sc_list])
+    ax.legend(['Propagated','Starcamera','Estimated','SC'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('ROLL (deg)')
     plt.show()
