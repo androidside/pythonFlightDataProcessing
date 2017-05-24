@@ -7,35 +7,32 @@ Main script
 '''
 print 'Imports...'
 import matplotlib as mpl
-from utils.dataset import DataSet,plt,sns
+from matplotlib.style import use
+from utils.dataset import DataSet,plt
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
 
 if __name__ == '__main__':
     folder = "C:/17-05-17_00_36_34/"
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-19_20_57_10\\"
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-23_23_25_41\\"
     
     Field.DTYPES=getDtypes(folder)
 
     
     fieldsList=[]
      
-    fieldsList.append(Field('bettii.PIDOutputCCMG.ut',label='ccmg_ut'))
-    fieldsList.append(Field('bettii.PIDOutputCCMG.et',label='ccmg_et'))
-    fieldsList.append(Field('bettii.PIDOutputMomDump.ut',label='mom_ut'))
-    fieldsList.append(Field('bettii.PIDOutputMomDump.et',label='mom_et'))
-    fieldsList.append(Field('bettii.PIDOutputCCMG.proportional',label='P CCMG'))   
-    fieldsList.append(Field('bettii.PIDOutputCCMG.integral',label='I CCMG'))
-    fieldsList.append(Field('bettii.PIDOutputCCMG.derivative',label='D CCMG'))
-    fieldsList.append(Field('bettii.PIDOutputMomDump.proportional',label='P MomDump'))   
-    fieldsList.append(Field('bettii.PIDOutputMomDump.integral',label='I MomDump'))
-    fieldsList.append(Field('bettii.PIDOutputMomDump.derivative',label='D MomDump'))
-    fieldsList.append(Field('bettii.StepperGalil.wheelsAngle',label='wheels_angle'))
+    fieldsList.append(Field('bettii.PIDInputCCMG.positionTarget',label='ptarget'))
+    fieldsList.append(Field('bettii.PIDInputCCMG.positionMeasurement',label='pmeas'))
+    fieldsList.append(Field('bettii.PIDInputCCMG.velocityTarget',label='vtarget'))
+    fieldsList.append(Field('bettii.PIDInputCCMG.velocityMeasurement',label='vmeas'))
 
-    mpl.style.use('classic') 
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
+    use('classic') 
     mpl.rcParams['toolbar'] = 'None'
-
+    mpl.rcParams['axes.grid'] = True
     
     ds = DataSet(folder,rpeaks=True)
     ds.readListFields(fieldsList, nValues=1000,verbose=True)   
@@ -45,36 +42,34 @@ if __name__ == '__main__':
     fig=[]
     ax={}
     fig.append(plt.figure(1)) 
-    ax['pid_ccmg1']=(plt.subplot(421,ylabel='ut'))
-    ax['pid_ccmg2']=(plt.subplot(423,ylabel='et'))
-    ax['pid_ccmg3']=(plt.subplot(425,ylabel='PID CCMG'))
+    ax['gx']=(plt.subplot(311,ylabel='Gyro X'))
+    ax['gy']=(plt.subplot(312,ylabel='Gyro Y'))
+    ax['gz']=(plt.subplot(313,ylabel='Gyro Z'))
+    fig.append(plt.figure(2))
+    ax['ptarget']=(plt.subplot(221,ylabel='Position'))
+    ax['pmeas']=(plt.subplot(222))
+    ax['vtarget']=(plt.subplot(223,xlabel='Time (frames)',ylabel='Velocity')) 
+    ax['vmeas']=(plt.subplot(224,xlabel='Time (frames)'))
     
-    ax['pid_mom1']=(plt.subplot(422,ylabel='ut'))
-    ax['pid_mom2']=(plt.subplot(424,ylabel='et'))
-    ax['pid_mom3']=(plt.subplot(426,ylabel='PID MomDump'))
-    
-    ax['pid_wheels']=(plt.subplot(414,ylabel='wheels angle'))
-    
+    ax['ptarget'].set_title('Target')
+    ax['pmeas'].set_title('Measurement')
 
     
-    data['ccmg_ut'].plot(ax=ax['pid_ccmg1'])
-    data['ccmg_et'].plot(ax=ax['pid_ccmg2'])
-    data[['P CCMG','I CCMG','D CCMG']].plot(ax=ax['pid_ccmg3'])
-    
-    data['mom_ut'].plot(ax=ax['pid_mom1'])
-    data['mom_et'].plot(ax=ax['pid_mom2'])
-    data[['P MomDump','I MomDump','D MomDump']].plot(ax=ax['pid_mom3'])
-    
-    data['wheels_angle'].plot(ax=ax['pid_wheels'])  
+    data['gyroX'].plot(ax=ax['gx'])
+    data['gyroY'].plot(ax=ax['gy'])
+    data['gyroZ'].plot(ax=ax['gz'])
+    data['ptarget'].plot(ax=ax['ptarget'])
+    data['pmeas'].plot(ax=ax['pmeas'])
+    data['vtarget'].plot(ax=ax['vtarget'])
+    data['vmeas'].plot(ax=ax['vmeas'])
     
     m={} #map axes to columns
     for a in ax.keys(): m[a]=[l.get_label() for l in ax[a].get_lines()]
-    
-    plt.ion()
      
     plt.draw()
     fig[0].tight_layout()
-    lastNValues=4000
+    fig[1].tight_layout()
+    lastNValues=30000
     nValues=1200
     i=-1
     while True:
@@ -112,7 +107,8 @@ if __name__ == '__main__':
         del ds.df
         ds.df=data #we delete some memory
         plt.draw()
-        #fig[0].tight_layout()
+        fig[0].tight_layout()
+        fig[1].tight_layout()
         plt.pause(0.1)
     plt.show()
 

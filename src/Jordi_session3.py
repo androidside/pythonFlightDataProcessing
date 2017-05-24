@@ -7,34 +7,33 @@ Main script
 '''
 print 'Imports...'
 import matplotlib as mpl
-from utils.dataset import DataSet,plt,sns
+from matplotlib.style import use
+from utils.dataset import DataSet,plt
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
 
 if __name__ == '__main__':
     folder = "C:/17-05-17_00_36_34/"
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-19_20_57_10\\"
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-24_00_40_24\\"
     
     Field.DTYPES=getDtypes(folder)
 
     
     fieldsList=[]
      
-    fieldsList.append(Field('bettii.PIDOutputCCMG.ut',label='ccmg_ut'))
-    fieldsList.append(Field('bettii.PIDOutputCCMG.et',label='ccmg_et'))
-    fieldsList.append(Field('bettii.PIDOutputMomDump.ut',label='mom_ut'))
-    fieldsList.append(Field('bettii.PIDOutputMomDump.et',label='mom_et'))
-    fieldsList.append(Field('bettii.PIDOutputCCMG.proportional',label='P CCMG'))   
-    fieldsList.append(Field('bettii.PIDOutputCCMG.integral',label='I CCMG'))
-    fieldsList.append(Field('bettii.PIDOutputCCMG.derivative',label='D CCMG'))
-    fieldsList.append(Field('bettii.PIDOutputMomDump.proportional',label='P MomDump'))   
-    fieldsList.append(Field('bettii.PIDOutputMomDump.integral',label='I MomDump'))
-    fieldsList.append(Field('bettii.PIDOutputMomDump.derivative',label='D MomDump'))
-    fieldsList.append(Field('bettii.StepperGalil.wheelsAngle',label='wheels_angle'))
+    fieldsList.append(Field('bettii.RTHighPriority.TelescopeRaDeg',label='tra'))
+    fieldsList.append(Field('bettii.RTHighPriority.TelescopeDecDeg',label='tdec'))
+    fieldsList.append(Field('bettii.RTHighPriority.GondolaRaDeg',label='gra'))
+    fieldsList.append(Field('bettii.RTHighPriority.GondolaDecDeg',label='gdec'))
+    fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRaDeg',label='sra'))
+    fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraDecDeg',label='sdec'))
 
-    mpl.style.use('classic') 
+    fieldsList.append(Field('bettii.GriffinsGalil.griffinAAngleDegrees',label='gangle'))
+    use('classic') 
     mpl.rcParams['toolbar'] = 'None'
+    mpl.rcParams['axes.grid'] = True
+    #mpl.rcParams['axes.formatter.useoffset'] = False
 
     
     ds = DataSet(folder,rpeaks=True)
@@ -45,32 +44,34 @@ if __name__ == '__main__':
     fig=[]
     ax={}
     fig.append(plt.figure(1)) 
-    ax['pid_ccmg1']=(plt.subplot(421,ylabel='ut'))
-    ax['pid_ccmg2']=(plt.subplot(423,ylabel='et'))
-    ax['pid_ccmg3']=(plt.subplot(425,ylabel='PID CCMG'))
+    ax['sra']=(plt.subplot(231,ylabel='RA (deg)'))
+    ax['sdec']=(plt.subplot(234,xlabel='Time (frames)',ylabel='DEC (deg)'))
+    ax['gra']=(plt.subplot(232))
+    ax['gdec']=(plt.subplot(235,xlabel='Time (frames)'))
+    ax['tra']=(plt.subplot(233))
+    ax['tdec']=(plt.subplot(236,xlabel='Time (frames)'))
+    fig.append(plt.figure(2))
+    ax['gangle']=(plt.subplot(111,xlabel='Time (frames)',ylabel='Griffin A Angle (deg)'))
     
-    ax['pid_mom1']=(plt.subplot(422,ylabel='ut'))
-    ax['pid_mom2']=(plt.subplot(424,ylabel='et'))
-    ax['pid_mom3']=(plt.subplot(426,ylabel='PID MomDump'))
+    ax['sra'].set_title('StarCamera')
+    ax['gra'].set_title('Gondola')
+    ax['tra'].set_title('Telescope')
     
-    ax['pid_wheels']=(plt.subplot(414,ylabel='wheels angle'))
-    
+    for a in ax.values(): a.get_yaxis().get_major_formatter().set_useOffset(False)
 
     
-    data['ccmg_ut'].plot(ax=ax['pid_ccmg1'])
-    data['ccmg_et'].plot(ax=ax['pid_ccmg2'])
-    data[['P CCMG','I CCMG','D CCMG']].plot(ax=ax['pid_ccmg3'])
-    
-    data['mom_ut'].plot(ax=ax['pid_mom1'])
-    data['mom_et'].plot(ax=ax['pid_mom2'])
-    data[['P MomDump','I MomDump','D MomDump']].plot(ax=ax['pid_mom3'])
-    
-    data['wheels_angle'].plot(ax=ax['pid_wheels'])  
+    data['tra'].plot(ax=ax['tra'])
+    data['tdec'].plot(ax=ax['tdec'])
+    data['gra'].plot(ax=ax['gra'])
+    data['gdec'].plot(ax=ax['gdec'])
+    data['sra'].plot(ax=ax['sra'])
+    data['sdec'].plot(ax=ax['sdec'])
+    data['gangle'].plot(ax=ax['gangle'])
     
     m={} #map axes to columns
     for a in ax.keys(): m[a]=[l.get_label() for l in ax[a].get_lines()]
     
-    plt.ion()
+    #plt.ion()
      
     plt.draw()
     fig[0].tight_layout()
@@ -80,7 +81,7 @@ if __name__ == '__main__':
     while True:
         #i=i+1
         #print 'Reading bytes from '+str(nValues*i)+' to '+str(nValues*(i+1)) 
-        ds.readListFields(fieldsList, nValues=nValues,verbose=False)   
+        ds.readListFields(fieldsList, nValues=nValues,verbose=False,rpeaks=True)   
         #i=i+1;ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
         data=ds.df.loc[max(ds.df.index)-lastNValues:,:]
 
@@ -112,7 +113,7 @@ if __name__ == '__main__':
         del ds.df
         ds.df=data #we delete some memory
         plt.draw()
-        #fig[0].tight_layout()
+        fig[0].tight_layout()
         plt.pause(0.1)
     plt.show()
 
