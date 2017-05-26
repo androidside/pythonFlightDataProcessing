@@ -400,7 +400,7 @@ class Quat(object):
         mult[2] = q2 * p1 - q1 * p2 + q4 * p3 + q3 * p4  # z
         mult[3] = -q1 * p1 - q2 * p2 - q3 * p3 + q4 * p4  # w
         
-        return Quat(mult).normalize()
+        return Quat(mult)#.normalize()
 
     def inv(self):
         """
@@ -484,23 +484,42 @@ def DCM2FordAngles(matrix,rollArnab=0,prVersions=False):
             z = 0.5 * sr;
             r = (matrix[0][1] - matrix[1][0]) / sr2;
         
-    q=Quat(x, y, z, r).inv();
-    if prVersions:
+    q=Quat((x, y, z, r)).inv();
+    if prVersions: #print versions
         dYaw=q.ra
         dPitch = -q.dec
         qdYaw = Quat((dYaw,0,0)); #quat = Quat((ra,dec,roll)) in degrees
         qdPitch = Quat((0.0,sin(dPitch*np.pi/180./2.0),0.0,cos(dPitch*np.pi/180./2.0))) #quat = Quat((ra,dec,roll)) in degreesq
         qdRoll = Quat((0,0,-rollArnab)) #quat = Quat((ra,dec,roll)) in degrees
         
-    qStarcam2Gyros_old=qdYaw*qdPitch*qdRoll
-    qStarcam2Gyros_mid=qdPitch*qdYaw*qdRoll
-    qStarcam2Gyros_new=qdRoll*qdPitch*qdYaw
-    
-    print "\tYAW\tPITCH\tROLL"
-    print "old\t",qStarcam2Gyros_old.ra,'\t',-qStarcam2Gyros_old.dec,'\t',qStarcam2Gyros_old.roll
-    print "mid\t",qStarcam2Gyros_mid.ra,'\t',-qStarcam2Gyros_mid.dec,'\t',qStarcam2Gyros_mid.roll
-    print "new\t",qStarcam2Gyros_new.ra,'\t',-qStarcam2Gyros_new.dec,'\t',qStarcam2Gyros_new.roll
+        qStarcam2Gyros_old=qdYaw*qdPitch*qdRoll
+        qStarcam2Gyros_mid=qdPitch*qdYaw*qdRoll
+        qStarcam2Gyros_new=qdRoll*qdPitch*qdYaw
+
+        print "\tYAW\tPITCH\tROLL"
+        print "old\t",qStarcam2Gyros_old.ra,'\t',-qStarcam2Gyros_old.dec,'\t',qStarcam2Gyros_old.roll
+        print "mid\t",qStarcam2Gyros_mid.ra,'\t',-qStarcam2Gyros_mid.dec,'\t',qStarcam2Gyros_mid.roll
+        print "new\t",qStarcam2Gyros_new.ra,'\t',-qStarcam2Gyros_new.dec,'\t',qStarcam2Gyros_new.roll
     
     return q
 
-
+def cost(x,q,order):
+    qY=Quat((x[0],0,0))
+    qP=Quat((0,x[1],0))
+    qR=Quat((0,0,x[2]))
+    if order=='YPR':
+        qx=qY*qP*qR   
+    elif order=='PYR':
+        qx=qP*qY*qR
+    elif order=='RPY':
+        qx=qR*qP*qY
+    else:
+        raise AttributeError('Bad order')
+    qdif=qx*q.inv()
+    return np.dot(qdif.equatorial,qdif.equatorial)
+from scipy.optimize import fmin
+def getAngles(q,order='YPR'):
+    xo=q.equatorial
+    xopt=fmin(cost,xo,args=(q,order))
+    return xopt
+    
