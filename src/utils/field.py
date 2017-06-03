@@ -11,7 +11,7 @@ class Field(object):
     '''
     DTYPES = None
 
-    def __init__(self, fieldName,dtype='f8',indexName=None,indexType='i8',label=None,conversion=1):
+    def __init__(self, fieldName,dtype='f8',indexName=None,indexType='i8',label=None,conversion=1,function=lambda x: x):
         '''
         Constructor
         '''
@@ -24,7 +24,7 @@ class Field(object):
         if self.DTYPES is None or fieldName not in self.DTYPES: self.dtype= dtype 
         else: self.dtype = self.DTYPES[fieldName]
         self.fieldName = fieldName
-        
+        self.function = function
         self.indexName = indexName
         self.indexType = indexType
         self.label = label

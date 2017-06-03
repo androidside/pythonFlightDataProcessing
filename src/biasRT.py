@@ -14,7 +14,7 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 if __name__ == '__main__':
     folder = "C:/17-05-17_00_36_34/"
-    #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-17_00_36_34\\"
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-24_00_40_24\\"
     
     Field.DTYPES=getDtypes(folder)
 
@@ -38,8 +38,8 @@ if __name__ == '__main__':
     
     plt.ion()
     
-    lastNValues=900000
-    nValues=lastNValues
+    lastNValues=3000
+    nValues=30000
     i=-1
     while True:
         #i=i+1

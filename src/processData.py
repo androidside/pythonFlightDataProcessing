@@ -18,6 +18,7 @@ if __name__ == '__main__':
     
     
     folder='C:/16-09-28_21_58_34-/'
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_01_42_03\\"
     
     Field.DTYPES=getDtypes(folder)
     

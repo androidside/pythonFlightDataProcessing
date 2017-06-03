@@ -503,6 +503,11 @@ def DCM2FordAngles(matrix,rollArnab=0,prVersions=False):
     
     return q
 
+def vec2skew(v):
+    v1=v[0];v2=v[1];v3=v[2];
+    return np.matrix([[0,-v3,v2],[v3,0,-v1],[-v2,v1,0]])
+    
+
 def cost(x,q,order):
     qY=Quat((x[0],0,0))
     qP=Quat((0,x[1],0))
@@ -520,6 +525,6 @@ def cost(x,q,order):
 from scipy.optimize import fmin
 def getAngles(q,order='YPR'):
     xo=q.equatorial
-    xopt=fmin(cost,xo,args=(q,order))
+    xopt=fmin(cost,xo,args=(q,order),disp=False)
     return xopt
     

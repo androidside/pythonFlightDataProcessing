@@ -116,7 +116,7 @@ class DataSet():
         if folder is None: folder=self.folder
         
         try:
-            field_data = load_single_field(folder+field.fieldName,field.dtype,nValues=nValues,start=start)*field.conversion
+            field_data = field.function(load_single_field(folder+field.fieldName,field.dtype,nValues=nValues,start=start))*field.conversion
             
             timeName=field.indexName
             timeType=field.indexType

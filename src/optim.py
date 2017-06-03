@@ -13,18 +13,19 @@ from utils.dataset import DataSet,plt,sns,load_single_field,pd
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from itertools import izip_longest
 
-def costFunc(angles,df,i2s):
-    print "Angles:",angles,
+def costFunc(c,df,i2s):
+    print "C values:",c,
     i=i2s.loc[df.index[0]:].index[0] #index of the first starcamera solution trigger when having gyros
     q_old=i2s.qI2G.loc[i]
     df=df.loc[i:]
     i_old=df.index[0]
     q_prop=q_old
-    errs=[0]*len(i2s.index)
+    errs=[]
     gyros=df[['gyroX','gyroY','gyroZ']].loc[i_old:].dropna()
 
-    q=Quat(angles);
-    M=np.matrix([[0.999999, 0.000309,-0.002822],[0.001062, 0.999995,-0.0031],[0.00129,0.002992,0.999991]]) #Arnab Matrix
+    cxy=c[0];cxz=c[1];cyz=c[2];
+    C=np.matrix([[0.0, cxy,cxz],[-cxy, 0.0,cyz],[-cxz,-cyz,0.0]])
+    M=np.eye(3)-C
     for j in range(len(gyros.index)-1):
         dt=(gyros.index[j+1]-gyros.index[j])/400.
         w=(gyros.iloc[j,:3].as_matrix())*(1/3600.*np.pi/180) #arcsec2rad conversion
@@ -35,7 +36,7 @@ def costFunc(angles,df,i2s):
         q_prop=Quat(A.dot(q_prop.q))
         ind=gyros.index[j]
         if ind in i2s.index:
-            qdif=q_prop*(q*i2s.qI2G.loc[ind]).inv()
+            qdif=q_prop*i2s.qI2G.loc[ind].inv()
             err=qdif.q[0]**2+qdif.q[1]**2+qdif.q[2]**2
             errs.append(err)
     cost=np.mean(errs)
@@ -71,35 +72,51 @@ if __name__ == '__main__':
     initial_time=4000000 #in frame number
     final_time = 5100000 #in frame number
     
-    initial_time=1000 #in frame number
-    final_time = None #in frame number
+    initial_time=7000000 #in frame number
+    final_time = 7400000 #in frame number
     
+    #array([ -0.15321407, -44.77279865,  19.87575523])
+    dYaw=-0.367
+    dPitch=44.9828
+    dRoll=-0.79
+     
+    qdYaw = Quat((dYaw,0,0)); #quat = Quat((ra,dec,roll)) in degrees
+    qdPitch = Quat((0.0,sin(dPitch*np.pi/180./2.0),0.0,cos(dPitch*np.pi/180./2.0))) #quat = Quat((ra,dec,roll)) in degrees
+    qdRoll = Quat((0,0,dRoll)) #quat = Quat((ra,dec,roll)) in degrees
+    
+    #qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
+
+    qStarcam2Gyros_old =  qdYaw*qdPitch*qdRoll
+    qStarcam2Gyros_mid =  qdPitch*qdYaw*qdRoll
+    qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
+    
+    qStarcam2Gyros=qStarcam2Gyros_old#[qStarcam2Gyros_old,qStarcam2Gyros_mid,qStarcam2Gyros_new]
     
     ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=True)
     ds.df=ds.df.interpolate(method='values').dropna()
     ds.df=ds.df.loc[initial_time:final_time]
     print 'Dataframe shape:', ds.df.shape
-    L=len(ds.df.index)
-    q_est_list=[0]*L   
-    q_sc_list=[0]*L
-    q_i2s_list=[0]*L
+    
+    q_est_list=[]    
+    q_sc_list=[]
+    qI2Starcam_list=[]
+    qStarcam2Est_list=[]
+    qGyros2Est_list=[]
+    qI2Starcam_list=[]
     print "Generating quaternions..."
-    for i in range(L):
-        mceFN=ds.df.index[i]
+    for mceFN in ds.df.index:
         q_est=Quat((ds.df.loc[mceFN][['qi','qj','qk','qr']]))
         q_sc=Quat((ds.df.loc[mceFN][['qi_sc','qj_sc','qk_sc','qr_sc']]))
-        q_i2s=Quat((ds.df.loc[mceFN][['ra_sc','dec_sc','roll_sc']]))
-        q_est_list[i]=(q_est)
-        q_sc_list[i]=(q_sc)
-        q_i2s_list[i]=(q_i2s)
+        q_est_list.append(q_est)
+        q_sc_list.append(q_sc)
+        qI2Starcam_list.append(q_sc) #no other way to get the SC solution :( There is now!!
     triggers=ds.df['triggers'].drop_duplicates()
-    i2s=pd.DataFrame({'qI2G': q_sc_list, 'qest':q_est_list},index=ds.df.index)
+    i2s=pd.DataFrame({'qI2S': qI2Starcam_list,'qI2G': q_sc_list, 'qest':q_est_list},index=ds.df.index)
     i2s=i2s.loc[triggers.index]
     i2s.index=triggers.values
-    
-    angles0=[0.0003,-0.0028,-0.003]
+    c0=[0.0003,-0.0028,-0.003]
     print "Starting optim..."
-    xopt=fmin(costFunc,angles0,args=(ds.df,i2s),full_output=True,disp=True)
+    xopt=fmin(costFunc,c0,args=(ds.df,i2s),full_output=True,disp=True)
 
     print xopt
     a=1  
