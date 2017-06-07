@@ -69,7 +69,7 @@ def getFFTs(matrix,sindex=0,eindex=None):
     for k in range(4):
         psd=abs(fft(matrix[k],axis=2))
         L=len(psd[0,0])
-        psd[0,0,0]=0
+        psd[:,:,0]=0
         ft[k]=psd[:,:,:L/2]
     return ft
 

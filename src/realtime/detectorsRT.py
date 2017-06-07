@@ -32,12 +32,14 @@ if __name__ == '__main__':
     print "Creating figures..."
     axes={}
     axes['rt']=createImagesAxes('RT Signal')
-    axes['fft']=createDataAxes('FFTs',dets=[3]) #plot only detector D
-    axes['interf']=createDataAxes('Interferograms',dets=[3]) #plot only detector D
     axes['intRT']=createImagesAxes('Integrated values')
     axes['power']=createImagesAxes('Power')
     
+    #===========================================================================
+    # axes['fft']=createDataAxes('FFTs',dets=[3]) #plot only detector D
+    # axes['interf']=createDataAxes('Interferograms',dets=[3]) #plot only detector D
     # axes['fftcum']=createDataAxes('Integrated FFTs',dets=[3])
+    #===========================================================================
     
     plt.draw()
 
@@ -54,12 +56,15 @@ if __name__ == '__main__':
         masterMceFn=data['masterMceFrameNumber']
         index=getIndexRangeLastStroke(CDLposTarget, CDLmceFN, masterMceFn)
         dead_pixels=getDeadPixels(filename="C:/cygwin/home/bettii/pythonFlightDataProcessing/src/utils/dead_pixels.txt")
-        det=data2matrices(data,index=index,dead=dead_pixels)
+        det=data2matrices(data,index=index,dead=dead_pixels,center=False)
         ffts=getFFTs(det)
         print "Plotting.."
-        plotData(ffts,axes['fft'])
-        plotData(det,axes['interf'])
-        #plotData(ffts,axes['fftcum'])
+        
+        #=======================================================================
+        # plotData(ffts,axes['fft'])
+        # plotData(det,axes['interf'])
+        # plotData(ffts,axes['fftcum'])
+        #=======================================================================
         
         plotImages(det, axes['intRT'], sum=True, cmap="Greens")
         plotImages(ffts, axes['power'], sum=True,cmap="Reds")
@@ -73,7 +78,7 @@ if __name__ == '__main__':
     for i in range(100):
         plotAll(i)
         plt.pause(0.2)
-    
+    print "End"
     plt.show()
     
     

@@ -5,7 +5,6 @@ Main script
 
 @author: Marc Casalprim
 '''
-from test._mock_backport import inplace
 print 'Imports...'
 from matplotlib.style import use
 from utils.dataset import pd,DataSet,plt,np
