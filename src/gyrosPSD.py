@@ -7,7 +7,7 @@ Main script
 '''
 from matplotlib.pyplot import xlabel
 print 'Imports...'
-import matplotlib
+from matplotlib.style import use
 from utils.dataset import DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 import pandas as pd
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     print 'Dataframe shape:', ds.df.shape
     data=ds.df.dropna()
     #data.index=data.index/ds.freq #index in seconds
-    matplotlib.style.use('ggplot')
+    use('ggplot')
     
     plt.ion()
     

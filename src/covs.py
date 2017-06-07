@@ -62,7 +62,7 @@ if __name__ == '__main__':
     initial_time=1000 #in frame number
     final_time = None #in frame number
     
-    ds = DataSet(folder,fieldsList=fieldsList,starcam=True,min=initial_time,max=final_time,verbose=True)
+    ds = DataSet(folder,fieldsList=fieldsList,min=initial_time,max=final_time,verbose=True)
     
     print 'Dataframe shape:', ds.df.shape
     data=ds.df.interpolate(method='values')

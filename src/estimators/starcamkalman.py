@@ -7,7 +7,7 @@ Main script
 '''
 from test._mock_backport import inplace
 print 'Imports...'
-import matplotlib as mpl
+from matplotlib.style import use
 from utils.dataset import pd,DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from utils.quat import Quat,sin,cos
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqk',label='qk_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqr',label='qr_sc')) 
 
-    mpl.style.use('classic') 
+    use('classic') 
     #mpl.rcParams['toolbar'] = 'None'
     initial_time=10000 #in frame number
     final_time = None #in frame number
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     
     for axis in ax: axis.clear()
     
-    #plotting elevation and crossElevation
+
     if not qs.empty:
         #=======================================================================
         # qs[['dec_sc','dec_est','dec_sc_SC','dec_est_SC']].plot(ax=ax[0])

@@ -15,10 +15,6 @@ Quaternion provides a class for manipulating quaternion objects.  This class pro
     Added _get_angle_axis to get the angle-axis representation
     Added _latlontoquat to get a rotation quat to ECEF from lat/lon
 """
-"""
-    Modified 2017 by Marc Casalprim
-    Removed time consuming operations
-"""
 
 
         
@@ -443,6 +439,11 @@ def normalize(array):
     """
     quat = np.array(array)
     return quat / np.sqrt(np.dot(quat, quat))
+
+matrix =[[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]
 
 def DCM2FordAngles(matrix,rollArnab=0,prVersions=False):
     trace = matrix [0][0] + matrix [1][1] + matrix [2][2];

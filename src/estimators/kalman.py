@@ -8,7 +8,8 @@ Main script
 print 'Imports...'
 import matplotlib
 import numpy as np
-import scipy
+from scipy.linalg import expm
+from matplotlib.style import use
 from utils.quat import Quat,vec2skew,sin,cos
 from utils.dataset import DataSet,plt,sns,load_single_field,pd
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
@@ -105,7 +106,7 @@ if __name__ == '__main__':
         wx=w[0];wy=w[1];wz=w[2]
         #wx=w[0];wy=w[1];wz=w[2]
         Ow=np.matrix([[0,wz,-wy,wx],[-wz,0,wx,wy],[wy,-wx,0,wz],[-wx,-wy,-wz,0]]) #Omega(omega)
-        A=scipy.linalg.expm(0.5*Ow*dt)
+        A=expm(0.5*Ow*dt)
         q_prop=Quat(A.dot(q_prop.q))
         Theta=np.eye(3)-dt*vec2skew(w)
         Psi=-dt*np.eye(3)
@@ -138,7 +139,7 @@ if __name__ == '__main__':
         #print bias
     
     print "Plotting..."
-    matplotlib.style.use('classic')
+    use('classic')
     matplotlib.rcParams['axes.grid']=True
     
     fig=plt.figure()

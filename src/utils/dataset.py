@@ -67,7 +67,28 @@ def load_single_field(fieldname,datatype,nValues=None,start=None):
 
     field = field.astype(type_str_final)
     return field
+def load_fields(fieldsList,folder=None,nValues=None,start=None):
+    df={}
+    for field in fieldsList:
+        df[field.label]=load_single_field(folder+field.fieldName,field.dtype,nValues=nValues,start=start)
+        if field.indexName not in df: df[field.indexName]=load_single_field(folder+field.indexName,field.indexType,nValues=nValues,start=start)
+    return df
+        
+def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc','qj_sc','qk_sc','qr_sc'],'qI2S':['ra_sc','dec_sc','roll_sc']}):
+    lists={}
+    matrices={}
+    for key in quats.keys() :
+        lists[key]=[]
+        matrices[key]=dataframe[quats[key]].as_matrix()
 
+
+    for i in range(len(dataframe.index)):
+        for key in quats.keys() :
+            lists[key].append(Quat(matrices[key][i]))
+     
+    return lists
+
+    
 class DataSet():
         
     def __init__(self,folder,freq=400.,min=None,max=None,folder_export = None, nValues=None, start=None, verbose=False, rpeaks=True,estimator=False,starcam=False,fieldsList=[],droplist = []):
@@ -401,3 +422,13 @@ class DataSet():
             #plt.close(fig)
         print "Done."
         
+def plotColumns(df,units=''):
+    data = df.dropna()
+    plt.figure()
+    N=len(data.columns)
+    for i in range(N):
+        column=data.columns[i]
+        ax=plt.subplot(N,1,i)
+        data[column].plot(ax=ax)
+        ax.set_ylabel(column+' '+units)
+    ax.set_xlabel('Index')
