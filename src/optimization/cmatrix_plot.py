@@ -127,7 +127,7 @@ if __name__ == '__main__':
 
     
     print "Plotting..."
-    matplotlib.style.use('classic')
+    use('classic')
     matplotlib.rcParams['axes.grid']=True
     
     fig=plt.figure()
