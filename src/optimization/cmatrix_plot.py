@@ -8,12 +8,11 @@ Main script
 print 'Imports...'
 import matplotlib
 import numpy as np
-import scipy
-from utils.quat import Quat,normalize,sin,cos
-from utils.dataset import DataSet,plt,sns,load_single_field,pd
+from utils.quat import Quat,sin,cos
+from utils.dataset import DataSet,plt,pd
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-from itertools import izip_longest
-
+from scipy.linalg import expm
+from matplotlib.style import use
 
 if __name__ == '__main__':
 
@@ -115,7 +114,7 @@ if __name__ == '__main__':
         w=M.dot(w)
         wx=w[0,0];wy=w[0,1];wz=w[0,2]
         Ow=np.matrix([[0,wz,-wy,wx],[-wz,0,wx,wy],[wy,-wx,0,wz],[-wx,-wy,-wz,0]]) #Omega(omega)
-        A=scipy.linalg.expm(0.5*Ow*dt)
+        A=expm(0.5*Ow*dt)
         q_prop=Quat(A.dot(q_prop.q))
         props.append(q_prop)
         ind=gyros.index[j]

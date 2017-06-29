@@ -74,7 +74,7 @@ def load_fields(fieldsList,folder=None,nValues=None,start=None):
         if field.indexName not in df: df[field.indexName]=load_single_field(folder+field.indexName,field.indexType,nValues=nValues,start=start)
     return df
         
-def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc','qj_sc','qk_sc','qr_sc'],'qI2S':['ra_sc','dec_sc','roll_sc']}):
+def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc','qj_sc','qk_sc','qr_sc'],'qI2S':['ra_sc','dec_sc','roll_sc']},norm=False):
     lists={}
     matrices={}
     for key in quats.keys() :
@@ -84,14 +84,16 @@ def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc'
 
     for i in range(len(dataframe.index)):
         for key in quats.keys() :
-            lists[key].append(Quat(matrices[key][i]))
+            q=Quat(matrices[key][i])
+            if norm: q=q.normalize()
+            lists[key].append(q)
      
     return lists
 
     
 class DataSet():
         
-    def __init__(self,folder,freq=400.,min=None,max=None,folder_export = None, nValues=None, start=None, verbose=False, rpeaks=True,estimator=False,starcam=False,fieldsList=[],droplist = []):
+    def __init__(self,folder=None,freq=400.,min=None,max=None,folder_export = None, nValues=None, start=None, verbose=False, rpeaks=True,estimator=False,starcam=False,fieldsList=[],foldersList=[],droplist = []):
         '''
         return a DataSet object containing df, a Pandas data frame indexed on the mceFramenumber
         Loads a list of fields fieldsList, the estimator data or the starcamera data dpeending on the correct parameters
@@ -103,8 +105,10 @@ class DataSet():
         self.freq = freq
         self.min=min
         self.max=max
-        self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start,verbose=verbose)
-        
+        if len(foldersList)<2:        self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start,verbose=verbose)
+        else:
+            self.folder=foldersList[0]
+            self.readMultipleFolders(fieldsList,foldersList,rpeaks=rpeaks, verbose=verbose)
         if estimator:
             self.readEstimator()
         if starcam:
@@ -120,7 +124,7 @@ class DataSet():
         if folder_export == None: self.folder_export = self.folder.split('/')[-1]
         else: self.folder_export = folder_export
         
-    def readListFields(self,fieldsList,folder=None,timeDivider=1,rpeaks=True, verbose=False, nValues=None,start=None):
+    def readListFields(self,fieldsList,folder=None,timeDivider=1,rpeaks=True, verbose=False, nValues=None,start=None,timeIndex=False):
         i=0
         if verbose: print 'Reading list of '+str(len(fieldsList))+' fields.'
         for field in fieldsList:
@@ -132,8 +136,7 @@ class DataSet():
         self.df = self.df.loc[self.min:self.max,:]
         if rpeaks: #remove peaks
             self.df=self.df.loc[(self.df.abs()>=1).any(1)]  #remove rows were all fields have a value <1
-            
-    def readField(self,field,folder=None,timeDivider=1,rpeaks=True,verbose=False,nValues=None,start=None):
+    def readField(self,field,folder=None,timeDivider=1,rpeaks=True,verbose=False,nValues=None,start=None,timeIndex=False):
         if folder is None: folder=self.folder
         
         try:
@@ -170,10 +173,32 @@ class DataSet():
             if label in self.df.keys() and len(self.df[label].as_matrix())==len(field_data):
                 if verbose: print label+' already in dataframe.'
             else:
-                df_tmp = pd.DataFrame({label:field_data},index=time/timeDivider)
+                if field.fieldName=='bettii.GpsReadings.altitudeMeters': #its GPS data (no mceframenumber)
+                    time=self.times['bettii.RTLowPriority.mceFrameNumber'] #get another mceFN vector of this archive
+                    L=len(field_data)
+                    time=time[time>1000]
+                    time=np.linspace(time[0], time[-1], L)
+                if field.indexName=='bettii.ThermometersDemuxedCelcius.mceFrameNumber': #its a thermometer
+                    field_data=field_data[field_data!=0]
+                    L=len(field_data)
+                    time=time[time>1000]
+                    time=np.linspace(time[0], time[-1], L)
+                L=len(field_data)
+                df_tmp = pd.DataFrame({label:field_data},index=time[:L]).sort_index()
                 df_tmp = df_tmp[~df_tmp.index.duplicated(keep='first')] #remove values with duplicated index
-                df_tmp=df_tmp[np.abs(df_tmp[label].as_matrix())<= 1e10] #keep only the ones that are within +1e10 to -1e10.
-
+                df_tmp=df_tmp[np.abs(df_tmp[label].as_matrix())<= field.range] #keep only the ones that are within fields range.
+                df_tmp=df_tmp[df_tmp.index>1000] #keep only meaningful index (a FN less than 1000 is impossible)
+                if not df_tmp.empty:
+                    z=(np.abs(df_tmp.index)-np.mean(df_tmp.index))/np.std(df_tmp.index)
+                    df_tmp=df_tmp[z<2] #keep only meaningful index (drop outliers >2sigmas)
+                if timeIndex and len(df_tmp.index)>0:
+                    text=folder.split('/')[-2]
+                    ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
+                    ftime=pd.to_datetime(ftime_str,yearfirst=True)
+                    index=(df_tmp.index-df_tmp.index[0])/self.freq #time in seconds
+                    index=pd.to_timedelta(index,unit='s')
+                    time=ftime+index
+                    df_tmp.index=time
                 if self.df.empty: self.df = df_tmp
                 elif label in self.df: self.df = self.df.combine_first(df_tmp)
                 else: self.df =        pd.merge(self.df,df_tmp,how='outer',left_index=True,right_index=True) 
@@ -181,7 +206,32 @@ class DataSet():
         except Exception as e:
             raise
             print 'ERROR reading '+field.fieldName+':', e
-
+    
+    def readMultipleFolders(self,fieldsList,foldersList,rpeaks=False, verbose=False,timeIndex=True):
+        i=0
+        dftmp=pd.DataFrame()
+        for folder in foldersList:
+            if verbose: print 'Reading list of '+str(len(fieldsList))+' fields from folder '+folder+'.'
+            self.times=dict()
+            self.df=pd.DataFrame()
+            for field in fieldsList:
+                i=i+1
+                if verbose: print str(100*i/len(foldersList)/len(fieldsList))+'%', 
+                self.readField(field, folder=folder,rpeaks=rpeaks,verbose=verbose,timeIndex=False)
+            if verbose: print ''
+            self.df = self.df.dropna(axis=0,how='all')
+            if timeIndex and len(self.df.index)>0:
+                text=folder.split('/')[-2]
+                ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
+                ftime=pd.to_datetime(ftime_str,yearfirst=True)
+                index=(self.df.index-self.df.index[0])/self.freq #time in seconds
+                index=pd.to_timedelta(index,unit='s')
+                time=ftime+index
+                self.df.index=time
+            if dftmp.empty: dftmp = self.df
+            else: dftmp = dftmp.combine_first(self.df)
+            
+        self.df=dftmp
     def readEstimator(self,folder=None,timeDivider=1):
         if folder is None: folder=self.folder
         #covariance matrix

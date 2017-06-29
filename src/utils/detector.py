@@ -109,7 +109,7 @@ def plotImages(data,axes,sum=None,cmap="viridis"):
         else: image=np.sum(data[k],axis=2)
         axes[k].imshow(np.ma.masked_values(image, 0,atol=1e-13),interpolation='none',cmap=cmap)
     axes[axes.keys()[0]].figure.canvas.draw() #draw canvas from the first ax (is the same for all of them)
-def plotData(data,axes,downsample=20):
+def plotData(data,axes,downsample=4):
     for k in axes.keys():
         ylims=[1e30,-1e30]
         for i in range(9):

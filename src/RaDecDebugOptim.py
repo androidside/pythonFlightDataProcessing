@@ -41,7 +41,7 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.qi'))
     fieldsList.append(Field('bettii.RTLowPriority.qj'))
     fieldsList.append(Field('bettii.RTLowPriority.qk'))
-    fieldsList.append(Field('bettii.GriffinsGalil.griffinAAngleDegrees'))
+    fieldsList.append(Field('bettii.GriffinsGalil.griffinBAngleDegrees'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasXarcsec',label='biasX'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='biasY')) 
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='biasZ')) 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     quats['qtelDEC']=[]
     quats['gAngle']=[]
     for i,qest in enumerate(quats['qest']):
-        angle=ds.df.griffinAAngleDegrees.iloc[i]
+        angle=ds.df.griffinBAngleDegrees.iloc[i]
         tra=ds.df.TelescopeRaDeg.iloc[i]
         tdec=ds.df.TelescopeDecDeg.iloc[i]
         qG2T=Quat((0,angle,0))
@@ -157,8 +157,8 @@ if __name__ == '__main__':
     plt.figure(5)
     data = ds.df.dropna()
     ax14=plt.subplot(111,xlabel='Time (frames)',ylabel='Griffins Angle (deg)')    
-    data[['griffinAAngleDegrees','gAngle']].plot(ax=ax14)
-    angleDiffs=(data.gAngle.subtract(data.griffinAAngleDegrees))
+    data[['griffinBAngleDegrees','gAngle']].plot(ax=ax14)
+    angleDiffs=(data.gAngle.subtract(data.griffinBAngleDegrees))
     plt.figure(7)
     angleDiffs.plot()
     plt.xlabel('Time (frames')

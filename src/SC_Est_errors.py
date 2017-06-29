@@ -16,6 +16,7 @@ from utils.quat import Quat,normalize,sin,cos
 
 if __name__ == '__main__':
     folder = "C:/17-05-28_02_18_19/"
+    folder = "C:\LocalAuroraArchive\17-05-23_23_45_10"
     #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-23_23_45_07\\"
     
     Field.DTYPES=getDtypes(folder)

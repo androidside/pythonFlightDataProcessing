@@ -35,11 +35,9 @@ if __name__ == '__main__':
     axes['intRT']=createImagesAxes('Integrated values')
     axes['power']=createImagesAxes('Power')
     
-    #===========================================================================
-    # axes['fft']=createDataAxes('FFTs',dets=[3]) #plot only detector D
-    # axes['interf']=createDataAxes('Interferograms',dets=[3]) #plot only detector D
-    # axes['fftcum']=createDataAxes('Integrated FFTs',dets=[3])
-    #===========================================================================
+    axes['fft']=createDataAxes('FFTs',dets=[3]) #plot only detector D
+    axes['interf']=createDataAxes('Interferograms',dets=[1,3]) #plot only detector D
+    #axes['fftcum']=createDataAxes('Integrated FFTs',dets=[3])
     
     plt.draw()
 
@@ -60,11 +58,9 @@ if __name__ == '__main__':
         ffts=getFFTs(det)
         print "Plotting.."
         
-        #=======================================================================
-        # plotData(ffts,axes['fft'])
-        # plotData(det,axes['interf'])
-        # plotData(ffts,axes['fftcum'])
-        #=======================================================================
+        plotData(ffts,axes['fft'])
+        plotData(det,axes['interf'],downsample=1)
+        #plotData(ffts,axes['fftcum'])
         
         plotImages(det, axes['intRT'], sum=True, cmap="Greens")
         plotImages(ffts, axes['power'], sum=True,cmap="Reds")

@@ -21,7 +21,7 @@ if __name__ == '__main__':
     #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-02_18_01_58\\"
     
     
-    folder='C:/16-09-28_21_58_34-/'
+    folder='X:/16-09-28_21_58_34-/'
     folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_01_42_03\\"
     folder='Z:/17-06-07_01_23_52-/'
     
@@ -41,11 +41,11 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.qi'))
     fieldsList.append(Field('bettii.RTLowPriority.qj'))
     fieldsList.append(Field('bettii.RTLowPriority.qk'))
-    fieldsList.append(Field('bettii.GriffinsGalil.griffinAAngleDegrees'))
+    fieldsList.append(Field('bettii.GriffinsGalil.griffinBAngleDegrees'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasXarcsec',label='biasX'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='biasY')) 
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='biasZ')) 
-    #fieldsList.append(Field('bettii.PIDOutputCCMG.et',label='et_ccmg'))
+    fieldsList.append(Field('bettii.GriffinsGalil.TPA',label='tpa',function=lambda x: (x-6522104)/46603.37777778))
    
     fieldsList.append(Field('bettii.RTHighPriority.EstimatorErrorRespectLastSCAzArcsec',label='err_az'))
     fieldsList.append(Field('bettii.RTHighPriority.EstimatorErrorRespectLastSCElArcsec',label='err_el'))
@@ -66,20 +66,18 @@ if __name__ == '__main__':
     
     #target 2
     
-    #===========================================================================
-    # initial_time=6301000 #in frame number
-    # final_time = 6303000 #in frame number
-    #===========================================================================
+    initial_time=6301000 #in frame number
+    final_time = 6303000 #in frame number
     
-    initial_time=1000 #in frame number
-    final_time = None #in frame number
+    initial_time=5350000 #in frame number
+    final_time = 5600000 #in frame number
     
     #ds = DataSet(folder,fieldsList=fieldsList,starcam=True,min=initial_time,max=final_time,verbose=True)
-    ds = DataSet(folder,fieldsList=fieldsList,start=0,nValues=1081500,min=5350000,max=5600000,verbose=True)
+    ds = DataSet(folder,fieldsList=fieldsList,start=0,nValues=1081500,min=initial_time,max=final_time,verbose=True)
     ds.df=ds.df.interpolate(method='values')
     print "Removing peaks.."
     ds.df=ds.df.loc[(ds.df[['TelescopeDecDeg']].abs()>=17).any(1)] #remove all decs less than 1
-    ds.df=ds.df.loc[(ds.df[['TelescopeRaDeg']].abs()>=170).any(1)]
+    ds.df=ds.df.loc[(ds.df[['TelescopeRaDeg']].abs()>=200).any(1)]
     ds.df=ds.df.loc[(ds.df[['targetDEC']].abs()>=17).any(1)]
 
     print 'Dataframe shape:', ds.df.shape
@@ -87,26 +85,21 @@ if __name__ == '__main__':
     print "Generating quaternions..."
     quats=genQuaternions(ds.df,quats={'qest':['qi','qj','qk','qr']})
     print "Calculating telescope..."
-    def costGAngle(gangle,tra,tdec,qest):
-        qG2T=Quat((0,gangle,0))
-        qI2T=qG2T*qest
-        cost=(qI2T.ra-tra)**2+(qI2T.dec-tdec)**2
-        return cost
+    D=0
     quats['qtelRA']=[]
     quats['qtelDEC']=[]
-    quats['gAngle']=[]
-    for i,qest in enumerate(quats['qest']):
-        angle=ds.df.griffinAAngleDegrees.iloc[i]
+    quats['angle']=[]
+    for i,qest in enumerate(quats['qest'][D:]):
+        angle=ds.df.tpa.iloc[i-D]
         tra=ds.df.TelescopeRaDeg.iloc[i]
         tdec=ds.df.TelescopeDecDeg.iloc[i]
         qG2T=Quat((0,angle,0))
         qI2T=qG2T*qest
         quats['qtelRA'].append(qI2T.ra+360)
         quats['qtelDEC'].append(qI2T.dec)
-        gangle=fmin(costGAngle,angle,args=(tra-360,tdec,qest),full_output=False,disp=False)
-        quats['gAngle'].append(gangle[0])
-    
-    teldata= pd.DataFrame(quats,index = ds.df.index)
+        quats['angle'].append(angle)
+    quats['qest']=quats['qest'][D:]
+    teldata= pd.DataFrame(quats,index = ds.df.index[D:])
     ds.df=pd.merge(ds.df,teldata,how='outer',left_index=True,right_index=True)
     
     print "Plotting..."
@@ -154,15 +147,6 @@ if __name__ == '__main__':
     data['biasY'].plot(ax=ax9)
     data['biasZ'].plot(ax=ax10)
     
-    plt.figure(5)
-    data = ds.df.dropna()
-    ax14=plt.subplot(111,xlabel='Time (frames)',ylabel='Griffins Angle (deg)')    
-    data[['griffinAAngleDegrees','gAngle']].plot(ax=ax14)
-    angleDiffs=(data.gAngle.subtract(data.griffinAAngleDegrees))
-    plt.figure(7)
-    angleDiffs.plot()
-    plt.xlabel('Time (frames')
-    plt.ylabel('Griffin angle offset (deg)')
     
     plt.figure(6)
     data=ds.df[['err_az','err_el','err_roll']].dropna()
@@ -173,6 +157,10 @@ if __name__ == '__main__':
     data['err_el'].plot(ax=ax12)
     data['err_roll'].plot(ax=ax13)
     
+    plt.figure(5)
+    data = ds.df.dropna()
+    ax14=plt.subplot(111,xlabel='Time (frames)',ylabel='Griffins Angle (deg)')    
+    data[['griffinBAngleDegrees','tpa']].plot(ax=ax14)
      
     crossDEC=errDEC.abs().argmin()
     crossRA=errRA.abs().argmin()
@@ -198,8 +186,6 @@ if __name__ == '__main__':
 
     print "Gap:",(crossDECnew-crossRAnew)/400.,"seconds"
     print "0 crossElevation:",crossxEl
-    #print angleDiffs
-    print "Griffin angle offset mean:", angleDiffs.mean()
 
     
     #===========================================================================
