@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     print "Generating quaternions..."
     quats=genQuaternions(ds.df)
-    print "Creating Starcam dataset..."
+    print "Creating Starcam dataframe..."
     triggers=ds.df.triggers.drop_duplicates()  
     triggers=triggers[[(triggers.loc[mceFN]<max(triggers.index) and triggers.loc[mceFN]>min(triggers.index)) for mceFN in triggers.index]]
     sc=pd.DataFrame(quats,index=ds.df.index)

@@ -49,7 +49,7 @@ if __name__ == '__main__':
     #data.index=data.index/ds.freq #index in seconds
     ds.df=ds.df[np.abs(ds.df['ut_ccmg'].values)<= 3e4]
     ds.df=ds.df[np.abs(ds.df['manual_speed'].values)<= 3e4]
-    matplotlib.style.use('classic')
+
     #plotting RA and DEC target vs estimated
     plt.ion()
     plt.figure(1)

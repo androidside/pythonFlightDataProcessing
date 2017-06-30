@@ -141,7 +141,7 @@ class DataSet():
         
         try:
             field_data = field.function(load_single_field(folder+field.fieldName,field.dtype,nValues=nValues,start=start))*field.conversion
-            
+            Lraw=len(field_data)
             timeName=field.indexName
             timeType=field.indexType
             if nValues is None:
@@ -173,21 +173,22 @@ class DataSet():
             if label in self.df.keys() and len(self.df[label].as_matrix())==len(field_data):
                 if verbose: print label+' already in dataframe.'
             else:
+                indmin=50000 #minimum index, frame number
                 if field.fieldName=='bettii.GpsReadings.altitudeMeters': #its GPS data (no mceframenumber)
                     time=self.times['bettii.RTLowPriority.mceFrameNumber'] #get another mceFN vector of this archive
                     L=len(field_data)
-                    time=time[time>1000]
+                    time=time[time>indmin]
                     time=np.linspace(time[0], time[-1], L)
                 if field.indexName=='bettii.ThermometersDemuxedCelcius.mceFrameNumber': #its a thermometer
                     field_data=field_data[field_data!=0]
                     L=len(field_data)
-                    time=time[time>1000]
+                    time=time[time>indmin]
                     time=np.linspace(time[0], time[-1], L)
-                L=len(field_data)
-                df_tmp = pd.DataFrame({label:field_data},index=time[:L]).sort_index()
+                L=min(len(field_data),len(time))
+                df_tmp = pd.DataFrame({label:field_data[:L]},index=time[:L]).sort_index()
                 df_tmp = df_tmp[~df_tmp.index.duplicated(keep='first')] #remove values with duplicated index
                 df_tmp=df_tmp[np.abs(df_tmp[label].as_matrix())<= field.range] #keep only the ones that are within fields range.
-                df_tmp=df_tmp[df_tmp.index>1000] #keep only meaningful index (a FN less than 1000 is impossible)
+                df_tmp=df_tmp[df_tmp.index>indmin] #keep only meaningful index (a FN less than indmin is impossible)
                 if not df_tmp.empty:
                     z=(np.abs(df_tmp.index)-np.mean(df_tmp.index))/np.std(df_tmp.index)
                     df_tmp=df_tmp[z<2] #keep only meaningful index (drop outliers >2sigmas)
@@ -202,7 +203,7 @@ class DataSet():
                 if self.df.empty: self.df = df_tmp
                 elif label in self.df: self.df = self.df.combine_first(df_tmp)
                 else: self.df =        pd.merge(self.df,df_tmp,how='outer',left_index=True,right_index=True) 
-                if verbose: print field.fieldName+' read. '+str(len(field_data))+' raw values. '+str(len(df_tmp))+' deduplicated values.'
+                if verbose: print field.fieldName+' read. '+str(Lraw)+' raw values. '+str(len(df_tmp))+' deduplicated values.'
         except Exception as e:
             raise
             print 'ERROR reading '+field.fieldName+':', e
