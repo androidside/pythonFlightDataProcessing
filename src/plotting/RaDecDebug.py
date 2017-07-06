@@ -1,7 +1,8 @@
 '''
-Created on 28 abr. 2017
+Created on 28 May 2017
 
-Main script
+Code to debug the delay in the estimated target RA,DEC crossings seen on Fort Summer.
+It's already been solved!
 
 @author: Marc Casalprim
 '''

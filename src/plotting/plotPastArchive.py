@@ -15,19 +15,17 @@ from utils.field import Field,getFieldsContaining
 
 
 if __name__ == '__main__':
-
+    
     folders=[]
-    root_folder='F:/GondolaFlightArchive/'
-    subdirs=next(os.walk(root_folder))[1]
-    folders=[root_folder+subdir+'/' for subdir in subdirs]
+    folders.append('C:/Users/bettii/Desktop/LocalAuroraArchive/17-05-30_19_44_12/')
 
+    img_folder='C:/Users/bettii/past_archive_plots/' 
     
-    
-    gyros=          False
-    momdump=        False
-    magnetometer=   False
+    gyros=          True
+    momdump=        True
+    magnetometer=   True
     thermometers=   True
-    currentSensors= False
+    currentSensors= True
     altitude=       False
     
     
@@ -61,7 +59,8 @@ if __name__ == '__main__':
     if currentSensors:
         folder=folders[0]
         l1=getFieldsContaining('bettii.currentReadout.currentReadout_UPBOne',folder)
-        l2=getFieldsContaining('bettii.currentReadout.currentReadout_UPBTwo',folder)
+        l2=[]
+        #l2=getFieldsContaining('bettii.currentReadout.currentReadout_UPBTwo',folder)
         lv=getFieldsContaining('bettii.currentReadout.voltage',folder)
         currentsUPB1_labels=[field.label for field in l1]
         currentsUPB2_labels=[field.label for field in l2]
@@ -73,13 +72,11 @@ if __name__ == '__main__':
             
     ds = DataSet(fieldsList=fieldsList,foldersList=folders,verbose=True,rpeaks=False)
     
-    print "Converting to Palestine Time..."
-    ds.df.index=ds.df.index-pd.Timedelta(hours=5) #Palestine time conversion (Archives folder names are in UTC)
 
     use('ggplot')
     mpl.rcParams['axes.grid']=True
     
-    img_folder='C:/Users/bettii/gondola_archive_plots/'
+
     time_label='Palestine Time'
     
     M=1 #downsample factor
@@ -131,18 +128,7 @@ if __name__ == '__main__':
         data.mPitch.plot(ax=ax2,style='.')
         fig.tight_layout()
         fig.savefig(img_folder+"magnetometer_unwrapped.png")
-        
-        
-        print "Plotting polar magnetometer"
-        fig=plt.figure()
-        data=ds.df.mAz.dropna()
-        fig.suptitle("Magnetometer Azimuth", fontsize=15,y=1)
-        t=data.index.astype(np.int64)//10**9 #in seconds
-        t=t-t[0] #reorigin
-        plt.polar(az*np.pi/180.,t**0.7,ms=0.3)
-        fig.tight_layout()
-        fig.savefig(img_folder+"magnetometer_polar.png")
-    
+            
     if momdump:
         print "Plotting rotator data..."
         fig=plt.figure()
@@ -157,7 +143,7 @@ if __name__ == '__main__':
         fig=plt.figure()
         fig.suptitle("Thermometers", fontsize=15,y=0.999)
         ax=plt.subplot(111,xlabel=time_label, ylabel='Temperature [Celsius]')
-        data=ds.df[therm_labels].dropna(how='all').interpolate(method='time')
+        data=ds.df[therm_labels].dropna(how='all').interpolate(method='values')
         data.plot(ax=ax,style='.',markersize=2.0)
         plt.legend(markerscale=3,numpoints=20)
         fig.tight_layout()
@@ -182,13 +168,15 @@ if __name__ == '__main__':
         fig.tight_layout()
         fig.savefig(img_folder+"currentsUPB1.png")
         
-        fig=plt.figure()
-        ax=plt.subplot(111,xlabel=time_label, ylabel='Current [A]')
-        data=ds.df[currentsUPB2_labels].dropna()
-        data.plot(ax=ax,style='.',ms=3.0)
-        plt.legend(markerscale=3,numpoints=20)
-        fig.tight_layout()
-        fig.savefig(img_folder+"currentsUPB2.png")
+        #=======================================================================
+        # fig=plt.figure()
+        # ax=plt.subplot(111,xlabel=time_label, ylabel='Current [A]')
+        # data=ds.df[currentsUPB2_labels].dropna()
+        # data.plot(ax=ax,style='.',ms=3.0)
+        # plt.legend(markerscale=3,numpoints=20)
+        # fig.tight_layout()
+        # fig.savefig(img_folder+"currentsUPB2.png")
+        #=======================================================================
         
         fig=plt.figure()
         ax=plt.subplot(111,xlabel=time_label, ylabel='Voltage [V]')

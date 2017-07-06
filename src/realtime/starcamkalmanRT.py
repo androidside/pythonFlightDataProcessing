@@ -1,13 +1,13 @@
 '''
-Created on 28 abr. 2017
+Created on 21 May 2017
 
-Main script
+Real Time plotting of the Starcamera solutions and Estimated attitudes in the Gyroscopes reference frame.
 
 @author: Marc Casalprim
 '''
-from test._mock_backport import inplace
 print 'Imports...'
 import matplotlib as mpl
+from matplotlib.style import use
 from utils.dataset import pd,DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from utils.quat import Quat,sin,cos
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqk',label='qk_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqr',label='qr_sc')) 
 
-    mpl.style.use('classic') 
+    use('classic') 
     mpl.rcParams['toolbar'] = 'None'
     initial_time=None #in frame number
     final_time = None #in frame number

@@ -1,7 +1,7 @@
 '''
-Created on 28 abr. 2017
+Created on 17 May 2017
 
-Main script
+Real Time plotting of the error between the SC and Estimator.
 
 @author: Marc Casalprim
 '''

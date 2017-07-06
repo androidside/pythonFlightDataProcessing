@@ -1,18 +1,20 @@
 '''
 Created on Jun 5, 2017
 
+Real time plotting of the FIR detectors data.
+There are some timing issues when generating the plots.
+The data reading and processing is fast, the problem comes from the plots.
+
 @author: Marc Casalprim
 '''
-from spyderplugins import widgets
-
 print 'Imports...'
 import matplotlib as mpl
 import warnings
 from matplotlib.style import use
 import matplotlib.animation as animation
 
-from utils.dataset import load_fields,DataSet,plt,np,pd
-from utils.field import Field,getDtypes,getFieldsContaining
+from utils.dataset import load_fields
+from utils.field import Field,getFieldsContaining
 from utils.detector import *
 
 if __name__ == '__main__':
@@ -36,7 +38,7 @@ if __name__ == '__main__':
     axes['power']=createImagesAxes('Power')
     
     axes['fft']=createDataAxes('FFTs',dets=[3]) #plot only detector D
-    axes['interf']=createDataAxes('Interferograms',dets=[1,3]) #plot only detector D
+    axes['interf']=createDataAxes('Interferograms',dets=[1,3]) #plot only detectors A and D
     #axes['fftcum']=createDataAxes('Integrated FFTs',dets=[3])
     
     plt.draw()

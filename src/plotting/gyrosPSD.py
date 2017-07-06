@@ -1,16 +1,14 @@
 '''
 Created on 28 abr. 2017
 
-Main script
+Plot of the Power Spectrum Density of the Gyroscopes
 
 @author: Marc Casalprim
 '''
-from matplotlib.pyplot import xlabel
 print 'Imports...'
 from matplotlib.style import use
 from utils.dataset import DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-import pandas as pd
 from scipy.signal.spectral import periodogram
 
 

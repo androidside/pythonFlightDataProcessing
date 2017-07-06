@@ -1,7 +1,7 @@
 '''
-Created on 28 abr. 2017
+Created on 17 may 2017
 
-Main script
+RT plottin gof the estimated biases.
 
 @author: Marc Casalprim
 '''

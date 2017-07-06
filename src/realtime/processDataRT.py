@@ -1,14 +1,14 @@
 '''
-Created on 28 abr. 2017
+Created on 2 May 2017
 
-Main script
+Real Time plots of crossElevation,elevation and target and telescope RA,DEC
 
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib
-from utils.dataset import DataSet,plt,sns
-from utils.field import Field#,getFieldsContaining,getFieldsRegex
+from matplotlib.style import use
+from utils.dataset import DataSet,plt
+from utils.field import Field
 
 
 
@@ -27,7 +27,7 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTHighPriority.targetDEC'))
     fieldsList.append(Field('bettii.RTHighPriority.targetRA'))
       
-    matplotlib.style.use('ggplot') 
+    use('ggplot') 
     
     initial_time=None #in frame number
     final_time = None #in frame number

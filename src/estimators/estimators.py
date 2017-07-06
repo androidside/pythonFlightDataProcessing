@@ -13,7 +13,7 @@ from utils.quat import Quat,vec2skew
 
 class Estimator15(object):
     '''
-    classdocs
+    Class implementing the 15 state Kalman filter.
     '''
 
 
@@ -21,9 +21,9 @@ class Estimator15(object):
         '''
         Constructor
         '''
-        self.gyros=gyros
-        self.sc=sc
-        self.est=None
+        self.gyros=gyros #dataframe whith the gyrsocopes data
+        self.sc=sc #dataframe with the starcamera data
+        self.est=None #resulting dataframe
     
     def plot(self):
         '''
@@ -59,9 +59,10 @@ class Estimator15(object):
     def estimate(self,P0=np.eye(15),b0=np.zeros(3),k0=np.zeros(3),m0=np.zeros(6),q0=None,Qd=np.eye(15),ts=None,te=None,progress=False):
         gyros=self.gyros.loc[ts:te]
         if progress: start_time = timer()
-        if q0 is None:
+        if q0 is None: #initializing the estimated attitude quaternion
             i=self.sc.loc[gyros.index[0]:].index[0] #index of the first starcamera solution trigger when having gyros
-            q0=self.sc.qI2G.loc[i]
+            q0=self.sc.qI2G.loc[i] #first starcamera solution assigned to the quaternion
+            #trimming of the dataframes
             gyros=gyros.loc[i:]
             sc=self.sc.loc[i:]
         else: sc=self.sc.loc[ts:te]

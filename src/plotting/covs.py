@@ -1,7 +1,8 @@
 '''
-Created on 28 abr. 2017
+Created on 28 May 2017
 
-Main script
+Plotting of the estimated biases and the diagonal values of the covariance matrix P
+In addition, a plot of the diagonal values of the P rotated by the qGyros2Starcam.
 
 @author: Marc Casalprim
 '''

@@ -1,7 +1,7 @@
 '''
-Created on 28 abr. 2017
+Created on 16 may 2017
 
-Main script
+Real Time script plotting Starcamera solutions in the Gyroscopes reference frame, using three different rotation orders.
 
 @author: Marc Casalprim
 '''
@@ -94,8 +94,6 @@ if __name__ == '__main__':
         qs = pd.DataFrame(d,index = data.index)
 
         for axis in ax: axis.clear()
-  
-        #plotting elevation and crossElevation
         
         qs[['dec_old','dec_mid','dec_new']].plot(ax=ax[0])
         qs[['ra_old','ra_mid','ra_new']].plot(ax=ax[1])

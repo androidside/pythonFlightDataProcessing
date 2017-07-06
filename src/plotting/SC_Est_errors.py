@@ -1,7 +1,11 @@
 '''
-Created on 28 abr. 2017
+Created on 23 May 2017
 
-Main script
+Plotting of:
+Estimator-SC errors in SC ref. frame
+Estimator-SC errors in Gondola ref. frame
+Biases
+
 
 @author: Marc Casalprim
 '''

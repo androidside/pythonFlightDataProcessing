@@ -1,7 +1,8 @@
 '''
-Created on 28 abr. 2017
+Created on 28 May 2017
 
-Main script
+Real time plotting of the estimated biases and the diagonal values of the covariance matrix P
+In addition, a RT plot of the diagonal values of the P rotated by the qGyros2Starcam.
 
 @author: Marc Casalprim
 '''
@@ -121,7 +122,7 @@ if __name__ == '__main__':
         P00rot=[0]*L
         P11rot=[0]*L
         P22rot=[0]*L
-        M=np.matrix([[0.693865,0,0.720106],[0,1,0],[-0.720106,0,0.693865]])
+        M=np.matrix([[0.693865,0,0.720106],[0,1,0],[-0.720106,0,0.693865]]) #rotation matrix used in LabView (qGyros2Starcam)
         mat=df_tmp.as_matrix()
         for i in range(L):
             ma=mat[i]

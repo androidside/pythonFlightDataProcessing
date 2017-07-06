@@ -1,7 +1,8 @@
 '''
-Created on 28 abr. 2017
+Created on 28 May 2017
 
-Main script
+Code to debug the delay in the estimated target RA,DEC crossings seen on Fort Summer.
+Trying to obtain via optimization the effective griffin angle used to get the telescope RA,DEC of the telemtry.
 
 @author: Marc Casalprim
 '''

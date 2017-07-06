@@ -6,11 +6,6 @@ The DataSet class is very similar, but using 'outer' merges
 
 @author: Marc Casalprim
 '''
-#===============================================================================
-# from itertools import combinations
-# from itertools import groupby
-# from numpy import sin,cos,arctan2,arcsin
-#===============================================================================
 import os
 import pandas as pd
 import numpy as np
@@ -20,30 +15,13 @@ import scipy.stats as stats
 from scipy.signal.spectral import periodogram
 from quat import Quat,normalize
 
-
-# plotting parameters
-#===============================================================================
-# mpl.rcParams['xtick.labelsize'] = 11
-# mpl.rcParams['xtick.major.size'] = 5
-# mpl.rcParams['ytick.major.size'] = 5
-# mpl.rcParams['xtick.minor.size'] = 5
-# mpl.rcParams['ytick.minor.size'] = 5
-# mpl.rcParams['ytick.labelsize'] = 11
-# mpl.rcParams['axes.labelsize'] = 11
-# mpl.rcParams['legend.fontsize'] = 11
-# mpl.rcParams['font.size'] = 11
-# mpl.rcParams['font.weight'] = 100
-# #mpl.rcParams['lines.linewidth'] = 2
-# mpl.rcParams['font.family'] = 'serif'
-# mpl.rcParams['font.serif'] = 'Times New Roman'
-#===============================================================================
-
 red = sns.xkcd_rgb['pale red']
 blue = sns.xkcd_rgb['denim blue']
 lt_blue = sns.xkcd_rgb['pastel blue']
 colors = [blue,'g',red]
 
 def load_single_field(fieldname,datatype,nValues=None,start=None):
+    """Return np.array from the file fieldname interpreting datatype (eg. 'i4')"""
     type_str_native = ">"+datatype
     type_str_final = "<"+datatype # change endianness
     
@@ -68,6 +46,7 @@ def load_single_field(fieldname,datatype,nValues=None,start=None):
     field = field.astype(type_str_final)
     return field
 def load_fields(fieldsList,folder=None,nValues=None,start=None):
+    """Return dictionary of np.array keyed by the field's label"""
     df={}
     for field in fieldsList:
         df[field.label]=load_single_field(folder+field.fieldName,field.dtype,nValues=nValues,start=start)
@@ -75,6 +54,7 @@ def load_fields(fieldsList,folder=None,nValues=None,start=None):
     return df
         
 def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc','qj_sc','qk_sc','qr_sc'],'qI2S':['ra_sc','dec_sc','roll_sc']},norm=False):
+    "Generates a dictionary of lists of utils.quat.Quat objects using the columns of dataframe defined on the quats dictionary."
     lists={}
     matrices={}
     for key in quats.keys() :
@@ -97,6 +77,21 @@ class DataSet():
         '''
         return a DataSet object containing df, a Pandas data frame indexed on the mceFramenumber
         Loads a list of fields fieldsList, the estimator data or the starcamera data dpeending on the correct parameters
+        Keyword arguments:
+        folder -- folder where the fields in fieldsList are located
+        freq   -- frequency of the mce (default 400Hz)
+        min    -- maximum mceFN value
+        max    --
+        folder_export -- folder where the plots will be saved
+        nValues -- number of values to read from the files (if None, all the file is  read)
+        start  -- value from where we start to read (if None, we count nValues from the end)
+        verbose -- Print progress of the dataframe generation
+        rpeaks -- Remove rows were all fields have values less than 1 (typical error when using telemetry archives)
+        estimator -- read estimator data?
+        starcam -- read starcam data?
+        fieldsList -- list of utils.field.Field objects, representing the fields to store on the dataframe.
+        foldersList -- list of folders, data will be merged
+        droplist -- list of columns to drop befure returning DataSet object
         '''
         
         self.folder = folder
@@ -105,10 +100,13 @@ class DataSet():
         self.freq = freq
         self.min=min
         self.max=max
-        if len(foldersList)<2:        self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start,verbose=verbose)
+        if len(foldersList)<2:
+            if len(foldersList)==1: self.folder=foldersList[0]
+            self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start,verbose=verbose,timeIndex=False)
         else:
             self.folder=foldersList[0]
-            self.readMultipleFolders(fieldsList,foldersList,rpeaks=rpeaks, verbose=verbose)
+            self.readMultipleFolders(fieldsList,foldersList,rpeaks=rpeaks, verbose=verbose,timeIndex=True)
+        
         if estimator:
             self.readEstimator()
         if starcam:
@@ -124,19 +122,19 @@ class DataSet():
         if folder_export == None: self.folder_export = self.folder.split('/')[-1]
         else: self.folder_export = folder_export
         
-    def readListFields(self,fieldsList,folder=None,timeDivider=1,rpeaks=True, verbose=False, nValues=None,start=None,timeIndex=False):
+    def readListFields(self,fieldsList,folder=None,rpeaks=True, verbose=False, nValues=None,start=None,timeIndex=False):
         i=0
         if verbose: print 'Reading list of '+str(len(fieldsList))+' fields.'
         for field in fieldsList:
             i=i+1
             if verbose: print str(100*i/len(fieldsList))+'%', 
-            self.readField(field, folder=folder,timeDivider=timeDivider,rpeaks=rpeaks,verbose=verbose,nValues=nValues,start=start)
+            self.readField(field, folder=folder,rpeaks=rpeaks,verbose=verbose,nValues=nValues,start=start)
         if verbose: print ''
         self.df = self.df.dropna(axis=0,how='all')
         self.df = self.df.loc[self.min:self.max,:]
         if rpeaks: #remove peaks
             self.df=self.df.loc[(self.df.abs()>=1).any(1)]  #remove rows were all fields have a value <1
-    def readField(self,field,folder=None,timeDivider=1,rpeaks=True,verbose=False,nValues=None,start=None,timeIndex=False):
+    def readField(self,field,folder=None,rpeaks=True,verbose=False,nValues=None,start=None,timeIndex=False):
         if folder is None: folder=self.folder
         
         try:
@@ -209,18 +207,24 @@ class DataSet():
             print 'ERROR reading '+field.fieldName+':', e
     
     def readMultipleFolders(self,fieldsList,foldersList,rpeaks=False, verbose=False,timeIndex=True):
+        """Stores in self.df a new pd.DatFrame onject containing
+        the fieldsList data from all the folders in foldersList.
+        The indexing of the DataFrame is a DatetimeIndex by default
+        (timeIndex=True), using the date and time of the folder name."""
         i=0
-        dftmp=pd.DataFrame()
+        dftmp=pd.DataFrame() #temporal dataframe where all the data is being merged
         for folder in foldersList:
             if verbose: print 'Reading list of '+str(len(fieldsList))+' fields from folder '+folder+'.'
             self.times=dict()
-            self.df=pd.DataFrame()
+            self.df=pd.DataFrame() #reset of self.df, that way we can use readField method
             for field in fieldsList:
                 i=i+1
                 if verbose: print str(100*i/len(foldersList)/len(fieldsList))+'%', 
                 self.readField(field, folder=folder,rpeaks=rpeaks,verbose=verbose,timeIndex=False)
             if verbose: print ''
             self.df = self.df.dropna(axis=0,how='all')
+            #if True, change mceFN indexing to a DatetimeIndex
+            #Using folder name as the time for the first mce frame
             if timeIndex and len(self.df.index)>0:
                 text=folder.split('/')[-2]
                 ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
@@ -322,26 +326,6 @@ class DataSet():
         df_solution = pd.merge(df_solution,pd.DataFrame(meas_radecroll,index=df_solution.index),how='inner',left_index=True,right_index=True)
         df_solution = df_solution.drop(['meas_qi','meas_qj','meas_qk','meas_qr'],1)
         
-        # trigger pulses (aligned with mceFrameNmber); this tells us how long the exposure time was, in number of frames (400Hz)
-        #position given by the star camera corresponds should be compared to the estimated position at the 
-        # at the location of the trigger (the index of this pulse) + half the amount of this pulse's value
-        
-        #=======================================================================
-        # starcam_trigger_pulses =load_single_field(folder+'bettii.RTHighPriority.StarCameraTriggerStatus','i8')
-        # 
-        # 
-        # #sort out the triggers and bad data lines
-        # pulses = pd.DataFrame({'duration': starcam_trigger_pulses},index = self.times['bettii.RTHighPriority.mceFrameNumber']/timeDivider)
-        # pulses.drop_duplicates(inplace=True)
-        # durations = self.pulses.loc[df_solution['triggers']]
-        # durations = pd.DataFrame(durations,index = durations.index)
-        # df_solution = pd.merge(df_solution,durations,how='inner',left_on='triggers',right_index=True)
-        # df_solution = df_solution.dropna(axis=0)
-        # df_solution['trigger_center'] = df_solution['triggers']+np.round(df_solution['duration']/8)*4
-        #=======================================================================
-        
-        # what are the estimated values?
-        #self.df = pd.merge(self.df,df_solution,how='outer',left_on='trigger_center',right_index=True)
         self.df = pd.merge(self.df,df_solution,how='outer',left_index=True,right_index=True)
 
     def simplePlot(self,val,minMax = [],ylabel="",origin=0,ax_key=None,save=False,draw=True,realTime=True,name=None,color=sns.xkcd_rgb['denim blue']):
@@ -474,6 +458,7 @@ class DataSet():
         print "Done."
         
 def plotColumns(df,units=''):
+    """Plot all columns of the pd.Dataframe df in a Nx1 subplots layout"""
     data = df.dropna()
     plt.figure()
     N=len(data.columns)

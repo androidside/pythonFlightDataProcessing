@@ -1,7 +1,8 @@
 '''
-Created on 28 abr. 2017
+Created on 23 May 2017
 
-Main script
+Plotting of the gyroscopes propagation, starting from the first Starcamera solution.
+Comparing with Starcamera and Estimator in Gyros ref frame.
 
 @author: Marc Casalprim
 '''
