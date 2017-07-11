@@ -65,18 +65,18 @@ if __name__ == '__main__':
         for axis in ax: axis.clear()
         
         #print 'Plotting last '+str(lastNValues)+' values.'
-        #plotting RA and DEC target vs estimated
+        #scripts RA and DEC target vs estimated
         data[['targetDEC','TelescopeDecDeg']].plot(ax=ax[0])
         data[['targetRA','TelescopeRaDeg']].plot(ax=ax[1])       
         
-        #plotting RA and DEC estimated-target  estimated
+        #scripts RA and DEC estimated-target  estimated
         
         errDEC=(data.TelescopeDecDeg.subtract(data.targetDEC))
         errDEC.plot(ax=ax[2])
         errRA=(data.TelescopeRaDeg.subtract(data.targetRA))
         errRA.plot(ax=ax[3])
         
-        #plotting elevation and crossElevation
+        #scripts elevation and crossElevation
         
         data['elevation'].plot(ax=ax[4])
         data['crossElevation'].plot(ax=ax[5])

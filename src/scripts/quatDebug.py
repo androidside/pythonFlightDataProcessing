@@ -1,7 +1,8 @@
 '''
-Created on 28 abr. 2017
+Created on 17 may. 2017
 
-Main script
+Generates the quaternions from the archive and three possible qSC2G rotations (old,mid,new).
+Useful to play with them after in a n interactive console, to see if the math is correct and debug.
 
 @author: Marc Casalprim
 '''

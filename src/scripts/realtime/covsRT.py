@@ -1,7 +1,7 @@
 '''
 Created on 28 May 2017
 
-Real time plotting of the estimated biases and the diagonal values of the covariance matrix P
+Real time scripts of the estimated biases and the diagonal values of the covariance matrix P
 In addition, a RT plot of the diagonal values of the P rotated by the qGyros2Starcam.
 
 @author: Marc Casalprim

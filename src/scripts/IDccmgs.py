@@ -1,7 +1,8 @@
 '''
-Created on 28 abr. 2017
+Created on 30 may. 2017
 
-Main script
+Generates a dataset including CCMGinput, wheelsAngle and Gyros and saves it on a .mat file.
+Useful for model identification, or finding the Inertia value in MatLab.
 
 @author: Marc Casalprim
 '''
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     ds.df=ds.df[np.abs(ds.df['ut_ccmg'].values)<= 3e4]
     ds.df=ds.df[np.abs(ds.df['manual_speed'].values)<= 3e4]
 
-    #plotting RA and DEC target vs estimated
+    #scripts RA and DEC target vs estimated
     plt.ion()
     plt.figure(1)
     ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='Jog Speed')

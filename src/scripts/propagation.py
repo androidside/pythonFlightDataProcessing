@@ -1,14 +1,15 @@
 '''
 Created on 28 abr. 2017
 
-Main script
-
+Propagates the gyroscopes applying to them only a matrix M (no bias).
+Plots the comparison between the Propagation, the Starcamera and the estimated by Boop.
 @author: Marc Casalprim
 '''
 print 'Imports...'
 import matplotlib
 import numpy as np
-import scipy
+from matplotlib.style import use
+from scipy.linalg import expm
 from utils.quat import Quat,normalize,sin,cos
 from utils.dataset import DataSet,plt,sns,load_single_field,pd
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
@@ -18,8 +19,9 @@ from itertools import izip_longest
 if __name__ == '__main__':
 
     #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_02_46_56\\"
-    #folder='C:/17-05-23_23_45_10/'
-    folder = "C:/17-05-28_00_59_52/"
+    folder='C:/17-05-23_23_45_10/'
+    folder='C:/17-05-28_02_18_19/'
+    #folder = "C:/17-05-28_00_59_52/"
     Field.DTYPES=getDtypes(folder)
     
     fieldsList=[]
@@ -42,13 +44,9 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
     
 
-    initial_time=2000000 #in frame number
-    final_time = 2010000 #in frame number
-    
-    #===========================================================================
-    # initial_time=None #in frame number
-    # final_time = None #in frame number
-    #===========================================================================
+   
+    initial_time=None #in frame number
+    final_time = None #in frame number
     
     #===========================================================================
     # initial_time=7000000 #in frame number
@@ -71,11 +69,18 @@ if __name__ == '__main__':
     qStarcam2Gyros_new =  Quat((dYaw,-dPitch,dRoll))
     
     qStarcam2Gyros=qStarcam2Gyros_old#[qStarcam2Gyros_old,qStarcam2Gyros_mid,qStarcam2Gyros_new]
-    
+    qrot=qStarcam2Gyros.inv()
     ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=True)
-    ds.df=ds.df.interpolate(method='values').dropna()
+    ds.df=ds.df.dropna()
     ds.df=ds.df.loc[initial_time:final_time]
     print 'Dataframe shape:', ds.df.shape
+    triggers=ds.df.triggers.drop_duplicates()
+    
+    
+    ds.df=pd.merge(ds.df,pd.DataFrame({'t':ds.df.triggers.drop_duplicates().values},index=ds.df.triggers.drop_duplicates().values).dropna(),how='outer',right_index=True,left_index=True)
+    ds.df=ds.df.interpolate(method='values').drop(['triggers', 't'],axis=1).dropna()
+    
+    gyros=ds.df[['gyroX','gyroY','gyroZ']]
     
     q_est_list=[]    
     q_sc_list=[]
@@ -94,7 +99,7 @@ if __name__ == '__main__':
         q_sc_list.append(q_sc)
         qI2Starcam_list.append(q_i2s) #no other way to get the SC solution :( There is now!!
         i=i+1
-    triggers=ds.df['triggers'].drop_duplicates()
+    estim = pd.DataFrame({'qest':q_est_list},index=ds.df.index)
     i2s=pd.DataFrame({'qI2S': qI2Starcam_list,'qI2G': q_sc_list, 'qest':q_est_list},index=ds.df.index)
     i2s=i2s.loc[triggers.index]
     i2s.index=triggers.values  
@@ -105,12 +110,15 @@ if __name__ == '__main__':
     i2s=i2s.loc[i:]
     i_old=ds.df.index[0]
     
-    q_prop=Quat((0,0,0,1))
+    q_prop=q_old#Quat((0,0,0,1))
     props=[q_prop]
     i_prop=[i_old]
-    errs=[]
+    errsc_psc=[]
+    errsc_esc=[]
+    errg_psc=[]
+    errg_esc=[]
     i_err=[]
-    gyros=ds.df[['gyroX','gyroY','gyroZ']].loc[i_old:].dropna()
+    gyros=gyros.loc[i_old:].dropna()
     #===========================================================================
     # c=[0.0001,0.0001,0.0001]
     # cxy=c[0];cxz=c[1];cyz=c[2];
@@ -127,78 +135,83 @@ if __name__ == '__main__':
         wx=w[0,0];wy=w[0,1];wz=w[0,2]
         #wx=w[0];wy=w[1];wz=w[2]
         Ow=np.matrix([[0,wz,-wy,wx],[-wz,0,wx,wy],[wy,-wx,0,wz],[-wx,-wy,-wz,0]]) #Omega(omega)
-        A=scipy.linalg.expm(0.5*Ow*dt)
+        A=expm(0.5*Ow*dt)
         q_prop=Quat(A.dot(q_prop.q))
         props.append(q_prop)
         ind=gyros.index[j]
         i_prop.append(ind)
         if ind in i2s.index:
-            qdif=q_prop*i2s.qI2S.loc[ind].inv()
-            err=qdif.q[0]**2+qdif.q[1]**2+qdif.q[2]**2
-            errs.append(qdif)
+            qi2g=i2s.qI2G.loc[ind]
+            qest=i2s.qest.loc[ind]
+            qdif=q_prop.equatorial-qi2g.equatorial
+            qprop_sc=qrot*q_prop
+            qi2s=qrot*qi2g
+            qest_sc=qrot*qest
+            #err=qdif.q[0]**2+qdif.q[1]**2+qdif.q[2]**2
+            errsc_psc.append(qprop_sc.equatorial-qi2s.equatorial)
+            errsc_esc.append(qest_sc.equatorial-qi2s.equatorial)
+            errg_psc.append(q_prop.equatorial-qi2g.equatorial)
+            errg_esc.append(qest.equatorial-qi2g.equatorial)
             i_err.append(ind)
-
+    errors=pd.DataFrame
     
     print "Plotting..."
-    matplotlib.style.use('classic')
+    use('seaborn-bright')
     matplotlib.rcParams['axes.grid']=True
     
     fig=plt.figure()
     ax=plt.subplot(111)
     plt.plot(i_prop,[q.ra for q in props])
-    plt.plot(i2s.index,[q.ra for q in i2s.qI2S.values])
-    ax.legend(['Propagated','Starcam'])                         
+    plt.plot(i2s.index,[q.ra for q in i2s.qI2G.values])
+    plt.plot(estim.index,[q.ra for q in estim.qest.values])
+    ax.legend(['Propagated','Starcam','Estimated'])                         
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('RA (deg)')
         
     fig=plt.figure()
     ax=plt.subplot(111)
     plt.plot(i_prop,[q.dec for q in props])
-    plt.plot(i2s.index,[q.dec for q in i2s.qI2S.values])
-    ax.legend(['Propagated','Starcam'])  
+    plt.plot(i2s.index,[q.dec for q in i2s.qI2G.values])
+    plt.plot(estim.index,[q.dec for q in estim.qest.values])
+    ax.legend(['Propagated','Starcam','Estimated'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('DEC (deg)')
         
     fig=plt.figure()
     ax=plt.subplot(111)
     plt.plot(i_prop,[q.roll for q in props])
-    plt.plot(i2s.index,[q.roll for q in i2s.qI2S.values])
-    ax.legend(['Propagated','Starcam'])  
+    plt.plot(i2s.index,[q.roll for q in i2s.qI2G.values])
+    plt.plot(estim.index,[q.roll for q in estim.qest.values])
+    ax.legend(['Propagated','Starcam','Estimated'])   
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('ROLL (deg)')
     
-    fig=plt.figure()
-    for i in range(4):
-        ax=plt.subplot(2,2,i+1)
-        plt.plot(i_err,[q.q[i] for q in errs])
-        ax.set_ylabel('dq'+str(i))
-    
+  
     fig=plt.figure()
     ax=plt.subplot(3,1,1)
-    plt.plot(i_err,[q.ra*3600 for q in errs])
+    plt.plot(i_err,[q[0]*3600 for q in errg_psc],i_err,[q[0]*3600 for q in errg_esc]);ax.legend(['Propagated','Estimated'])  
     ax.set_ylabel('RA (arcsec)')
     ax=plt.subplot(3,1,2)
-    plt.plot(i_err,[q.dec*3600 for q in errs])
+    plt.plot(i_err,[q[1]*3600 for q in errg_psc],i_err,[q[1]*3600 for q in errg_esc]);ax.legend(['Propagated','Estimated']) 
     ax.set_ylabel('DEC (arcsec)')
     ax=plt.subplot(3,1,3)
-    plt.plot(i_err,[q.roll*3600 for q in errs])
+    plt.plot(i_err,[q[2]*3600 for q in errg_psc],i_err,[q[2]*3600 for q in errg_esc]);ax.legend(['Propagated','Estimated']) 
     ax.set_ylabel('ROLL (arcsec)')
+    fig.suptitle('Errors Gyros frame')
+    
     
     fig=plt.figure()
     ax=plt.subplot(3,1,1)
-    plt.plot(i_err,[q.ra for q in errs])
-    ax.set_ylabel('RA (deg)')
+    plt.plot(i_err,[q[0]*3600 for q in errsc_psc],i_err,[q[0]*3600 for q in errsc_esc]);ax.legend(['Propagated','Estimated']) 
+    ax.set_ylabel('RA (arcsec)')
     ax=plt.subplot(3,1,2)
-    plt.plot(i_err,[q.dec for q in errs])
-    ax.set_ylabel('DEC (deg)')
+    plt.plot(i_err,[q[1]*3600 for q in errsc_psc],i_err,[q[1]*3600 for q in errsc_esc]);ax.legend(['Propagated','Estimated']) 
+    ax.set_ylabel('DEC (arcsec)')
     ax=plt.subplot(3,1,3)
-    plt.plot(i_err,[q.roll for q in errs])
-    ax.set_ylabel('ROLL (deg)')
+    plt.plot(i_err,[q[2]*3600 for q in errsc_psc],i_err,[q[2]*3600 for q in errsc_esc]);ax.legend(['Propagated','Estimated']) 
+    ax.set_ylabel('ROLL (arcsec)')
+    fig.suptitle('Errors SC frame')
     
-    mq=range(4)
-    for i in range(4):
-        mq[i]=np.array([q.q[i] for q in errs]).mean()
-    print mq
-    print np.linalg.norm(mq)
+   
     a=1  
     plt.show()

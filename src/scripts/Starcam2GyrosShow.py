@@ -1,7 +1,7 @@
 '''
-Created on 28 abr. 2017
+Created on 24 abr. 2017
 
-Main script
+Script to show the impact of an error in roll.
 
 @author: Marc Casalprim
 '''

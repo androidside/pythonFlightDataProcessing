@@ -71,7 +71,7 @@ if __name__ == '__main__':
         st=max(ds.df.index)-lastNValues #starting time for the x axis
         data=ds.df.loc[st:,:]
 
-        #plotting elevation and crossElevation
+        #scripts elevation and crossElevation
         try:
             x=data.index
             xlims=(min(x),max(x))

@@ -54,7 +54,7 @@ def load_fields(fieldsList,folder=None,nValues=None,start=None):
     return df
         
 def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc','qj_sc','qk_sc','qr_sc'],'qI2S':['ra_sc','dec_sc','roll_sc']},norm=False):
-    "Generates a dictionary of lists of utils.quat.Quat objects using the columns of dataframe defined on the quats dictionary."
+    """Generates a dictionary of lists of utils.quat.Quat objects using the columns of dataframe defined on the quats dictionary."""
     lists={}
     matrices={}
     for key in quats.keys() :
@@ -70,10 +70,26 @@ def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc'
      
     return lists
 
+def extractGyrosAndStarcam(dataframe,labels_gyros=['gyroX','gyroY','gyroZ'],label_triggers='triggers',label_scerrors=['ra_err','dec_err','roll_err']):
+    """Returns two dataframes with the Groscopes and Starcamera data respectively. Synchronizes the Starcamera with the triggers. Useful for the Estimator classes."""
+    print "Generating quaternions..."
+    quats=genQuaternions(dataframe,norm=True)
+    print "Creating Starcam dataframe..."
+    triggers=dataframe[label_triggers].drop_duplicates()  
+    triggers=triggers[[(triggers.loc[mceFN]<max(triggers.index) and triggers.loc[mceFN]>min(triggers.index)) for mceFN in triggers.index]]
+    sc=pd.DataFrame(quats,index=dataframe.index)
+    quats=sc
+    if label_scerrors is not None: sc=pd.merge(sc,dataframe[label_scerrors],how='outer',left_index=True,right_index=True) 
+    sc=sc.loc[triggers.index]
+    sc.index=triggers.values  
+    if labels_gyros is not None: gyros=dataframe[labels_gyros]
+    else: gyros=None
+    #print 'Done'  
+    return gyros,sc,quats
     
 class DataSet():
         
-    def __init__(self,folder=None,freq=400.,min=None,max=None,folder_export = None, nValues=None, start=None, verbose=False, rpeaks=True,estimator=False,starcam=False,fieldsList=[],foldersList=[],droplist = []):
+    def __init__(self,folder=None,freq=400.,min=None,max=None,folder_export = None, nValues=None, start=None, verbose=False, rpeaks=False,estimator=False,starcam=False,fieldsList=[],foldersList=[],droplist = [],timeIndex=False):
         '''
         return a DataSet object containing df, a Pandas data frame indexed on the mceFramenumber
         Loads a list of fields fieldsList, the estimator data or the starcamera data dpeending on the correct parameters
@@ -102,7 +118,7 @@ class DataSet():
         self.max=max
         if len(foldersList)<2:
             if len(foldersList)==1: self.folder=foldersList[0]
-            self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start,verbose=verbose,timeIndex=False)
+            self.readListFields(fieldsList,rpeaks=rpeaks,nValues=nValues,start=start,verbose=verbose,timeIndex=timeIndex)
         else:
             self.folder=foldersList[0]
             self.readMultipleFolders(fieldsList,foldersList,rpeaks=rpeaks, verbose=verbose,timeIndex=True)
@@ -117,12 +133,13 @@ class DataSet():
             self.df = self.df.drop(droplist)
             if rpeaks: #remove peaks
                 self.df=self.df.loc[(self.df.abs()>=1).any(1)]  #remove rows were all fields have a value <1           
-            self.df = self.df.loc[self.min:self.max,:]
+            #self.df = self.df.loc[self.min:self.max,:]
                 
         if folder_export == None: self.folder_export = self.folder.split('/')[-1]
         else: self.folder_export = folder_export
         
     def readListFields(self,fieldsList,folder=None,rpeaks=True, verbose=False, nValues=None,start=None,timeIndex=False):
+        if folder is None: folder=self.folder
         i=0
         if verbose: print 'Reading list of '+str(len(fieldsList))+' fields.'
         for field in fieldsList:
@@ -132,6 +149,14 @@ class DataSet():
         if verbose: print ''
         self.df = self.df.dropna(axis=0,how='all')
         self.df = self.df.loc[self.min:self.max,:]
+        if timeIndex and len(self.df.index)>0:
+            text=folder.split('/')[-2]
+            ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
+            ftime=pd.to_datetime(ftime_str,yearfirst=True)
+            index=(self.df.index-self.df.index[0])/self.freq #time in seconds
+            index=pd.to_timedelta(index,unit='s')
+            time=ftime+index
+            self.df.index=time
         if rpeaks: #remove peaks
             self.df=self.df.loc[(self.df.abs()>=1).any(1)]  #remove rows were all fields have a value <1
     def readField(self,field,folder=None,rpeaks=True,verbose=False,nValues=None,start=None,timeIndex=False):
@@ -172,24 +197,24 @@ class DataSet():
                 if verbose: print label+' already in dataframe.'
             else:
                 indmin=50000 #minimum index, frame number
-                if field.fieldName=='bettii.GpsReadings.altitudeMeters': #its GPS data (no mceframenumber)
+                if field.fieldName=='bettii.GpsReadings.altitudeMeters': #its GPS data (theres no mceframenumber)
                     time=self.times['bettii.RTLowPriority.mceFrameNumber'] #get another mceFN vector of this archive
                     L=len(field_data)
                     time=time[time>indmin]
-                    time=np.linspace(time[0], time[-1], L)
+                    time=np.round(np.linspace(time[0], time[-1], L))
                 if field.indexName=='bettii.ThermometersDemuxedCelcius.mceFrameNumber': #its a thermometer
                     field_data=field_data[field_data!=0]
                     L=len(field_data)
                     time=time[time>indmin]
-                    time=np.linspace(time[0], time[-1], L)
+                    time=np.linspace(time[0], time[-1], L) #we expand the time (i dont understand the logic of the thermomemeters mceframenumber)
                 L=min(len(field_data),len(time))
-                df_tmp = pd.DataFrame({label:field_data[:L]},index=time[:L]).sort_index()
+                df_tmp = pd.DataFrame({label:field_data[:L]},index=time[:L]).sort_index() #create temporal dataframe
                 df_tmp = df_tmp[~df_tmp.index.duplicated(keep='first')] #remove values with duplicated index
                 df_tmp=df_tmp[np.abs(df_tmp[label].as_matrix())<= field.range] #keep only the ones that are within fields range.
                 df_tmp=df_tmp[df_tmp.index>indmin] #keep only meaningful index (a FN less than indmin is impossible)
                 if not df_tmp.empty:
                     z=(np.abs(df_tmp.index)-np.mean(df_tmp.index))/np.std(df_tmp.index)
-                    df_tmp=df_tmp[z<2] #keep only meaningful index (drop outliers >2sigmas)
+                    df_tmp=df_tmp[z<2] #keep only meaningful index (drop outliers >2sigmas), seems dangerous but there are always bad mceFN that mess the entire plot
                 if timeIndex and len(df_tmp.index)>0:
                     text=folder.split('/')[-2]
                     ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
@@ -456,7 +481,19 @@ class DataSet():
             if show: plt.draw()
             #plt.close(fig)
         print "Done."
-        
+def toTimeIndex(dataframe,folder,freq=400.):
+    """Returns the same dataframe but with the indices in DateTime format.
+    The input dataframe must have mceFrameNumber indices.
+    The time in the folder is considered as the starting time for the first mce frame number.
+    """
+    text=folder.split('/')[-2]
+    ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
+    ftime=pd.to_datetime(ftime_str,yearfirst=True)
+    index=(dataframe.index-dataframe.index[0])/freq #time in seconds
+    index=pd.to_timedelta(index,unit='s')
+    time=ftime+index
+    dataframe.index=time
+    return dataframe   
 def plotColumns(df,units=''):
     """Plot all columns of the pd.Dataframe df in a Nx1 subplots layout"""
     data = df.dropna()
@@ -464,7 +501,7 @@ def plotColumns(df,units=''):
     N=len(data.columns)
     for i in range(N):
         column=data.columns[i]
-        ax=plt.subplot(N,1,i)
+        ax=plt.subplot(N,1,i+1)
         data[column].plot(ax=ax)
         ax.set_ylabel(column+' '+units)
     ax.set_xlabel('Index')

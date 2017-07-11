@@ -84,7 +84,7 @@ if __name__ == '__main__':
         #i=i+1;ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
         data=ds.df.loc[max(ds.df.index)-lastNValues:,:]
 
-        #plotting elevation and crossElevation
+        #scripts elevation and crossElevation
         try:
             x=data.index
             xlims=(min(x),max(x))

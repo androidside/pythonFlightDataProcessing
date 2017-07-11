@@ -110,7 +110,7 @@ if __name__ == '__main__':
     
     for axis in ax: axis.clear()
     
-    #plotting elevation and crossElevation
+    #scripts elevation and crossElevation
     if not qs.empty:
         #=======================================================================
         # qs[['dec_sc','dec_est','dec_sc_SC','dec_est_SC']].plot(ax=ax[0])

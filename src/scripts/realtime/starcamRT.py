@@ -1,7 +1,7 @@
 '''
 Created on 16 may 2017
 
-Real Time script plotting Starcamera solutions in the Gyroscopes reference frame, using three different rotation orders.
+Real Time script scripts Starcamera solutions in the Gyroscopes reference frame, using three different rotation orders.
 
 @author: Marc Casalprim
 '''

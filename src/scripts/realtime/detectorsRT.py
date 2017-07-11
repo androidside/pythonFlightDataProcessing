@@ -1,7 +1,7 @@
 '''
 Created on Jun 5, 2017
 
-Real time plotting of the FIR detectors data.
+Real time scripts of the FIR detectors data.
 There are some timing issues when generating the plots.
 The data reading and processing is fast, the problem comes from the plots.
 

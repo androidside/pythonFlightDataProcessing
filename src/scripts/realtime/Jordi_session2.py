@@ -15,26 +15,24 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 if __name__ == '__main__':
     folder = "C:/17-05-17_00_36_34/"
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-24_00_40_24\\"
+    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-23_23_25_41\\"
     
     Field.DTYPES=getDtypes(folder)
 
     
     fieldsList=[]
      
-    fieldsList.append(Field('bettii.RTHighPriority.TelescopeRaDeg',label='tra'))
-    fieldsList.append(Field('bettii.RTHighPriority.TelescopeDecDeg',label='tdec'))
-    fieldsList.append(Field('bettii.RTHighPriority.GondolaRaDeg',label='gra'))
-    fieldsList.append(Field('bettii.RTHighPriority.GondolaDecDeg',label='gdec'))
-    fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRaDeg',label='sra'))
-    fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraDecDeg',label='sdec'))
+    fieldsList.append(Field('bettii.PIDInputCCMG.positionTarget',label='ptarget'))
+    fieldsList.append(Field('bettii.PIDInputCCMG.positionMeasurement',label='pmeas'))
+    fieldsList.append(Field('bettii.PIDInputCCMG.velocityTarget',label='vtarget'))
+    fieldsList.append(Field('bettii.PIDInputCCMG.velocityMeasurement',label='vmeas'))
 
-    fieldsList.append(Field('bettii.GriffinsGalil.griffinAAngleDegrees',label='gangle'))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
     use('classic') 
     mpl.rcParams['toolbar'] = 'None'
     mpl.rcParams['axes.grid'] = True
-    #mpl.rcParams['axes.formatter.useoffset'] = False
-
     
     ds = DataSet(folder,rpeaks=True)
     ds.readListFields(fieldsList, nValues=1000,verbose=True)   
@@ -44,48 +42,44 @@ if __name__ == '__main__':
     fig=[]
     ax={}
     fig.append(plt.figure(1)) 
-    ax['sra']=(plt.subplot(231,ylabel='RA (deg)'))
-    ax['sdec']=(plt.subplot(234,xlabel='Time (frames)',ylabel='DEC (deg)'))
-    ax['gra']=(plt.subplot(232))
-    ax['gdec']=(plt.subplot(235,xlabel='Time (frames)'))
-    ax['tra']=(plt.subplot(233))
-    ax['tdec']=(plt.subplot(236,xlabel='Time (frames)'))
+    ax['gx']=(plt.subplot(311,ylabel='Gyro X'))
+    ax['gy']=(plt.subplot(312,ylabel='Gyro Y'))
+    ax['gz']=(plt.subplot(313,ylabel='Gyro Z'))
     fig.append(plt.figure(2))
-    ax['gangle']=(plt.subplot(111,xlabel='Time (frames)',ylabel='Griffin A Angle (deg)'))
+    ax['ptarget']=(plt.subplot(221,ylabel='Position'))
+    ax['pmeas']=(plt.subplot(222))
+    ax['vtarget']=(plt.subplot(223,xlabel='Time (frames)',ylabel='Velocity')) 
+    ax['vmeas']=(plt.subplot(224,xlabel='Time (frames)'))
     
-    ax['sra'].set_title('StarCamera')
-    ax['gra'].set_title('Gondola')
-    ax['tra'].set_title('Telescope')
-    
-    for a in ax.values(): a.get_yaxis().get_major_formatter().set_useOffset(False)
+    ax['ptarget'].set_title('Target')
+    ax['pmeas'].set_title('Measurement')
 
     
-    data['tra'].plot(ax=ax['tra'])
-    data['tdec'].plot(ax=ax['tdec'])
-    data['gra'].plot(ax=ax['gra'])
-    data['gdec'].plot(ax=ax['gdec'])
-    data['sra'].plot(ax=ax['sra'])
-    data['sdec'].plot(ax=ax['sdec'])
-    data['gangle'].plot(ax=ax['gangle'])
+    data['gyroX'].plot(ax=ax['gx'])
+    data['gyroY'].plot(ax=ax['gy'])
+    data['gyroZ'].plot(ax=ax['gz'])
+    data['ptarget'].plot(ax=ax['ptarget'])
+    data['pmeas'].plot(ax=ax['pmeas'])
+    data['vtarget'].plot(ax=ax['vtarget'])
+    data['vmeas'].plot(ax=ax['vmeas'])
     
     m={} #map axes to columns
     for a in ax.keys(): m[a]=[l.get_label() for l in ax[a].get_lines()]
-    
-    #plt.ion()
      
     plt.draw()
     fig[0].tight_layout()
-    lastNValues=4000
+    fig[1].tight_layout()
+    lastNValues=30000
     nValues=1200
     i=-1
     while True:
         #i=i+1
         #print 'Reading bytes from '+str(nValues*i)+' to '+str(nValues*(i+1)) 
-        ds.readListFields(fieldsList, nValues=nValues,verbose=False,rpeaks=True)   
+        ds.readListFields(fieldsList, nValues=nValues,verbose=False)   
         #i=i+1;ds.readListFields(fieldsList, nValues=nValues,start=nValues*i,verbose=False) #for simulation
         data=ds.df.loc[max(ds.df.index)-lastNValues:,:]
 
-        #plotting elevation and crossElevation
+        #scripts elevation and crossElevation
         try:
             x=data.index
             xlims=(min(x),max(x))
@@ -114,6 +108,7 @@ if __name__ == '__main__':
         ds.df=data #we delete some memory
         plt.draw()
         fig[0].tight_layout()
+        fig[1].tight_layout()
         plt.pause(0.1)
     plt.show()
 

@@ -1,7 +1,7 @@
 '''
 Created on 21 May 2017
 
-Real Time plotting of the Starcamera solutions and Estimated attitudes in the Gyroscopes reference frame.
+Real Time scripts of the Starcamera solutions and Estimated attitudes in the Gyroscopes reference frame.
 
 @author: Marc Casalprim
 '''
@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
         for axis in ax: axis.clear()
   
-        #plotting elevation and crossElevation
+        #scripts elevation and crossElevation
         if not qs.empty:
             qs[['dec_sc','dec_est']].plot(ax=ax[0])
             qs[['ra_sc','ra_est']].plot(ax=ax[1])

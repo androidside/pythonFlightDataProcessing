@@ -1,7 +1,7 @@
 '''
 Created on Jun 22, 2017
 
-Altitude plotting without indexing, because we dont have a valid index for GpsReadings (approximatmceFN is empty)
+Altitude scripts without indexing, because we dont have a valid index for GpsReadings (approximatmceFN is empty)
 
 @author: Marc Casalprim
 '''

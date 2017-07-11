@@ -121,7 +121,7 @@ if __name__ == '__main__':
     use('classic')
     mpl.rcParams['axes.grid'] = True
     
-    #plotting RA and DEC target vs estimated
+    #scripts RA and DEC target vs estimated
     plt.figure(1)
     data = ds.df.dropna()
     ax1=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC (deg)')
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     data[['targetDEC','TelescopeDecDeg','qtelDEC']].plot(ax=ax1)
     data[['targetRA','TelescopeRaDeg','qtelRA']].plot(ax=ax2)
 
-    #plotting RA and DEC estimated-target  estimated
+    #scripts RA and DEC estimated-target  estimated
     plt.figure(2)
     ax3=plt.subplot(211,xlabel='Time (frames)',ylabel='DEC error (deg)')
     ax4=plt.subplot(212,xlabel='Time (frames)',ylabel='RA error (deg)')
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     errDECnew=(data.qtelDEC.subtract(data.targetDEC))
     errRAnew=(data.qtelRA.subtract(data.targetRA))
     
-    #plotting elevation and crossElevation
+    #scripts elevation and crossElevation
     plt.figure(3)
     ax5=plt.subplot(221,xlabel='Time (frames)',ylabel='elevation (arcsec)')
     ax6=plt.subplot(223,xlabel='Time (frames)',ylabel='crossElevation (arcsec)')

@@ -1,7 +1,7 @@
 '''
 Created on 28 jun. 2017
 
-Script for plotting simultaneously data from different archives
+Script for scripts simultaneously data from different archives
 
 @author: Marc Casalprim
 '''
@@ -43,9 +43,9 @@ if __name__ == '__main__':
 
     
     
-    gyros=          False
+    gyros=          True
     momdump=        False
-    magnetometer=   True
+    magnetometer=   False
     thermometers=   False
     currentSensors= False
     altitude=       False
@@ -56,11 +56,7 @@ if __name__ == '__main__':
         fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='Gyro X',dtype='i4',conversion=0.0006304))
         fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='Gyro Y',dtype='i4',conversion=0.0006437,range=2e5))
         fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='Gyro Z',dtype='i4',conversion=0.0006324,range=2e5))
-        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_X',label='Temp. Gyro X',conversion=0.01))
-        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_Y',label='Temp. Gyro Y',conversion=0.01))
-        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_Z',label='Temp. Gyro Z',conversion=0.01))
-        
-    
+   
     if altitude: fieldsList.append(Field('bettii.GpsReadings.altitudeMeters',indexName='bettii.RTLowPriority.mceFrameNumber',label='altitude'))
     
     if magnetometer:
@@ -76,6 +72,9 @@ if __name__ == '__main__':
         therm.append(Field('bettii.ThermometersDemuxedCelcius.J4L35',label='Flight computer',range=100)) #35
         therm.append(Field('bettii.ThermometersDemuxedCelcius.J1L16',label='Structure points',range=100))#91
         therm.append(Field('bettii.ThermometersDemuxedCelcius.J4L5',label='Right siderostat',range=100))#83
+        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_X',label='Temp. Gyro X',conversion=0.01))
+        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_Y',label='Temp. Gyro Y',conversion=0.01))
+        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_Z',label='Temp. Gyro Z',conversion=0.01))
         therm_labels=[field.label for field in therm]
         fieldsList=fieldsList+therm
     if currentSensors:
@@ -107,15 +106,6 @@ if __name__ == '__main__':
         plt.legend(markerscale=3,numpoints=20)
         fig.tight_layout()
         fig.savefig(img_folder+"gyroscopes.png")
-        
-        fig=plt.figure()
-        fig.suptitle("Gyroscopes Temperatures", fontsize=15,y=1)
-        ax=plt.subplot(111,xlabel=time_label, ylabel='Temperature [Celsius]')
-        data=ds.df[['Temp. Gyro X','Temp. Gyro Y','Temp. Gyro Z']].dropna()
-        data.plot(ax=ax,style=['r+','g+','b+'],markersize=1.0)
-        plt.legend(markerscale=3,numpoints=20)
-        fig.tight_layout()
-        fig.savefig(img_folder+"gyroscopes_temps.png",dpi=300)
     
     if magnetometer:
         fig=plt.figure()
@@ -154,6 +144,15 @@ if __name__ == '__main__':
         plt.legend(markerscale=3,numpoints=20)
         fig.tight_layout()
         fig.savefig(img_folder+"thermometers.png")
+        
+        fig=plt.figure()
+        fig.suptitle("Gyroscopes Temperatures", fontsize=15,y=1)
+        ax=plt.subplot(111,xlabel=time_label, ylabel='Temperature [Celsius]')
+        data=ds.df[['Temp. Gyro X','Temp. Gyro Y','Temp. Gyro Z']].dropna()
+        data.plot(ax=ax,style=['r+','g+','b+'],markersize=1.0)
+        plt.legend(markerscale=3,numpoints=20)
+        fig.tight_layout()
+        fig.savefig(img_folder+"gyroscopes_temps.png",dpi=300)
         
     if altitude:
         fig=plt.figure()

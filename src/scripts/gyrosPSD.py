@@ -10,7 +10,7 @@ from matplotlib.style import use
 from utils.dataset import DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from scipy.signal.spectral import periodogram
-
+from numpy.fft import fft,ifft
 
 if __name__ == '__main__':
   
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     folder='C:/17-05-23_19_49_39/'
     folder='F:/LocalBettiiArchive/17-06-08_22_19_34-/'
     #folder='\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-18_00_15_03\\'
-    #folder='C:/16-09-28_21_58_34-/'
+    folder='F:/GondolaFlightArchive/17-06-09_09_58_36/'
     
     Field.DTYPES=getDtypes(folder)
     
@@ -29,8 +29,8 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
    
     
-    initial_time=1000 #in frame number
-    final_time = 16700000 #in frame number
+    initial_time=1100000 #in frame number
+    final_time = 4020000 #in frame number
     
 
     #===========================================================================
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     
     data[gyros].plot()
     
-    fs=100#ds.freq/np.diff(data.index).mean();
+    fs=100.#ds.freq/np.diff(data.index).mean();
     print "Approx dt:",np.diff(data.index).mean();
     plt.figure(3)
     plt.plot((data.index[1:]-data.index[0])/400./60.,np.diff(data.index)/400./60.)
@@ -64,12 +64,38 @@ if __name__ == '__main__':
     for i in range(len(gyros)):
         x=data[gyros[i]].interpolate('values')
         f, Pxx = periodogram(x, fs)
-        ax[i].plot(f,Pxx)
+        ax[i].loglog(f,Pxx)
         ax[i].set_ylim(min(Pxx),max(Pxx))
         ax[i].set_xlim(min(f),max(f))
-    #fig.tight_layout()
+    plt.tight_layout()
     #ds.multiPSD(gyros,show=True,loglog=False,name="multiPSD_no_loglog",minMax=[1,26])
-
+    
+    #RMS
+    ax=[]
+    plt.figure()
+    ax.append(plt.subplot(111,xlabel='Time [Frame Number]', ylabel='Gyro X [arcsec/s]'))
+    plt.figure()
+    ax.append(plt.subplot(111,xlabel='Time [Frame Number]', ylabel='Gyro X [arcsec/s]'))
+    plt.figure()
+    ax.append(plt.subplot(111,xlabel='Time [Frame Number]', ylabel='Gyro X [arcsec/s]'))
+    gx={}
+    for i in range(len(gyros)):
+        x=data[gyros[i]].interpolate('values')
+        N=len(x)
+        f=range(N)*fs/N
+        fc=3
+        ic=int(fc/fs*N)       
+        X = fft(x, fs)
+        X[:ic]=0
+        ax[i].plot(f,abs(X))
+        ax[i].set_ylim(min(X),max(X))
+        ax[i].set_xlim(min(f),max(f))
+        x=ifft(X)
+        gx[i]=x
+        rms=np.sqrt(np.sum(x**2))
+        print "RMS #"+str(i)+": "+str(rms)
+    plt.tight_layout()
+    
     plt.draw()
     plt.pause(1)
     
