@@ -3,6 +3,100 @@ Created on :'Jul 10, 2017
 
 @author: Marc Casalprim
 '''
+import os
+import pandas as pd
+import numpy as np
+from utils.calibrator import Calibrator
+
+package_directory = os.path.dirname(os.path.abspath(__file__))
+prefix=package_directory+'\\thermoCalibrations\\'
+DC3 = prefix + "DiodeCal3.txt";
+DT670 = prefix + "DT-670.txt";
+FbDiode = prefix + "FbDiode.txt";
+Ru = prefix + "RuO2mean.txt";
+X6 = prefix + "X65096.txt";
+X7 = prefix + "X65097.txt";
+
+calFbDiode = Calibrator(FbDiode);
+calRu = Calibrator(Ru);
+calDC3 = Calibrator(DC3);
+calDT670 = Calibrator(DT670);
+
+calibrators={'demodRaw0':calFbDiode,
+             'demodRaw1':calDC3,
+             'demodRaw2':calDC3,
+             'demodRaw3':calDC3,
+             'demodRaw4':calDC3,
+             'demodRaw5':calDT670,
+             'demodRaw6':calDT670,
+             'demodRaw7':calDT670,
+             'demodRaw8':calDT670,
+             'demodRaw9':calDT670,
+             'demodRaw10':calDT670,
+             'demodRaw11':calDT670,
+             'std_demodRaw0':calRu,
+             'std_demodRaw1':calRu,
+             'std_demodRaw2':Calibrator(X7),
+             'std_demodRaw3':Calibrator(X6),
+             }
+PiperNames={'demodRaw0':"Exchanger",
+             'demodRaw1':"4HePump",
+             'demodRaw2':"3HePump",
+             'demodRaw3':"4HeSwitch",
+             'demodRaw4':"3HeSwitch",
+             'demodRaw5':"OpticsBench",
+             'demodRaw6':"LHeTank",
+             'demodRaw7':"LHeShield",
+             'demodRaw8':"NIRBench",
+             'demodRaw9':"H1RG",
+             'demodRaw10':"NIRBench2",
+             'demodRaw11':"LN2Tank",
+             'std_demodRaw0':"3HeColdHead",
+             'std_demodRaw1':"4HeColdHead",
+             'std_demodRaw2':"BatwingRight",
+             'std_demodRaw3':"BatwingLeft",
+             }
+def getTemperaturesFromRawDataFrame(rawdf):
+    """Returns a new dataframe with the calculated temperatures.
+    Raw DataFrame format: all columns from Standard message start with std_"""
+    data={}
+    for column in rawdf.columns:
+        if "demodRaw" in column and column in calibrators.keys():
+            calibrator=calibrators[column]
+
+            gdaclabel=column.replace('demodRaw','gDac')
+            adaclabel=column.replace('demodRaw','aDac')
+            nsumlabel=column.replace('demodRaw','nsum').split('m')[0]+'m'
+            rawValues=rawdf[column].values
+            if "std" in column:
+                delta=0.007833*rawValues/rawdf[nsumlabel].values
+                X=100*65536/4.99*rawdf[adaclabel].values/rawdf[gdaclabel].values*4/72.5
+                volts= 220100*delta/(X-delta)              
+            else:
+                delta=rawValues/2/rawdf[nsumlabel].values
+                gain=65536.0/rawdf[gdaclabel].values
+                volts=delta*4.096/65536*4.99/gain           
+            getTemperature = np.vectorize(calibrator.getTemperature, otypes=[np.float])
+            temperatures=getTemperature(volts)            
+            name=PiperNames[column]
+            data[name]=temperatures
+    df=pd.DataFrame(data,index=rawdf.index)
+    #df=df.loc[(df.abs()>=0.001).any(1)]
+    return df
+
+def unwrapCounter(counter):
+    """Returns the evolution of the counter but unwrapping modulo 255"""
+    if len(counter)<10:
+        return counter
+    d=np.diff(counter)
+    d=np.append(d,d[-1])
+    unwrapped=counter
+    offset=0
+    for i,c in enumerate(counter):
+        unwrapped[i]=offset+c
+        if d[i]<0:
+            offset=offset+255
+    return unwrapped
 
 ThermometerName = {76:'J3L12',
 3:'J3L28',

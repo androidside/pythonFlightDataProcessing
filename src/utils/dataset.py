@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 from scipy.signal.spectral import periodogram
 from quat import Quat,normalize
+from utils.thermometers import unwrapCounter
 
 red = sns.xkcd_rgb['pale red']
 blue = sns.xkcd_rgb['denim blue']
@@ -197,11 +198,14 @@ class DataSet():
                 if verbose: print label+' already in dataframe.'
             else:
                 indmin=50000 #minimum index, frame number
-                if field.fieldName=='bettii.GpsReadings.altitudeMeters': #its GPS data (theres no mceframenumber)
+                if field.fieldName=='bettii.GpsReadings.altitudeMeters' or 'PiperThermo' in field.fieldName: #its PIPER or GPS data (theres no mceframenumber)
                     time=self.times['bettii.RTLowPriority.mceFrameNumber'] #get another mceFN vector of this archive
                     L=len(field_data)
                     time=time[time>indmin]
-                    time=np.round(np.linspace(time[0], time[-1], L))
+                    DT=(time[-1]-time[0])
+                    time=np.round(np.linspace(time[0], time[0]+DT, L))
+                if "TRead" in field.fieldName: #its TRead message (using frame counter)
+                    time=(unwrapCounter(time)+indmin)*400 #time has to be TRead[...].frameCounter
                 if field.indexName=='bettii.ThermometersDemuxedCelcius.mceFrameNumber': #its a thermometer
                     field_data=field_data[field_data!=0]
                     L=len(field_data)
@@ -212,12 +216,12 @@ class DataSet():
                 df_tmp = df_tmp[~df_tmp.index.duplicated(keep='first')] #remove values with duplicated index
                 df_tmp=df_tmp[np.abs(df_tmp[label].as_matrix())<= field.range] #keep only the ones that are within fields range.
                 df_tmp=df_tmp[df_tmp.index>indmin] #keep only meaningful index (a FN less than indmin is impossible)
-                if not df_tmp.empty:
+                if False and not df_tmp.empty:
                     z=(np.abs(df_tmp.index)-np.mean(df_tmp.index))/np.std(df_tmp.index)
                     df_tmp=df_tmp[z<2] #keep only meaningful index (drop outliers >2sigmas), seems dangerous but there are always bad mceFN that mess the entire plot
                 if timeIndex and len(df_tmp.index)>0:
                     text=folder.split('/')[-2]
-                    ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
+                    ftime_str=text[0:8]+' '+text[9:17].replace('_',':').replace('-','') #foldertime
                     ftime=pd.to_datetime(ftime_str,yearfirst=True)
                     index=(df_tmp.index-df_tmp.index[0])/self.freq #time in seconds
                     index=pd.to_timedelta(index,unit='s')
@@ -232,7 +236,7 @@ class DataSet():
             print 'ERROR reading '+field.fieldName+':', e
     
     def readMultipleFolders(self,fieldsList,foldersList,rpeaks=False, verbose=False,timeIndex=True):
-        """Stores in self.df a new pd.DatFrame onject containing
+        """Stores in self.df a new pd.DatFrame object containing
         the fieldsList data from all the folders in foldersList.
         The indexing of the DataFrame is a DatetimeIndex by default
         (timeIndex=True), using the date and time of the folder name."""
@@ -495,7 +499,7 @@ def toTimeIndex(dataframe,folder,freq=400.):
     dataframe.index=time
     return dataframe   
 def plotColumns(df,units=''):
-    """Plot all columns of the pd.Dataframe df in a Nx1 subplots layout"""
+    """Plot the N columns of the pd.Dataframe df in a Nx1 subplots layout"""
     data = df.dropna()
     plt.figure()
     N=len(data.columns)

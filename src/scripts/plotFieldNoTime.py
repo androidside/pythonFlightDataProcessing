@@ -1,7 +1,7 @@
 '''
 Created on Jun 22, 2017
 
-Altitude scripts without indexing, because we dont have a valid index for GpsReadings (approximatmceFN is empty)
+Plot raw data from a field. Merging archives if we want.
 
 @author: Marc Casalprim
 '''
@@ -17,7 +17,6 @@ from utils.dataset import DataSet,plt,sns,np, load_single_field
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
-
 if __name__ == '__main__':
 
     folders=[]
@@ -25,11 +24,18 @@ if __name__ == '__main__':
     subdirs=next(os.walk(root_folder))[1]
     folders=[root_folder+subdir+'/' for subdir in subdirs]
  
+    field='TReadStandardMessage.frameCounter'
     fieldsList=[]
-    print "Folder name      \tfinal mceFN"
-    field='bettii.RTLowPriority.mceFrameNumber'
+    print "Folder name      \t"+field
+    data=[]
     for folder in folders:
-        d=load_single_field(folder+field,datatype='i4')
-        d=d[d>50000]
+        d=load_single_field(folder+field,datatype=Field.DTYPES[field])
+        data=data+list(d)
         name=folder.split('/')[-2]
-        print name+":\t"+str(d[-1])
+        print name+":\t"+str(len(d))+" raw values."
+    print "Plotting.."
+
+    plt.plot(data)
+    plt.suptitle(field)
+    print "Show.."
+    plt.show()

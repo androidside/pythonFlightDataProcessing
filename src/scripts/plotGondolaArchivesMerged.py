@@ -22,8 +22,8 @@ if __name__ == '__main__':
     folders = [root_folder + subdir + '/' for subdir in subdirs]
 
         
-    gyros = True
-    momdump = False
+    gyros = False
+    momdump = True
     magnetometer = False
     thermometers = False
     currentSensors = False
@@ -71,6 +71,9 @@ if __name__ == '__main__':
           
     ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False)
     
+    M = 100  # downsample factor
+    ds.df = ds.df.iloc[::M]
+    
     print "Converting to Palestine Time..."
     ds.df.index = ds.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)
 
@@ -80,8 +83,7 @@ if __name__ == '__main__':
     img_folder = 'C:/Users/bettii/gondola_archive_plots/'
     time_label = 'Palestine Time'
     
-    M = 1  # downsample factor
-    ds.df = ds.df.iloc[::M]
+
     
     print "Generating plots.."
     
