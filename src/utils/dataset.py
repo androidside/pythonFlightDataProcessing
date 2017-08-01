@@ -81,9 +81,9 @@ def extractGyrosAndStarcam(dataframe,labels_gyros=['gyroX','gyroY','gyroZ'],labe
     sc=pd.DataFrame(quats,index=dataframe.index)
     quats=sc
     if label_scerrors is not None: sc=pd.merge(sc,dataframe[label_scerrors],how='outer',left_index=True,right_index=True) 
-    sc=sc.loc[triggers.index]
+    sc=sc.loc[triggers.index].dropna().interpolate(method='values')
     sc.index=triggers.values  
-    if labels_gyros is not None: gyros=dataframe[labels_gyros]
+    if labels_gyros is not None: gyros=dataframe[labels_gyros].interpolate(method='values')
     else: gyros=None
     #print 'Done'  
     return gyros,sc,quats

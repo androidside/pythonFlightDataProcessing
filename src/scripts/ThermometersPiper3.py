@@ -93,7 +93,7 @@ if __name__ == '__main__':
         fig.savefig(img_folder+"thermometers_"+str(k)+".png")
     
     print "Saving CSV..."
-    df.to_csv(save_folder+"thermometers3.txt",sep='\t', float_format='%.4f', index_label='Palestine time  ', date_format="%Y-%m-%d %H:%M:%S")
+    df[df>0.01].to_csv(save_folder+"thermometers3.txt",sep='\t', float_format='%.3f', index_label='Palestine time  ', date_format="%Y-%m-%d %H:%M:%S")
     print "Saved"
     
     print "Show..."

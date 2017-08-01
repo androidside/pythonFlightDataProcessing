@@ -25,14 +25,14 @@ if __name__ == '__main__':
     subdirs=next(os.walk(root_folder))[1]
     folders=[root_folder+subdir+'/' for subdir in subdirs]
 
-    save_folder='C:/Users/bettii/thermometers/'
-    img_folder=save_folder+"Dale/set1/"
+    save_folder='C:/Users/bettii/thermometers/Dale/'
+    img_folder=save_folder+"J304/"
     
 
     
     folder=folders[0]
-    fieldsList=getFieldsContaining('bettii.ThermometersDemuxedCelcius.J',folder)
-    
+    fieldsList=[]#getFieldsContaining('bettii.ThermometersDemuxedCelcius.J',folder)
+    fieldsList.append(Field('bettii.ThermometersDemuxedCelcius.J3L4'))
 
     labels=[]
     for field in fieldsList:
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     print "Converting to Palestine Time..."
     ds.df.index=ds.df.index-pd.Timedelta(hours=5) #Palestine time conversion (Archives folder names are in UTC)
     #ds.df=ds.df.ix[pd.to_datetime('06/09/2017 06:00:00'):] #slicing
-    ds.df=ds.df[labels].dropna(axis=1,how='all').interpolate(method='time')
+    ds.df=ds.df[labels].dropna(axis=1,how='all')#.interpolate(method='time')
     ds.df.dropna(inplace=True)
 
     labels=ds.df.columns
