@@ -20,7 +20,7 @@ from estimators.estimators import Estimator15,Estimator6,plt,pd
 if __name__ == '__main__':
     folder="F:/GondolaFlightArchive/17-06-09_01_51_04/"
     save_folder=folder
-    read=False
+    read=True
     estimated=False
     
     if read: 
