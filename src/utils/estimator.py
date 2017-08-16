@@ -39,7 +39,7 @@ def readAndSave(folder):
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
     
 
-    initial_time=100 #in frame number
+    initial_time=1000 #in frame number
     final_time = None #in frame number
 
     
