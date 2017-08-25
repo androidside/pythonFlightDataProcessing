@@ -55,7 +55,7 @@ if __name__ == '__main__':
     
     data[gyros].plot()
     
-    fs=100.#ds.freq/np.diff(data.index).mean();
+    fs=100#ds.freq/np.diff(data.index).mean();
     print "Approx dt:",np.diff(data.index).mean();
     plt.figure(3)
     plt.plot((data.index[1:]-data.index[0])/400./60.,np.diff(data.index)/400./60.)
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     for i in range(len(gyros)):
         x=data[gyros[i]].interpolate('values')
         N=len(x)
-        f=range(N)*fs/N
+        f=np.array(range(N))*fs*1.0/N
         fc=3
         ic=int(fc/fs*N)       
         X = fft(x, fs)
