@@ -5,16 +5,13 @@ Main script
 
 @author: Marc Casalprim
 '''
-from bokeh.io import save
+
 print 'Imports...'
-
-import numpy as np
-
+import os
+import matplotlib as mpl
 from matplotlib.style import use
-from matplotlib import rcParams
-
-from utils.estimator import readAndSave,openPickles
-from estimators.estimators import Estimator15,Estimator6,plt,pd
+from utils.dataset import DataSet, plt, np, pd
+from utils.field import Field, getFieldsContaining
 
 
 if __name__ == '__main__':
@@ -48,38 +45,55 @@ if __name__ == '__main__':
     
     fieldsList=[Field('bettii.GyroReadings.angularVelocityZ', label='Gyro Z', dtype='i4', conversion=0.0006324, range=2e5)]
     
-    save_folder=folder
+
     read=True
     estimated=False
     
-    if read: 
-        gyros,sc,quats=readAndSave(folder)
-    else:
-        gyros,sc,quats=openPickles(folder,quats=True)
-    kal15=Estimator15(gyros,sc)
-    kalOrg=Estimator6(gyros,sc)
-    if not estimated:
-        print "Estimating 15 states Kalman filter..."
-        ts=17369088
-        Qd=0.003*np.eye(15)
-        kal15.estimate(Qd=Qd,ts=ts,te=ts+600*400,progress=True)
+    ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False)
+    dsd= DataSet(fieldsList=fieldsList, foldersList=foldersD, verbose=True, rpeaks=False)
+    
+    M = 1  # downsample factor
+    ds.df = ds.df.iloc[::M]
+    dsd.df = dsd.df.iloc[::M]
+    print "Converting to Palestine Time..."
+    dsd.df.index = dsd.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)
 
-        print "Estimating 6 states Kalman filter..."
-        Qd=0.003*np.eye(6)
-        kalOrg.estimate(Qd=Qd,ts=ts,te=ts+600*400,progress=True)
-        print "Saving..."
-        kal15.est.to_pickle(save_folder+Estimator15.EST_FILENAME)
-        kalOrg.est.to_pickle(save_folder+Estimator6.EST_FILENAME)
-    else:
-        print "Opening.."
-        kal15.est=pd.read_pickle(save_folder+Estimator15.EST_FILENAME)
-        kalOrg.est=pd.read_pickle(save_folder+Estimator6.EST_FILENAME)
-    print "Plotting..."
-    use('classic')
-    rcParams['axes.grid']=True
+    print "Cropping time"
+    time_start=pd.datetime(2017, 6, 8, 18)
+    time_end=pd.datetime(2017, 6, 9, 6)
+    ds.df = ds.df.loc[time_start:time_end]
+    dsd.df = dsd.df.loc[time_start:time_end]
+    use('ggplot')
+    mpl.rcParams['axes.grid'] = True
     
-    kal15.plot()
-    kalOrg.plot()
+    img_folder = 'C:/Users/bettii/thesis/plots/'
+    time_label = 'Palestine Time'
     
-    a=1  
+
+    
+    print "Generating plots.."
+    fig = plt.figure()
+    ax = plt.subplot(111, xlabel=time_label, ylabel='Azimuth velocity [arcsec/s]')
+    data = ds.df['Gyro Z'].dropna()
+    data.plot(ax=ax, style='r+', markersize=1.0)
+    fig.tight_layout()
+    fig.savefig(img_folder + "gyros_tel.png")
+    
+    fig = plt.figure()
+    ax = plt.subplot(111, xlabel=time_label, ylabel='Azimuth velocity [arcsec/s]')
+    data = dsd.df['Gyro Z'].dropna()
+    data.plot(ax=ax, style='b+', markersize=1.0)
+    fig.tight_layout()
+    fig.savefig(img_folder + "gyros_ssd.png")
+    plt.show()
+    
+    fig = plt.figure()
+    ax = plt.subplot(211, xlabel=time_label, ylabel='Azimuth velocity [arcsec/s]')
+    data = ds.df['Gyro Z'].dropna()
+    data.plot(ax=ax, style='r+', markersize=1.0)
+    ax = plt.subplot(212, xlabel=time_label, ylabel='Azimuth velocity [arcsec/s]')
+    data = dsd.df['Gyro Z'].dropna()
+    data.plot(ax=ax, style='b+', markersize=1.0)
+    fig.tight_layout()
+    fig.savefig(img_folder + "gyros_comp.png")
     plt.show()
