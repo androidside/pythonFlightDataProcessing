@@ -11,7 +11,7 @@ Script for scripts simultaneously data from different archives
 @author: Marc Casalprim
 '''
 print 'Imports...'
-
+import os
 import matplotlib as mpl
 from matplotlib.style import use
 from utils.dataset import DataSet,plt,np,pd
@@ -23,8 +23,12 @@ if __name__ == '__main__':
 
     folder='F:/GondolaFlightArchive/17-06-09_01_51_04/'
     save_folder='C:/Users/bettii/thesis/'
-    img_folder=save_folder+'plots/'
+    img_folder=save_folder+'plots/brake/'
     savefilename='MomDump.pkl'
+    
+    if not os.path.exists(img_folder):
+        os.makedirs(img_folder)
+    
     read=True
     if read:
         start_time = timer()

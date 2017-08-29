@@ -63,37 +63,53 @@ if __name__ == '__main__':
     time_end=pd.datetime(2017, 6, 9, 6)
     ds.df = ds.df.loc[time_start:time_end]
     dsd.df = dsd.df.loc[time_start:time_end]
-    use('ggplot')
+    
+    use('seaborn-bright')
     mpl.rcParams['axes.grid'] = True
-    
-    img_folder = 'C:/Users/bettii/thesis/plots/'
-    time_label = 'Palestine Time'
-    
+    plt.rc('font', family='serif')
+    img_folder = 'C:/Users/bettii/thesis/plots/telemetry_comparison/'
 
-    
+    if not os.path.exists(img_folder):
+        os.makedirs(img_folder)
+
     print "Generating plots.."
+    
+    ms=0.2 #markersize
+    time_label = 'Palestine Time'
+    tel_label = 'Azimuth velocity from telemetry [arcsec/s]'
+    ssd_label = 'Azimuth velocity from disks [arcsec/s]'
+    
     fig = plt.figure()
-    ax = plt.subplot(111, xlabel=time_label, ylabel='Azimuth velocity [arcsec/s]')
+    ax1 = plt.subplot(111, xlabel=time_label, ylabel=tel_label)
     data = ds.df['Gyro Z'].dropna()
-    data.plot(ax=ax, style='r+', markersize=1.0)
+    data.plot(ax=ax1, style='r+', markersize=ms)
     fig.tight_layout()
     fig.savefig(img_folder + "gyros_tel.png")
     
     fig = plt.figure()
-    ax = plt.subplot(111, xlabel=time_label, ylabel='Azimuth velocity [arcsec/s]')
+    ax2 = plt.subplot(111, xlabel=time_label, ylabel=ssd_label)
     data = dsd.df['Gyro Z'].dropna()
-    data.plot(ax=ax, style='b+', markersize=1.0)
+    data.plot(ax=ax2, style='b+', markersize=ms)
     fig.tight_layout()
     fig.savefig(img_folder + "gyros_ssd.png")
-    plt.show()
+    
+    xmin=736488.75
+    xmax=736489.25
+    ax1.set_xlim(xmin,xmax)
+    ax2.set_xlim(xmin,xmax)
     
     fig = plt.figure()
-    ax = plt.subplot(211, xlabel=time_label, ylabel='Azimuth velocity [arcsec/s]')
+    ax = plt.subplot(211, ylabel=tel_label)
     data = ds.df['Gyro Z'].dropna()
-    data.plot(ax=ax, style='r+', markersize=1.0)
-    ax = plt.subplot(212, xlabel=time_label, ylabel='Azimuth velocity [arcsec/s]')
+    data.plot(ax=ax, style='r+', markersize=ms)
+    ax.set_xlim(xmin,xmax)
+    
+    ax = plt.subplot(212, xlabel=time_label, ylabel=ssd_label)
     data = dsd.df['Gyro Z'].dropna()
-    data.plot(ax=ax, style='b+', markersize=1.0)
+    data.plot(ax=ax, style='b+', markersize=ms)
+    ax.set_xlim(xmin,xmax)
     fig.tight_layout()
     fig.savefig(img_folder + "gyros_comp.png")
+    
+    print "Show..."
     plt.show()

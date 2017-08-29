@@ -6,6 +6,7 @@ Plot of the Power Spectrum Density of the Gyroscopes
 @author: Marc Casalprim
 '''
 print 'Imports...'
+import matplotlib as mpl
 from matplotlib.style import use
 from utils.dataset import DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
@@ -40,9 +41,8 @@ if __name__ == '__main__':
     print 'Dataframe shape:', ds.df.shape
     data=ds.df.dropna()
     #data.index=data.index/ds.freq #index in seconds
-    use('ggplot')
-    
-    plt.ion()
+    use('seaborn-bright')
+    mpl.rcParams['axes.grid'] = True
     
     gyros = ['gyroX','gyroY','gyroZ']
 
@@ -56,16 +56,16 @@ if __name__ == '__main__':
     data[gyros].plot()
     
     fs=100#ds.freq/np.diff(data.index).mean();
-    print "Approx dt:",np.diff(data.index).mean();
+    print "Approx dt: %0.1f frames." % np.diff(data.index).mean();
     plt.figure(3)
-    plt.plot((data.index[1:]-data.index[0])/400./60.,np.diff(data.index)/400./60.)
+    plt.plot((data.index[1:]-data.index[0])/400./60.,np.diff(data.index)/400.)
     plt.xlabel('Time (min)')
-    plt.ylabel('dt (min)')
+    plt.ylabel('dt (s)')
     for i in range(len(gyros)):
         x=data[gyros[i]].interpolate('values')
         f, Pxx = periodogram(x, fs)
         ax[i].loglog(f,Pxx)
-        ax[i].set_ylim(min(Pxx),max(Pxx))
+        ax[i].set_ylim(1e-10,1e7)
         ax[i].set_xlim(min(f),max(f))
     plt.tight_layout()
     #ds.multiPSD(gyros,show=True,loglog=False,name="multiPSD_no_loglog",minMax=[1,26])
@@ -73,31 +73,35 @@ if __name__ == '__main__':
     #RMS
     ax=[]
     plt.figure()
-    ax.append(plt.subplot(111,xlabel='Time [Frame Number]', ylabel='Gyro X [arcsec/s]'))
+    ax.append(plt.subplot(111,xlabel='Time [s]', ylabel='Gyro X [arcsec/s]'))
     plt.figure()
-    ax.append(plt.subplot(111,xlabel='Time [Frame Number]', ylabel='Gyro X [arcsec/s]'))
+    ax.append(plt.subplot(111,xlabel='Time [s]', ylabel='Gyro Y [arcsec/s]'))
     plt.figure()
-    ax.append(plt.subplot(111,xlabel='Time [Frame Number]', ylabel='Gyro X [arcsec/s]'))
+    ax.append(plt.subplot(111,xlabel='Time [s]', ylabel='Gyro Z [arcsec/s]'))
     gx={}
-    for i in range(len(gyros)):
+    styles=['b','g','r']
+    for i in range(3):
         x=data[gyros[i]].interpolate('values')
         N=len(x)
-        f=np.array(range(N))*fs*1.0/N
-        fc=3
-        ic=int(fc/fs*N)       
-        X = fft(x, fs)
+
+        #Low pass filter @ fc Hz
+        fc=3 #3hz
+        ic=int(fc*1.0/fs*N)       
+        X = fft(x, N)
         X[:ic]=0
-        ax[i].plot(f,abs(X))
-        ax[i].set_ylim(min(X),max(X))
-        ax[i].set_xlim(min(f),max(f))
-        x=ifft(X)
+        X[N-ic:]=0
+        x=np.real(ifft(X))
+        T=2*ic #transitori
+        x=x[T:N-T]
+        t=np.array(range(len(x)))/400.
+        ax[i].plot(t,x,styles[i])
+        ax[i].set_ylim(min(x),max(x))
+        ax[i].set_xlim(min(t),max(t))
+
         gx[i]=x
-        rms=np.sqrt(np.sum(x**2))
+        rms=np.sqrt(np.mean(x**2))
         print "RMS #"+str(i)+": "+str(rms)
     plt.tight_layout()
     
-    plt.draw()
-    plt.pause(1)
-    
-    plt.ioff()
+
     plt.show()

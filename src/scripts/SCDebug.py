@@ -19,9 +19,9 @@ from utils.field import Field#,getFieldsContaining,getFieldsRegex
 
 
 if __name__ == '__main__':
-    folder='D:/GondolaFlightArchive/17-06-09_01_51_04/'
+    folder='F:/GondolaFlightArchive/17-06-09_01_51_04/'
     filename=folder+'estimator.pkl'
-    read=True
+    read=False
     
     if read:
         fieldsList=[]
@@ -74,6 +74,10 @@ if __name__ == '__main__':
     else:
         print "Opening..."
         df=pd.read_pickle(filename)
+    print "Cropping time"
+    time_start=pd.datetime(2017, 6, 8, 18)
+    time_end=pd.datetime(2017, 6, 9, 11)
+    df = df.loc[time_start:time_end]
     print 'Dataframe shape:', df.shape
     styles=['g*','b+']
     

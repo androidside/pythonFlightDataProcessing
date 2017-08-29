@@ -286,3 +286,4 @@ ThermometerLocationByNumber={1:'R2',
 97:'FL2',
 98:'FR5',
 99:'FC6'}
+ThermometerNumberByLocation = {v: k for k, v in ThermometerLocationByNumber.iteritems()}  # mapping location to a number
