@@ -1,10 +1,8 @@
 '''
-Created on 23 May 2017
+Created on 28 Aug 2017
 
-Plotting of:
-Estimator-SC errors in SC ref. frame
-Estimator-SC errors in Gondola ref. frame
-Biases
+Generates the data and stores it in a pickle.
+There is a lot of filtering involved in the estimator data
 
 
 @author: Marc Casalprim
@@ -59,25 +57,27 @@ if __name__ == '__main__':
     #mpl.rcParams['toolbar'] = 'None'
     mpl.rcParams['axes.grid'] = True
 
-
+    SCstyle='go'
+    ESTstyle='b+'
+    
     fig=plt.figure()
     ax=plt.subplot(311)
-    plt.plot(ds.df.index,[q.ra for q in quats['qest']])
-    plt.plot(sc.index,[q.ra for q in sc.qI2G.values])
+    plt.plot(ds.df.index,[q.ra for q in quats['qest']],ESTstyle)
+    plt.plot(sc.index,[q.ra for q in sc.qI2G.values],SCstyle)
     ax.legend(['Estimated','Starcamera'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('RA (deg)')
     
     ax=plt.subplot(312)
-    plt.plot(ds.df.index,[q.dec for q in quats['qest']])
-    plt.plot(sc.index,[q.dec for q in sc.qI2G.values])
+    plt.plot(ds.df.index,[q.dec for q in quats['qest']],ESTstyle)
+    plt.plot(sc.index,[q.dec for q in sc.qI2G.values],SCstyle)
     ax.legend(['Estimated','Starcamera'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('DEC (deg)')
     
     ax=plt.subplot(313)
-    plt.plot(ds.df.index,[q.roll for q in quats['qest']])
-    plt.plot(sc.index,[q.roll for q in sc.qI2G.values])
+    plt.plot(ds.df.index,[q.roll for q in quats['qest']],ESTstyle)
+    plt.plot(sc.index,[q.roll for q in sc.qI2G.values],SCstyle)
     ax.legend(['Estimated','Starcamera'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('ROLL (deg)')
@@ -86,28 +86,34 @@ if __name__ == '__main__':
     
     fig=plt.figure()
     ax=plt.subplot(311)
-    plt.plot(ds.df.index,[(qGyros2Starcam*q).ra for q in quats['qest']])
-    plt.plot(sc.index,[q.ra for q in sc.qI2S.values])
+    plt.plot(ds.df.index,[(qGyros2Starcam*q).ra for q in quats['qest']],ESTstyle)
+    plt.plot(sc.index,[q.ra for q in sc.qI2S.values],SCstyle)
     ax.legend(['Estimated','Starcamera'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('RA (deg)')
     
     ax=plt.subplot(312)
-    plt.plot(ds.df.index,[(qGyros2Starcam*q).dec for q in quats['qest']])
-    plt.plot(sc.index,[q.dec for q in sc.qI2S.values])
+    plt.plot(ds.df.index,[(qGyros2Starcam*q).dec for q in quats['qest']],ESTstyle)
+    plt.plot(sc.index,[q.dec for q in sc.qI2S.values],SCstyle)
     ax.legend(['Estimated','Starcamera'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('DEC (deg)')
     
     ax=plt.subplot(313)
-    plt.plot(ds.df.index,[(qGyros2Starcam*q).roll for q in quats['qest']])
-    plt.plot(sc.index,[q.roll for q in sc.qI2S.values])
+    plt.plot(ds.df.index,[(qGyros2Starcam*q).roll for q in quats['qest']],ESTstyle)
+    plt.plot(sc.index,[q.roll for q in sc.qI2S.values],SCstyle)
     ax.legend(['Estimated','Starcamera'])  
     ax.set_xlabel('Time (frames)')
     ax.set_ylabel('ROLL (deg)')
     
     fig.suptitle('SC ref. frame')
 
+    for i in sc.index:
+        qI2S=sc.loc[i].qI2S
+        qI2G=sc.loc[i].qI2G
+        qS2G=qI2G*qI2S.inv()
+        print "qS2G: "+str(qS2G)
+    
     plt.show()
 
     

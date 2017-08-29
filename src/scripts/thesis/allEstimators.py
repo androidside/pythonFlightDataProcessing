@@ -5,7 +5,6 @@ Main script
 
 @author: Marc Casalprim
 '''
-from bokeh.io import save
 print 'Imports...'
 
 import numpy as np

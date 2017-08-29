@@ -20,11 +20,11 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 if __name__ == '__main__':
 
     folders=[]
-    root_folder='F:/GondolaFlightArchive/'
+    root_folder='D:/GondolaFlightArchive/'
     subdirs=next(os.walk(root_folder))[1]
     folders=[root_folder+subdir+'/' for subdir in subdirs]
  
-    field='TReadStandardMessage.frameCounter'
+    field='bettii.ThermometersDemuxedCelcius.mceFrameNumber'
     fieldsList=[]
     print "Folder name      \t"+field
     data=[]

@@ -81,7 +81,7 @@ def extractGyrosAndStarcam(dataframe,labels_gyros=['gyroX','gyroY','gyroZ'],labe
     sc=pd.DataFrame(quats,index=dataframe.index)
     quats=sc
     if label_scerrors is not None: sc=pd.merge(sc,dataframe[label_scerrors],how='outer',left_index=True,right_index=True) 
-    sc=sc.loc[triggers.index].dropna().interpolate(method='values')
+    sc=sc.loc[triggers.index].dropna()#.interpolate(method='values')
     sc.index=triggers.values  
     if labels_gyros is not None: gyros=dataframe[labels_gyros].interpolate(method='values')
     else: gyros=None
@@ -509,3 +509,54 @@ def plotColumns(df,units=''):
         data[column].plot(ax=ax)
         ax.set_ylabel(column+' '+units)
     ax.set_xlabel('Index')
+def plotQuaternions(df,units='(deg)',labels=None,styles=['b','r','g','k'],legend=False):
+    """Plot the quaternions of the pd.Dataframe df in a 3x1 subplots layout (RA,DEC,ROLL)"""
+    plt.figure()
+    N=len(df.columns)
+    axRA=plt.subplot(311)
+    axDEC=plt.subplot(312)
+    axROLL=plt.subplot(313)
+    axRA.set_ylabel('RA (deg)')
+    axDEC.set_ylabel('DEC (deg)')
+    axROLL.set_ylabel('ROLL (deg)')
+    axROLL.set_xlabel('Time (frames)')
+    for i in range(N):
+        column=df.columns[i]
+        data=df[column].dropna()
+        style=styles[i%len(styles)]
+        axRA.plot(data.index,[q.ra for q in data],style)
+        axDEC.plot(data.index,[q.dec for q in data],style)
+        axROLL.plot(data.index,[q.roll for q in data],style)
+    if labels is None: labels=df.columns
+    if legend: axRA.legend(labels)
+def filterQuats(df,th=1,dt=1000):
+    "Removes peaks from the quaternions of the dataframe df"
+    toDrop=[]
+    for column in df.columns:
+        i0=df.index[0]
+        i1=df.index[1]
+        if isinstance(df[column].loc[i0], Quat):
+            for i in df.index[2:]:
+                v0=df[column].loc[i0].roll
+                v1=df[column].loc[i1].roll
+                v=df[column].loc[i].roll
+                if i-i0<dt and abs(v1-v0)>th and abs(v-v1)>th:
+                    toDrop.append(i1)
+                i0=i1
+                i1=i
+    df=df.drop(toDrop)            
+    return df
+def extractDuplicates(df,th=1e-3):
+    "Removes duplicates of the quaternions of the dataframe df"
+    toExtract=[df.index[0]]
+    for column in df.columns:
+        i0=df.index[0]
+        if isinstance(df[column].loc[i0], Quat):
+            for i in df.index[1:]:
+                v0=df[column].loc[i0].ra
+                v=df[column].loc[i].ra
+                if  abs(v-v0)>th:
+                    toExtract.append(i)
+                i0=i
+    df=df.loc[toExtract]            
+    return df

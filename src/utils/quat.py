@@ -17,6 +17,7 @@ Quaternion provides a class for manipulating quaternion objects.  This class pro
 """
 """
     Modified 2017 by Marc Casalprim
+    fixed 3 dimensional constructor
     Removed time consuming operations
 """
 
