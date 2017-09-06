@@ -59,8 +59,12 @@ if __name__ == '__main__':
     N=100 #moving average wdot
     wdot=np.convolve(wdot, np.ones((N,))/N, mode='same')
     Jzt=torque/wdot
-    Jz=np.mean(torque[2*N:])/np.mean(wdot[2*N:])
+    mtorque=np.mean(torque[2*N:])
+    mwdot=np.mean(wdot[2*N:])
+    Jz=mtorque/mwdot
     #Jzt=np.convolve(Jzt, np.ones((1000,))/1000, mode='same')
+    
+    print"Torque: %s Nms \nWdot: %s rad/s2" % (mtorque,mwdot)
     print "Inertia Jz: %0.2f kg m^2" % Jz     
     
     use('seaborn-bright')

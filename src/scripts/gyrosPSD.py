@@ -43,17 +43,25 @@ if __name__ == '__main__':
     #data.index=data.index/ds.freq #index in seconds
     use('seaborn-bright')
     mpl.rcParams['axes.grid'] = True
+    plt.rc('font', family='serif')
     
     gyros = ['gyroX','gyroY','gyroZ']
-
+    
+    d=data.copy()
+    d.index=(data.index-data.index[0])/400.
+    ax=d[gyros].plot()
+    ax.set_ylabel('Angular velocity [arcsec/s]')
+    ax.set_xlabel('Time [s]')
+    ax.figure.tight_layout()
+    
     ax=[]
-    fig=plt.figure(1)
+    fig=plt.figure()
     fig.suptitle("Gyros PSDs [(arcsec/s)$^2$/Hz]", fontsize=15,y=1)
     ax.append(plt.subplot(311,xlabel='Frequency [Hz]', ylabel='Gyro X'))
     ax.append(plt.subplot(312,xlabel='Frequency [Hz]', ylabel='Gyro Y'))
     ax.append(plt.subplot(313,xlabel='Frequency [Hz]', ylabel='Gyro Z'))
     
-    data[gyros].plot()
+
     
     fs=100#ds.freq/np.diff(data.index).mean();
     print "Approx dt: %0.1f frames." % np.diff(data.index).mean();
@@ -83,23 +91,24 @@ if __name__ == '__main__':
     for i in range(3):
         x=data[gyros[i]].interpolate('values')
         N=len(x)
-
         #Low pass filter @ fc Hz
-        fc=3 #3hz
-        ic=int(fc*1.0/fs*N)       
+        fc=5 #3hz
+        ic=int(fc*1.0/fs*N)
+        iu=int(0*1.0/fs*N)       
         X = fft(x, N)
         X[:ic]=0
         X[N-ic:]=0
+        #x[N/2-iu:N/2+iu]=0
         x=np.real(ifft(X))
         T=2*ic #transitori
         x=x[T:N-T]
-        t=np.array(range(len(x)))/400.
+        t=(np.arange(T,N-T))/fs
         ax[i].plot(t,x,styles[i])
         ax[i].set_ylim(min(x),max(x))
         ax[i].set_xlim(min(t),max(t))
 
         gx[i]=x
-        rms=np.sqrt(np.mean(x**2))
+        rms=np.sqrt(np.mean(x[:2000]**2))
         print "RMS #"+str(i)+": "+str(rms)
     plt.tight_layout()
     

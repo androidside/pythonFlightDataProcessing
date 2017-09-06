@@ -18,7 +18,7 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 if __name__ == '__main__':
     folder = "C:/17-05-23_00_59_52/"
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-23_23_45_07\\"
+    #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-23_23_45_07\\"
     
     
     #===========================================================================
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
    
-    fieldsList.append(Field('bettii.FpgaState.state',label='state'))
+    #fieldsList.append(Field('bettii.FpgaState.state',label='state'))
     
     initial_time=5145000 #in frame number
     final_time = 5149000 #in frame number
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     data['P44'].plot(ax=ax2)
     data['P55'].plot(ax=ax3)
 
-    print ds.df.state.drop_duplicates()
+    #print ds.df.state.drop_duplicates()
         
     plt.show()
     plt.pause(1)

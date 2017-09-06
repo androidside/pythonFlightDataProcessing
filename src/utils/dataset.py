@@ -12,6 +12,7 @@ import numpy as np
 import seaborn.apionly as sns
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+from scipy.signal import find_peaks_cwt
 from scipy.signal.spectral import periodogram
 from quat import Quat,normalize
 from utils.thermometers import unwrapCounter
@@ -54,7 +55,7 @@ def load_fields(fieldsList,folder=None,nValues=None,start=None):
         if field.indexName not in df: df[field.indexName]=load_single_field(folder+field.indexName,field.indexType,nValues=nValues,start=start)
     return df
         
-def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc','qj_sc','qk_sc','qr_sc'],'qI2S':['ra_sc','dec_sc','roll_sc']},norm=False):
+def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc','qj_sc','qk_sc','qr_sc'],'qI2S':['ra_sc','dec_sc','roll_sc']},norm=False,filter=False):
     """Generates a dictionary of lists of utils.quat.Quat objects using the columns of dataframe defined on the quats dictionary."""
     lists={}
     matrices={}
@@ -65,25 +66,44 @@ def genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr'],'qI2G':['qi_sc'
 
     for i in range(len(dataframe.index)):
         for key in quats.keys() :
-            q=Quat(matrices[key][i])
-            if norm: q=q.normalize()
+            v=matrices[key][i]
+            q=Quat(v)
+            if filter:
+                if len(v)==4:
+                    if abs(q)>1.5 or abs(q)<0.7:
+                        q=np.nan
+                else:
+                    if np.mean(abs(v[:2]))<0.01:
+                        q=np.nan
+            if norm and not filter and isinstance(q, Quat): q=q.normalize()
             lists[key].append(q)
      
     return lists
 
 def extractGyrosAndStarcam(dataframe,labels_gyros=['gyroX','gyroY','gyroZ'],label_triggers='triggers',label_scerrors=['ra_err','dec_err','roll_err']):
     """Returns two dataframes with the Groscopes and Starcamera data respectively. Synchronizes the Starcamera with the triggers. Useful for the Estimator classes."""
-    print "Generating quaternions..."
-    quats=genQuaternions(dataframe,norm=True)
+    SClabels=['qI2G','qI2S']
+
     print "Creating Starcam dataframe..."
-    triggers=dataframe[label_triggers].drop_duplicates()  
-    triggers=triggers[[(triggers.loc[mceFN]<max(triggers.index) and triggers.loc[mceFN]>min(triggers.index)) for mceFN in triggers.index]]
-    sc=pd.DataFrame(quats,index=dataframe.index)
-    quats=sc
-    if label_scerrors is not None: sc=pd.merge(sc,dataframe[label_scerrors],how='outer',left_index=True,right_index=True) 
-    sc=sc.loc[triggers.index].dropna()#.interpolate(method='values')
-    sc.index=triggers.values  
-    if labels_gyros is not None: gyros=dataframe[labels_gyros].interpolate(method='values')
+    triggers=dataframe[label_triggers].drop_duplicates()
+    L=1e300
+    while (L-len(triggers))>0:
+        L=len(triggers)
+        triggers=triggers[[(triggers.loc[mceFN]<max(triggers.index) and triggers.loc[mceFN]>(min(triggers.index)-10000)) for mceFN in triggers.index]]
+    subdf=dataframe.loc[triggers.index].drop_duplicates(subset=['dec_sc','ra_sc','roll_sc']).dropna()
+    index=triggers.loc[subdf.index].index#values #here we can index the sc dataframe with the triggers (using .values instead of .index)
+    sc=pd.DataFrame(genQuaternions(subdf,norm=True,filter=True),index=index)[SClabels].dropna()
+    if label_scerrors is not None: sc[label_scerrors]=dataframe[label_scerrors].loc[sc.index]
+    sc[label_triggers]=triggers.loc[subdf.index]
+    print "Number of solutions: %s"%len(sc)
+    print "Generating estimator quaternions..."
+    quats=pd.DataFrame(genQuaternions(dataframe,quats={'qest':['qi','qj','qk','qr']},norm=True),index=dataframe.index)
+    print "Filtering..."
+    quats=filterQuats(quats)
+    
+
+ 
+    if labels_gyros is not None: gyros=dataframe[labels_gyros].dropna().interpolate(method='values')
     else: gyros=None
     #print 'Done'  
     return gyros,sc,quats
@@ -97,10 +117,10 @@ class DataSet():
         Keyword arguments:
         folder -- folder where the fields in fieldsList are located
         freq   -- frequency of the mce (default 400Hz)
-        min    -- maximum mceFN value
-        max    --
+        min    -- minimum mceFN value
+        max    -- maximum mceFN value
         folder_export -- folder where the plots will be saved
-        nValues -- number of values to read from the files (if None, all the file is  read)
+        nValues -- number of values to read from the files (if None, all the file is read)
         start  -- value from where we start to read (if None, we count nValues from the end)
         verbose -- Print progress of the dataframe generation
         rpeaks -- Remove rows were all fields have values less than 1 (typical error when using telemetry archives)
@@ -108,7 +128,7 @@ class DataSet():
         starcam -- read starcam data?
         fieldsList -- list of utils.field.Field objects, representing the fields to store on the dataframe.
         foldersList -- list of folders, data will be merged
-        droplist -- list of columns to drop befure returning DataSet object
+        droplist -- list of columns to drop before returning DataSet object
         '''
         
         self.folder = folder
@@ -148,7 +168,7 @@ class DataSet():
             if verbose: print str(100*i/len(fieldsList))+'%', 
             self.readField(field, folder=folder,rpeaks=rpeaks,verbose=verbose,nValues=nValues,start=start)
         if verbose: print ''
-        self.df = self.df.dropna(axis=0,how='all')
+        self.df = self.df.dropna(axis=0,how='all').sort_index()
         self.df = self.df.loc[self.min:self.max,:]
         if timeIndex and len(self.df.index)>0:
             text=folder.split('/')[-2]
@@ -498,64 +518,147 @@ def toTimeIndex(dataframe,folder,freq=400.):
     time=ftime+index
     dataframe.index=time
     return dataframe   
-def plotColumns(df,units=''):
+def plotColumns(df,units='',xlabel='Index',ylabels=None):
     """Plot the N columns of the pd.Dataframe df in a Nx1 subplots layout"""
     data = df.dropna()
-    plt.figure()
     N=len(data.columns)
+    fig,axes =plt.subplots(N, 1, sharex=True, sharey=True)
     for i in range(N):
         column=data.columns[i]
-        ax=plt.subplot(N,1,i+1)
-        data[column].plot(ax=ax)
-        ax.set_ylabel(column+' '+units)
-    ax.set_xlabel('Index')
-def plotQuaternions(df,units='(deg)',labels=None,styles=['b','r','g','k'],legend=False):
+        data[column].plot(ax=axes[i])
+        if ylabels is None: axes[i].set_ylabel(column+' '+units)
+        else: axes[i].set_ylabel(ylabels[i]+' '+units)
+    axes[-1].set_xlabel(xlabel)
+    fig.tight_layout()
+    return fig
+def plotQuaternions(df,time_label='Palestine Time',labels=None,styles=['b','r','g','k'],legend=False,xlim=None):
     """Plot the quaternions of the pd.Dataframe df in a 3x1 subplots layout (RA,DEC,ROLL)"""
-    plt.figure()
     N=len(df.columns)
-    axRA=plt.subplot(311)
-    axDEC=plt.subplot(312)
-    axROLL=plt.subplot(313)
+    fig,(axRA,axDEC,axROLL) =plt.subplots(3, 1, sharex=True, sharey=True)
     axRA.set_ylabel('RA (deg)')
     axDEC.set_ylabel('DEC (deg)')
     axROLL.set_ylabel('ROLL (deg)')
-    axROLL.set_xlabel('Time (frames)')
+    axROLL.set_xlabel(time_label)
     for i in range(N):
         column=df.columns[i]
         data=df[column].dropna()
         style=styles[i%len(styles)]
-        axRA.plot(data.index,[q.ra for q in data],style)
-        axDEC.plot(data.index,[q.dec for q in data],style)
-        axROLL.plot(data.index,[q.roll for q in data],style)
+        if isinstance(style, basestring):
+            axRA.plot(data.index,[q.ra for q in data],style)
+            axDEC.plot(data.index,[q.dec for q in data],style)
+            axROLL.plot(data.index,[q.roll for q in data],style)
+        else:
+            axRA.plot(data.index,[q.ra for q in data],**style)
+            axDEC.plot(data.index,[q.dec for q in data],**style)
+            axROLL.plot(data.index,[q.roll for q in data],**style)
     if labels is None: labels=df.columns
-    if legend: axRA.legend(labels)
-def filterQuats(df,th=1,dt=1000):
+    if xlim is not None:
+        axRA.set_xlim(xlim)
+        axDEC.set_xlim(xlim)
+        axROLL.set_xlim(xlim)
+    if legend:
+        axRA.legend(labels,loc=0,markerscale=2,numpoints=1)
+    fig.tight_layout()
+    return fig
+def plotInnovations(dataframesList,time_label='Palestine Time',labels=None,styles=['b','r','g','k'],legend=False,xlim=None):
+    for df in dataframesList:
+        pass
+def plotCovs(df,time_label='Palestine Time',ylabels=None,labels=None,styles=['b','r','g','k'],legend=False,xlim=None,function=lambda x: x,rotate=False):
+    """Plot the first three diagonal elements of P of the pd.Dataframe df in a 3x1 subplots layout (P11,P22,P33)"""
+    N=len(df.columns)
+    fig,(axRA,axDEC,axROLL) =plt.subplots(3, 1, sharex=True, sharey=True)
+    if ylabels is None:
+        axROLL.set_ylabel(r'$P_{00}$')
+        axDEC.set_ylabel(r'$P_{11}$')
+        axRA.set_ylabel(r'$P_{22}$')
+    else:
+        axRA.set_ylabel(ylabels[0])
+        axDEC.set_ylabel(ylabels[1])
+        axROLL.set_ylabel(ylabels[2])
+    axROLL.set_xlabel(time_label)
+    M=np.matrix([[0.693865,0,0.720106],[0,1,0],[-0.720106,0,0.693865]])
+    for i in range(N):
+        column=df.columns[i]
+        data=df[column].dropna() #matrix P
+        index=data.index
+        if rotate:
+            data=[M*P[:3,:3]*M.T for P in data]
+        style=styles[i%len(styles)]
+        ROLLdata=[function(P[0,0]) for P in data]
+        DECdata=[function(P[1,1]) for P in data]
+        RAdata=[function(P[2,2]) for P in data]
+        if isinstance(style, basestring):
+            axRA.plot(index,RAdata,style)
+            axDEC.plot(index,DECdata,style)
+            axROLL.plot(index,ROLLdata,style)
+        else:
+            axRA.plot(index,RAdata,**style)
+            axDEC.plot(index,DECdata,**style)
+            axROLL.plot(index,ROLLdata,**style)
+    if labels is None: labels=df.columns
+    if xlim is not None:
+        axRA.set_xlim(xlim)
+        axDEC.set_xlim(xlim)
+        axROLL.set_xlim(xlim)
+    if legend:
+        axRA.legend(labels,loc=0,markerscale=2,numpoints=1)
+    fig.tight_layout()
+    return fig
+def filterArray(x,N=200,R=0.9):
+    "Smoothes peaks from the np.array x. N:size of the peak, R: Recouvrement of the gliding window"
+    ic=N/2 #central index
+    ip=np.arange(0,N)
+    
+    while(ip[-1]<len(x)):        
+        v0=x[ip[0]]
+        vc=x[ip[ic]]
+        vf=x[ip[-1]]
+        if not isinstance(vc, Quat):
+            d0=vc-v0     
+            df=vc-vf
+            m=(vf+v0)/2
+            th=0
+        else:
+            d0=np.sum((vc*v0.inv()).q[:3])
+            df=np.sum((vc*vf.inv()).q[:3])
+            m=Quat((v0.q+vf.q)/2)
+            th=0.001
+            
+        if abs(d0)>th and abs(df)>th:
+            s0=np.sign(d0)
+            sf=np.sign(df)  
+            if s0!=0 and s0==sf:
+                x[ip[1:-1]]=m
+        ip=ip+int(np.ceil((1-R)*N))
+    return x       
+    #===========================================================================
+    # peakind = find_peaks_cwt(x,np.arange(1,N))
+    # print "peaks: %s"%len(peakind)
+    # return np.delete(x, peakind)
+    #===========================================================================
+def filterQuats(df,onlyQuats=True):
     "Removes peaks from the quaternions of the dataframe df"
-    toDrop=[]
     for column in df.columns:
-        i0=df.index[0]
-        i1=df.index[1]
-        if isinstance(df[column].loc[i0], Quat):
-            for i in df.index[2:]:
-                v0=df[column].loc[i0].roll
-                v1=df[column].loc[i1].roll
-                v=df[column].loc[i].roll
-                if i-i0<dt and abs(v1-v0)>th and abs(v-v1)>th:
-                    toDrop.append(i1)
-                i0=i1
-                i1=i
-    df=df.drop(toDrop)            
+        v=df[column].iloc[0]
+        if not onlyQuats or isinstance(v, Quat):
+            df[column]=filterArray(df[column].values, N=3, R=0.9)         
+    return df
+def filterDataframe(df,N=3, R=0.9):
+    "Removes peaks from the dataframe df"
+    for column in df.columns:
+        v=df[column].iloc[0]
+        df[column]=filterArray(df[column].values, N=N, R=R)         
     return df
 def extractDuplicates(df,th=1e-3):
-    "Removes duplicates of the quaternions of the dataframe df"
+    "Removes rows where there are duplicates of the quaternions at the first column of the dataframe df"
     toExtract=[df.index[0]]
-    for column in df.columns:
+    for column in df.columns[0:]:
         i0=df.index[0]
         if isinstance(df[column].loc[i0], Quat):
             for i in df.index[1:]:
                 v0=df[column].loc[i0].ra
-                v=df[column].loc[i].ra
-                if  abs(v-v0)>th:
+                vc=df[column].loc[i].ra
+                if  abs(vc-v0)>th:
                     toExtract.append(i)
                 i0=i
     df=df.loc[toExtract]            

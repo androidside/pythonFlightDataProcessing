@@ -14,8 +14,9 @@ GYROS_FILENAME="gyros_dataframe"
 SC_FILENAME="sc_dataframe"
 EST_FILENAME="est_dataframe"
 QUATS_FILENAME="quats_dataframe"
+ORG_FILENAME="org_dataframe"
 
-def readAndSave(folder):
+def readAndSave(folder,initial_time=1000,final_time = None):
     start_time = timer()
     fieldsList=[]     
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqi',label='qi_sc'))
@@ -38,21 +39,20 @@ def readAndSave(folder):
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=-0.0006437))
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
     
-
-    initial_time=1000 #in frame number
-    final_time = None #in frame number
-
-    
     ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=True)
     #ds.df=ds.df.interpolate(method='values').dropna()
 
     print 'Dataframe shape:', ds.df.shape       
     gyros,sc,quats=extractGyrosAndStarcam(ds.df)
     print "Elapsed time:",timer()-start_time,"seconds."
+    print 'SC     Dataframe shape:', sc.shape
+    print 'Gyros. Dataframe shape:', gyros.shape
+    print 'Quats  Dataframe shape:', quats.shape
     print "Saving.."
     gyros.to_pickle(folder+GYROS_FILENAME)
     sc.to_pickle(folder+SC_FILENAME)
     quats.to_pickle(folder+QUATS_FILENAME)
+    ds.df.to_pickle(folder+ORG_FILENAME)
     print "Saved"
     return gyros,sc,quats
 

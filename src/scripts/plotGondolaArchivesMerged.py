@@ -7,6 +7,7 @@ Script for scripts simultaneously data from different archives
 '''
 print 'Imports...'
 import os
+import re
 import matplotlib as mpl
 from matplotlib.style import use
 from utils.dataset import DataSet, plt, np, pd
@@ -20,15 +21,24 @@ if __name__ == '__main__':
     root_folder = 'F:/GondolaFlightArchive/'
     subdirs = next(os.walk(root_folder))[1]
     folders = [root_folder + subdir + '/' for subdir in subdirs]
-
-        
+    
+    save_folder='C:/Users/bettii/thesis/'
+    img_folder=save_folder+'plots/merged/'
+    if not os.path.exists(img_folder):
+        os.makedirs(img_folder)
+    
+    use('seaborn-bright')
+    mpl.rcParams['axes.grid']=True
+    plt.rc('font', family='serif')
+      
     gyros = False
-    momdump = True
+    momdump = False
     magnetometer = False
     thermometers = False
     currentSensors = False
-    altitude = False
+    altitude = True
     
+    titles=False
     
     fieldsList = []
     if gyros:
@@ -62,6 +72,10 @@ if __name__ == '__main__':
         l1 = getFieldsContaining('bettii.currentReadout.currentReadout_UPBOne', folder)
         l2 = getFieldsContaining('bettii.currentReadout.currentReadout_UPBTwo', folder)
         lv = getFieldsContaining('bettii.currentReadout.voltage', folder)
+        for field in l1:
+            number=re.findall(r'\d+', field.label)[0]
+            if 'negative' in field.label: l1.remove(field)#number='-'+number
+            field.label=number+'V'
         currentsUPB1_labels = [field.label for field in l1]
         currentsUPB2_labels = [field.label for field in l2]
         voltages_labels = [field.label for field in lv]
@@ -70,17 +84,13 @@ if __name__ == '__main__':
         fieldsList = fieldsList + l1 + l2 + lv
           
     ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False)
-    
-    M = 100  # downsample factor
+    #ds.df = ds.df.iloc[:-1000]
+    M = 1  # downsample factor
     ds.df = ds.df.iloc[::M]
     
     print "Converting to Palestine Time..."
     ds.df.index = ds.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)
 
-    use('ggplot')
-    mpl.rcParams['axes.grid'] = True
-    
-    img_folder = 'C:/Users/bettii/gondola_archive_plots/'
     time_label = 'Palestine Time'
     
 
@@ -90,7 +100,7 @@ if __name__ == '__main__':
     if gyros:
         print "Plotting gyroscopes data..."
         fig = plt.figure()
-        fig.suptitle("Gyroscopes", fontsize=15, y=1)
+        if titles: fig.suptitle("Gyroscopes", fontsize=15, y=1)
         ax = plt.subplot(111, xlabel=time_label, ylabel='Angular velocity [arcsec/s]')
         data = ds.df[['Gyro X', 'Gyro Y', 'Gyro Z']].dropna()
         data.plot(ax=ax, style=['r+', 'g+', 'b+'], markersize=1.0)
@@ -103,7 +113,7 @@ if __name__ == '__main__':
     if magnetometer:
         print "Plotting magnetometer data..."
         fig = plt.figure()
-        fig.suptitle("Magnetometer", fontsize=15, y=1)
+        if titles: fig.suptitle("Magnetometer", fontsize=15, y=1)
         ax = plt.subplot(211, xlabel=time_label, ylabel='Azimuth [deg]')
         ax2 = plt.subplot(212, xlabel=time_label, ylabel='Pitch [deg]')
         data = ds.df[['mAz', 'mPitch', 'mRoll']].dropna()
@@ -117,7 +127,7 @@ if __name__ == '__main__':
         az = np.unwrap(y) * 180 / np.pi
 
         fig = plt.figure()
-        fig.suptitle("Magnetometer unwrapped", fontsize=15, y=1)
+        if titles: fig.suptitle("Magnetometer unwrapped", fontsize=15, y=1)
         ax = plt.subplot(211, xlabel=time_label, ylabel='Azimuth [deg]')
         ax2 = plt.subplot(212, xlabel=time_label, ylabel='Pitch [deg]')
         pd.Series(az, index=data.index).plot(ax=ax, style='.')
@@ -125,11 +135,28 @@ if __name__ == '__main__':
         fig.tight_layout()
         fig.savefig(img_folder + "magnetometer_unwrapped.png")
         
+        fig = plt.figure()
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Azimuth [deg]')
+        data.mAz.plot(ax=ax, style='.')
+        fig.tight_layout()
+        fig.savefig(img_folder + "mAz.png")
+        
+        fig = plt.figure()
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Pitch [deg]')
+        data.mPitch.plot(ax=ax, style='.')
+        fig.tight_layout()
+        fig.savefig(img_folder + "mPitch.png")
+        
+        fig = plt.figure()
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Azimuth [deg]')
+        pd.Series(az, index=data.index).plot(ax=ax, style='.')
+        fig.tight_layout()
+        fig.savefig(img_folder + "mAz_unwrapped.png")
         
         print "Plotting polar magnetometer"
         fig = plt.figure()
         data = ds.df.mAz.dropna()
-        fig.suptitle("Magnetometer Azimuth", fontsize=15, y=1)
+        if titles: fig.suptitle("Magnetometer Azimuth", fontsize=15, y=1)
         t = data.index.astype(np.int64) // 10 ** 9  # in seconds
         t = t - t[0]  # reorigin
         plt.polar(az * np.pi / 180., t ** 0.7, ms=0.3)
@@ -139,7 +166,7 @@ if __name__ == '__main__':
     if momdump:
         print "Plotting rotator data..."
         fig = plt.figure()
-        fig.suptitle("Rotator output", fontsize=15, y=1)
+        if titles: fig.suptitle("Rotator output", fontsize=15, y=1)
         ax = plt.subplot(111, xlabel=time_label, ylabel='Command [counts/s]')
         data = ds.df.ut.dropna()
         data.plot(ax=ax, style='b+', markersize=1.0)
@@ -148,7 +175,7 @@ if __name__ == '__main__':
     if thermometers:
         print "Plotting thermometers data..."
         fig = plt.figure()
-        fig.suptitle("Thermometers", fontsize=15, y=0.999)
+        if titles: fig.suptitle("Thermometers", fontsize=15, y=0.999)
         ax = plt.subplot(111, xlabel=time_label, ylabel='Temperature [Celsius]')
         data = ds.df[therm_labels].dropna(how='all').interpolate(method='time')
         data.plot(ax=ax, style='.', markersize=2.0)
@@ -157,7 +184,7 @@ if __name__ == '__main__':
         fig.savefig(img_folder + "thermometers.png")
         
         fig = plt.figure()
-        fig.suptitle("Gyroscopes Temperatures", fontsize=15, y=1)
+        if titles: fig.suptitle("Gyroscopes Temperatures", fontsize=15, y=1)
         ax = plt.subplot(111, xlabel=time_label, ylabel='Temperature [Celsius]')
         data = ds.df[['Temp. Gyro X', 'Temp. Gyro Y', 'Temp. Gyro Z']].dropna()
         data.plot(ax=ax, style=['r+', 'g+', 'b+'], markersize=1.0)
@@ -169,7 +196,7 @@ if __name__ == '__main__':
         fig = plt.figure()
         ax = plt.subplot(111, xlabel=time_label, ylabel='Altitude [m]')
         data = ds.df.altitude.dropna()
-        data.plot(ax=ax, style='b')
+        data.plot(ax=ax, style='b.',markersize=3)
         fig.tight_layout()
         fig.savefig(img_folder + "altitude.png")
     
@@ -179,7 +206,7 @@ if __name__ == '__main__':
         ax = plt.subplot(111, xlabel=time_label, ylabel='Current [A]')
         data = ds.df[currentsUPB1_labels].dropna()
         data.plot(ax=ax, style='.', ms=3.0)
-        plt.legend(markerscale=3, numpoints=20)
+        plt.legend(loc=0,markerscale=3, numpoints=20)
         fig.tight_layout()
         fig.savefig(img_folder + "currentsUPB1.png")
         

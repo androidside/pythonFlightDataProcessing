@@ -29,7 +29,7 @@ if __name__ == '__main__':
     if not os.path.exists(img_folder):
         os.makedirs(img_folder)
     
-    read=True
+    read=False
     if read:
         start_time = timer()
         
@@ -64,9 +64,9 @@ if __name__ == '__main__':
     
     print "Generating plots.."
     
-    use('ggplot')
+    use('seaborn-bright')
     mpl.rcParams['axes.grid']=True
-    
+    plt.rc('font', family='serif')
 
     time_label='Palestine Time'
     

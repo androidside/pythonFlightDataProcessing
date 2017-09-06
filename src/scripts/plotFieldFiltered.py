@@ -13,8 +13,8 @@ import matplotlib as mpl
 
 from matplotlib.style import use
 
-from utils.dataset import plt, load_single_field
-from utils.field import Field
+from utils.dataset import DataSet,plt,sns,np, load_single_field, filterArray
+from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
 if __name__ == '__main__':
@@ -52,18 +52,23 @@ if __name__ == '__main__':
     print "Folder name      \t"+field
     data=[]
     time=[]
+    #folders=['F:/GondolaFlightArchive/17-06-09_01_51_04/']
     for folder in folders:
         d=load_single_field(folder+field,datatype=Field.DTYPES[field])
         t=load_single_field(folder+time_field,datatype=Field.DTYPES[time_field])
         data=data+list(d)
-        time=time+list(t)
+        L=len(d)
+        time=time+list(t[:L])
         name=folder.split('/')[-2]
         print name+":\t"+str(len(d))+" raw values. "+str(len(t))+' FN values.'
-    
+    print "Filtering..."
+    data=filterArray(np.array(data))
+    data=filterArray(data,N=2000,R=0.5)
+    #data=filterArray(data,N=20000,R=0.5)
     print "Plotting.."
     use('ggplot')
     mpl.rcParams['axes.grid'] = True
-    plt.plot(time,data)
+    plt.plot(time,data,'.')
     plt.ylabel(field)
     plt.xlabel(time_field)
     print "Show.."

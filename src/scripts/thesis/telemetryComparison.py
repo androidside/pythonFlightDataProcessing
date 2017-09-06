@@ -84,19 +84,21 @@ if __name__ == '__main__':
     data = ds.df['Gyro Z'].dropna()
     data.plot(ax=ax1, style='r+', markersize=ms)
     fig.tight_layout()
-    fig.savefig(img_folder + "gyros_tel.png")
+    
     
     fig = plt.figure()
     ax2 = plt.subplot(111, xlabel=time_label, ylabel=ssd_label)
     data = dsd.df['Gyro Z'].dropna()
     data.plot(ax=ax2, style='b+', markersize=ms)
     fig.tight_layout()
-    fig.savefig(img_folder + "gyros_ssd.png")
+    
     
     xmin=736488.75
     xmax=736489.25
     ax1.set_xlim(xmin,xmax)
     ax2.set_xlim(xmin,xmax)
+    ax1.figure.savefig(img_folder + "gyros_tel.png")
+    ax2.figure.savefig(img_folder + "gyros_ssd.png")
     
     fig = plt.figure()
     ax = plt.subplot(211, ylabel=tel_label)
