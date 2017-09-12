@@ -1,7 +1,7 @@
 '''
 Created on Jun 22, 2017
 
-Plot raw data from a field. Merging archives if we want.
+Plot data from a field, using DataSet class. Merging archives if we want.
 
 @author: Marc Casalprim
 '''

@@ -4,6 +4,8 @@ Created on 28 Aug 2017
 Plotting of the estimated biases and the diagonal values of the covariance matrix P
 In addition, a plot of the diagonal values of the P rotated by the qGyros2Starcam.
 
+See utils.dataset.plotCovs() to obtain similar results
+
 @author: Marc Casalprim
 '''
 print 'Imports...'

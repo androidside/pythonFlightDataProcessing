@@ -1,7 +1,7 @@
 '''
 Created on 10 jul. 2017
 
-Script for plotting thermometers data from different archives
+Script for plotting thermometers data from different archives. The thermometers calssified in different groups by their mean temperature and also plotted by data flatness.
 
 @author: Marc Casalprim
 '''
@@ -34,9 +34,9 @@ if __name__ == '__main__':
     fieldsList=getFieldsContaining('bettii.ThermometersDemuxedCelcius.J',folder)
     
 
-
+    #Labelling the fields with their locations
     for field in fieldsList:
-        field.range=90
+        field.range=90 #setting their range to +-90 Celsius
         label=field.label
         if label in  ThermometerNumber.keys():
             number=ThermometerNumber[label]

@@ -1,7 +1,7 @@
 '''
 Created on 3 june 2017
 
-Main script
+Plot comparison between thedata collected from the telemtry vs. the data in the disks
 
 @author: Marc Casalprim
 '''

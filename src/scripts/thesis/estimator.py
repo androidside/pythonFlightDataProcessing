@@ -1,124 +1,99 @@
 '''
-Created on 23 May 2017
+Created on 3 june 2017
 
-Plotting of:
-Estimator-SC errors in SC ref. frame
-Estimator-SC errors in Gondola ref. frame
-Biases
-
+Main script
 
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-import pandas as pd
+
+from timeit import default_timer as timer
+
+import numpy as np
+
 from matplotlib.style import use
-from utils.dataset import DataSet,plt,genQuaternions,plotQuaternions,\
-    filterQuats,extractGyrosAndStarcam,filterArray
-from utils.field import Field#,getFieldsContaining,getFieldsRegex
+from matplotlib import rcParams
+
+from utils.estimator import readAndSave,openPickles
+from estimators.estimators import Estimator3,Estimator6,Estimator15,plt,pd
+from utils.dataset import plotQuaternions,plotColumns,plotCovs,plotInnovations
 
 
 if __name__ == '__main__':
-    folder='F:/GondolaFlightArchive/17-06-09_01_51_04/'
     folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
+    save_folder='C:/Users/bettii/thesis/plots/postflight/'
     
-    text=folder.split('/')[-2]
-    ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
-    ftime=pd.to_datetime(ftime_str,yearfirst=True)
+    read=False #read again the files?
+    estimated=True
     
-    est_filename=folder+'est.pkl'
-    sc_filename=folder+'sc.pkl'
-    gyros_filename=folder+'gyr.pkl'
-    org_filename=folder+'org.pkl'
+    ti=20389100
+    tf=None#28700000
+    if read: 
+        gyros,sc,quats=readAndSave(folder,initial_time=ti,final_time=None)
+    else:
+        gyros,sc,quats=openPickles(folder,quats=False)
     
-    read=False
-    
-    SCLabels=['qI2S','qI2G']
-    if read:
-        fieldsList=[]
-         
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqi',label='qi_sc'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqj',label='qj_sc'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqk',label='qk_sc'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqr',label='qr_sc'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraDecDeg',label='dec_sc'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRaDeg',label='ra_sc'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRollDeg',label='roll_sc'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraDecError',label='dec_err'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRaError',label='ra_err'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRollError',label='roll_err'))
-        fieldsList.append(Field('bettii.RTLowPriority.qr'))
-        fieldsList.append(Field('bettii.RTLowPriority.qi'))
-        fieldsList.append(Field('bettii.RTLowPriority.qj'))
-        fieldsList.append(Field('bettii.RTLowPriority.qk'))
-        fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered',label='triggers'))
-        
-        fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasXarcsec',label='biasX'))
-        fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='biasY'))
-        fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='biasZ'))
-        
-        fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=-0.0006304))
-        fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=-0.0006437))
-        fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
-    
-        ti=19061609
-        tf=None#22880065
-        ds = DataSet(folder,fieldsList=fieldsList,min=ti,max=tf,verbose=True)
-    
-        ds.df=ds.df.interpolate('values')
-        print 'Dataframe shape:', ds.df.shape
-        gyros,sc,est=extractGyrosAndStarcam(ds.df)
-        
 
+    kal3=Estimator3(gyros,sc)
+
+    if not estimated:
+        dt=0.01
+        Qd=(4.848e-6*0.3)**2*dt*np.eye(3) #dtheta
+
+        print "Estimating 3 states Kalman filter..."
+        kal3.estimate(Qd=Qd[:3,:3],ts=ti,te=tf,progress=True)
         print "Saving..."
-        est.to_pickle(est_filename)
-        gyros.to_pickle(gyros_filename)
-        sc.to_pickle(sc_filename)
-        ds.df.to_pickle(org_filename)
+        kal3.est.to_pickle(save_folder+Estimator3.EST_FILENAME)
     else:
         print "Opening..."
-        est=pd.read_pickle(est_filename)
-        sc=pd.read_pickle(sc_filename)
-    
-    print 'SC   Dataframe shape:', sc.shape
-    print 'Est. Dataframe shape:', est.shape
-    df=pd.merge(est.iloc[1:-1],sc,how='outer',left_index=True,right_index=True)
-    print 'Dataframe shape:', df.shape
-    if True:
-        print "Time conversion ..."
-        index=(df.index-df.index[0])/400. #time in seconds
-        index=pd.to_timedelta(index,unit='s')
-        time=ftime+index-pd.Timedelta(hours=5) #Palestine
-        df.index=time
-        #=======================================================================
-        # print "Cropping time"
-        # ftime=pd.datetime(2017, 6, 9, 1, 51,4)
-        # time_start=pd.datetime(2017, 6, 9, 4, 51)
-        # time_end=pd.datetime(2017, 6, 9, 12)
-        # df = df.loc[time_start:time_end]
-        # dt=df.index[0]-ftime
-        # df.index=df.index-pd.Timedelta(hours=8)
-        #=======================================================================
-    print 'Dataframe shape:', df.shape
+        kal3.est=pd.read_pickle(save_folder+Estimator3.EST_FILENAME)
     
     print "Plotting..."
-   
     use('seaborn-bright')
-    mpl.rcParams['axes.grid'] = True
+    rcParams['axes.grid']=True
     plt.rc('font', family='serif')
     
-    styles=['b.',{'color':'g','linestyle':'None','marker':'*','ms':10}]
-    sc=df[SCLabels].dropna()
-    xmin=736489.01118224463
-    xmax=736489.07284310518
-    tmin=None#pd.datetime(2017, 6, 9, 0, 15, 44)
-    tmax=None#pd.datetime(2017, 6, 9, 1, 44, 04)
-    xlim=None#[xmin,xmax]
-    plotQuaternions(df[['qest','qI2G']].loc[tmin:tmax],styles=styles,legend=True,labels=['Estimator','Starcamera'],xlim=xlim)
-    #plotQuaternions(sc[['qI2G','qI2S']],legend=True,styles=['g*','b+'])
-    a=1
+   
+    kal3.est=kal3.est.iloc[:-1]
+    
+    time_label='Time (frame number)'
+    if False: #convert from frame number to Palestine time
+        time_label='Palestine Time'
+        text=folder.split('/')[-2]
+        ftime_str=text[0:8]+' '+text[9:17].replace('_',':') #foldertime
+        ftime=pd.to_datetime(ftime_str,yearfirst=True)-pd.Timedelta(hours=5) #Palestine
+        
+        i0=19899228 #frame number referring to the start of the folder
+        
+        index=(kal3.est.index-i0)/400. #time in seconds
+        index=pd.to_timedelta(index,unit='s')
+        time=ftime+index
+        kal3.est.index=time
+        
+        index=(sc.index-i0)/400. #time in seconds
+        index=pd.to_timedelta(index,unit='s')
+        time=ftime+index
+        sc.index=time
+    
+    #===========================================================================
+    # df=pd.merge(kal3.est,sc,how='outer',left_index=True,right_index=True)
+    # print 'Dataframe shape:', df.shape
+    # styles=['b.',{'color':'g','linestyle':'None','marker':'*','ms':10}]
+    # f=plotQuaternions(df[['qest','qI2G']],styles=styles,legend=True,labels=['Estimator','Starcamera'], time_label=time_label)
+    # f.savefig(save_folder+"estimator_pc_3_opt.png")
+    # 
+    # Ps=pd.DataFrame()
+    # Ps['Kalman 3']=kal3.est['P']
+    # f=plotCovs(Ps,styles=['b','g','r'],legend=True, time_label=time_label,function=lambda x: np.sqrt(x)/4.848e-6,rotate=True,ylabels=[r'$\sigma_{RA}$ (arcsec)',r'$\sigma_{DEC}$ (arcsec)',r'$\sigma_{ROLL}$ (arcsec)'])
+    # f.savefig(save_folder+"covs_pc.png")
+    #===========================================================================
+    
+    
+    ests=[kal3.est]
+    labels=['Kalman 3']
+    styles=['b','r','g']
+    fig=plotInnovations(ests,sc, time_label=time_label, labels=labels, styles=styles, legend=True)
+    fig.savefig(save_folder+"errs.png")
+    
     print "Show"
     plt.show()
-
-
-    

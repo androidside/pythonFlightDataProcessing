@@ -63,7 +63,7 @@ if __name__ == '__main__':
     print "Plotting.."
     use('ggplot')
     mpl.rcParams['axes.grid'] = True
-    plt.plot(time,data)
+    plt.plot(time,data) #if dimensions do not match, use plotFieldNoTime.py or crop time=time[:len(data)]
     plt.ylabel(field)
     plt.xlabel(time_field)
     print "Show.."

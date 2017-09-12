@@ -1,7 +1,7 @@
 '''
 Created on 3 june 2017
 
-Main script
+Little scrip to print LaTex code of some example quaternions
 
 @author: Marc Casalprim
 '''
@@ -22,6 +22,7 @@ if __name__ == '__main__':
     row=['qi','q_j','q_k','q_r']
     roweq=['RA','DEC','ROLL']
     quats=[qI2T,qG2T,qS2G,qI2S]
+    
     print(" & $\prescript{T}{I}{\\textbf{q}}$ & $\prescript{T}{G}{\\textbf{q}}$ & $\prescript{G}{S}{\\textbf{q}}$ & $\\prescript{S}{I}{\\textbf{q}}$ \\\\ \hline")
     for i,r in enumerate(row):
         s="$"+r+"$"

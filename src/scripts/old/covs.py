@@ -4,6 +4,8 @@ Created on 28 May 2017
 Plotting of the estimated biases and the diagonal values of the covariance matrix P
 In addition, a plot of the diagonal values of the P rotated by the qGyros2Starcam.
 
+See utils.dataset.plotCovs() to obtain similar results
+
 @author: Marc Casalprim
 '''
 print 'Imports...'
@@ -18,13 +20,7 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 if __name__ == '__main__':
     folder = "C:/17-05-23_00_59_52/"
-    #folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-23_23_45_07\\"
-    
-    
-    #===========================================================================
-    # folder='C:/16-09-28_21_58_34-/'
-    # folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_01_42_03\\"
-    #===========================================================================
+
     
     Field.DTYPES=getDtypes(folder)
     

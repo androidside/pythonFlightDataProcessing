@@ -1,7 +1,7 @@
 '''
 Created on 10 jul. 2017
 
-Script for plotting thermometers data from different archives
+Script for plotting thermometers from a single folder. Interpolating the data with cubic splines to have uniform time steps.
 
 @author: Marc Casalprim
 '''
@@ -42,9 +42,10 @@ if __name__ == '__main__':
             os.makedirs(img_folder)
     
         
-        fL=getFieldsContaining('bettii.ThermometersDemuxedCelcius.J',folder)
+        fL=getFieldsContaining('bettii.ThermometersDemuxedCelcius.J',folder) #thermometers list
         #fieldsList.append(Field('bettii.ThermometersDemuxedCelcius.J3L4'))
-        fieldsList=[]
+        
+        fieldsList=[] #list that will have all the valid thermometers (that exist in ThermometerNumber dictionary)
         labels=[]
         for field in fL:
             field.range=90
@@ -62,6 +63,7 @@ if __name__ == '__main__':
         fields[time_label] = fields.pop('bettii.ThermometersDemuxedCelcius.mceFrameNumber')
         
         
+        #printing 'histogram' of data length
         lengths=[]
         bins={}
         for k in fields.keys():
@@ -80,21 +82,21 @@ if __name__ == '__main__':
                 print therm+', ',
             print ''
     
-        N=mode(lengths)[0][0]
+        N=mode(lengths)[0][0] #the most common length is used as the length of the time to interpolate
         print "Mode: %s" % N
         time=fields[time_label]
-        t0=time[0]
-        tf=time[-1]
-        time=np.linspace(t0,tf,N)
+        t0=time[0] #initial frame number
+        tf=time[-1]#final frame number
+        time=np.linspace(t0,tf,N) #common time
         fields[time_label]=time
         
         fieldsNew={}
         for k in fields.keys():
             y=fields[k]
             y=filt(y)
-            t=np.linspace(t0,tf,len(y))
-            tck = interpolate.splrep(t, y, s=0)
-            ynew = interpolate.splev(time, tck, der=0)
+            t=np.linspace(t0,tf,len(y)) #time
+            tck = interpolate.splrep(t, y, s=0) #we prepare the interpolation
+            ynew = interpolate.splev(time, tck, der=0) #we query at the common time
             if k!=time_label: fieldsNew[k]=ynew
     
         df=pd.DataFrame(fieldsNew,index=time)
@@ -127,6 +129,7 @@ if __name__ == '__main__':
         
         print "Saving CSV..."
         df.to_csv(thermo_filename,sep='\t', float_format='%.3f', index_label=time_label, date_format="%Y-%m-%d %H:%M:%S")
+        #changing column labels, to print the thermometers by Name on the CSV file
         cols=labels
         for i,label in enumerate(labels):
             number=ThermometerNumberByLocation[label]      
@@ -140,8 +143,8 @@ if __name__ == '__main__':
         ftime=pd.to_datetime(ftime_str,yearfirst=True)-pd.to_timedelta(5,unit='H')
         dt=(time[1]-time[0])/400.
         print "Delta time: %.2f seconds" % dt
-        dt=((tf-t0)/400./60)
-        print "Data span: %.2f minutes" % dt
+        ds=((tf-t0)/400./60)
+        print "Data span: %.2f minutes" % ds
         print ftime
         print ftime+pd.to_timedelta(dt,unit='m')
     print "Show..."

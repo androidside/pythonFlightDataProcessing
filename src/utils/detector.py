@@ -118,7 +118,7 @@ def plotImages(data,axes,sum=None,cmap="viridis"):
     for k in axes.keys():
         if sum is None: image=data[k][:,:,-1] #we pick the last
         else: image=np.sum(data[k],axis=2)
-        #imshow the image but interpreting the 0 values (+-atol) as invalid values (dead pixels)
+        #imshow the image but interpreting the values in [-atol,atol] as invalid values (dead pixels)
         axes[k].imshow(np.ma.masked_values(image, 0,atol=1e-13),interpolation='none',cmap=cmap)
     axes[axes.keys()[0]].figure.canvas.draw() #draw canvas from the first ax figure (is the same for all of them)
     

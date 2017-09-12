@@ -1,7 +1,7 @@
 '''
 Created on 22 aug. 2017
 
-
+Inertia value Jz calculation from a hanging test on ground
 
 @author: Marc Casalprim
 '''

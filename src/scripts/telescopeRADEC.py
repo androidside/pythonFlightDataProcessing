@@ -1,11 +1,7 @@
 '''
 Created on 23 May 2017
 
-Plotting of:
-Estimator-SC errors in SC ref. frame
-Estimator-SC errors in Gondola ref. frame
-Biases
-
+Plot and save telescope RA and DEC
 
 @author: Marc Casalprim
 '''
@@ -13,7 +9,7 @@ print 'Imports...'
 import matplotlib as mpl
 import pandas as pd
 from matplotlib.style import use
-from utils.dataset import DataSet,plt,extractGyrosAndStarcam
+from utils.dataset import DataSet,plt,plotColumns
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from utils.quat import Quat,normalize,sin,cos
 
@@ -28,8 +24,8 @@ if __name__ == '__main__':
 
 
     
-    ds = DataSet(folder,fieldsList=fieldsList,min=19361609,max=19712791,verbose=True)
-
+    ds = DataSet(folder,fieldsList=fieldsList,min=19361609,max=19712791,verbose=True,rpeaks=True)
+    f=plotColumns(ds.df[['RA (deg)','DEC (deg)']], xlabel='Time (frame number)')
     ds.df=ds.df.interpolate('values')
     
     print 'Dataframe shape:', ds.df.shape

@@ -1,7 +1,7 @@
 '''
 Created on Jun 22, 2017
 
-Plot raw data from a field. Merging archives if we want.
+Plot data from a field. The peaks of field data are filtered using utils.dataset.filterArray. Merging archives if we want.
 
 @author: Marc Casalprim
 '''

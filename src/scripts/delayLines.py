@@ -1,12 +1,7 @@
 '''
 Created on Jul 7, 2017
 
-@author: bettii
-'''
-'''
-Created on 28 jun. 2017
-
-Script for scripts simultaneously data from different archives
+Plot, delay lines control loops
 
 @author: Marc Casalprim
 '''

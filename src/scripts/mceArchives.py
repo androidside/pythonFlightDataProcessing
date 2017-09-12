@@ -1,7 +1,7 @@
 '''
 Created on Jun 22, 2017
 
-Altitude scripts without indexing, because we dont have a valid index for GpsReadings (approximatmceFN is empty)
+Prints the frame numbers that are in each Archive inside the root_folder
 
 @author: Marc Casalprim
 '''
