@@ -10,7 +10,7 @@ print 'Imports...'
 import matplotlib
 import numpy as np
 from utils.quat import Quat,normalize,sin,cos
-from utils.dataset import DataSet,plt,sns,load_single_field,pd
+from utils.dataset import DataSet,plt,load_single_field,pd
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from itertools import izip_longest
 

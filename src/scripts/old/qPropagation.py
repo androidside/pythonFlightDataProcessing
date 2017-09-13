@@ -12,7 +12,7 @@ import numpy as np
 from scipy.linalg import expm
 from matplotlib.style import use
 from utils.quat import Quat,normalize,sin,cos
-from utils.dataset import DataSet,plt,sns,load_single_field,pd
+from utils.dataset import DataSet,plt,load_single_field,pd
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from itertools import izip_longest
 

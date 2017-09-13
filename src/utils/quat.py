@@ -408,24 +408,24 @@ class Quat(object):
         return Quat(mult)#.normalize()
 
     def inv(self):
-        """
-        Invert the quaternion 
+        """Invert the quaternion
+        
         :returns: inverted quaternion
         :rtype: Quat
         """
         return Quat([-self.q[0], -self.q[1], -self.q[2], self.q[3]])
     
     def normalize(self):
-        """
-        Normalize the quaternion 
+        """ Normalize the quaternion 
+        
         :returns: normalized quaternion
         :rtype: Quat
         """
         return Quat(self.q/abs(self))
     
     def __repr__(self):
-        """
-        Represent a quaternion
+        """Represent a quaternion
+        
         :returns: string with the 3 equatorial angles
         :rtype: str
         """
@@ -504,6 +504,12 @@ def DCM2FordAngles(matrix,rollArnab=0,prVersions=False):
     return q
 
 def vec2skew(v):
+    '''Return the skew-matrix related to the vector `v`
+    
+    :param v: a 3-dimensional vector
+    :return: a skew-matrix
+    :rtype:  3x3 np.matrix
+    '''
     v1=v[0];v2=v[1];v3=v[2];
     return np.matrix([[0,-v3,v2],[v3,0,-v1],[-v2,v1,0]])
     

@@ -1,6 +1,8 @@
 '''
 Created on Sep 12, 2017
 
+Module that configures ``matplotlib``. It also contains some common variables for the scripts.
+
 @author: Marc Casalprim
 '''
 import os
@@ -10,11 +12,10 @@ from matplotlib.style import use
 import matplotlib.pyplot as plt
 
 #Plotting parameters
-use('seaborn-colorblind')
+use('classic')
 
 mpl.rcParams['axes.grid']=True
 plt.rc('font', family='serif')
-
 mpl.rcParams['date.autoformatter.hour']  = '%H:%M'
 mpl.rcParams['date.autoformatter.minute']  = '%H:%M:%S'
 

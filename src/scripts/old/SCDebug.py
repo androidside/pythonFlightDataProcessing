@@ -56,7 +56,7 @@ if __name__ == '__main__':
     
         ds.df=ds.df.interpolate('values')
         print 'Dataframe shape:', ds.df.shape
-        _,sc,est=extractGyrosAndStarcam(ds.df,labels_gyros=None,label_scerrors=None)
+        _,sc,est=extractGyrosAndStarcam(ds.df,labels_gyros=None,labels_scerrors=None)
         
 
         print "Saving..."

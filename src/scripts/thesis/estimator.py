@@ -7,13 +7,14 @@ Main script
 '''
 print 'Imports...'
 from utils.estimator import readAndSave,openPickles
-from estimators.estimators import Estimator3
+from estimators.estimators import Estimator6
 from utils.dataset import plt,pd,np,plotQuaternions,plotCovs,plotInnovations
+from utils.config import save_folder,img_folder
 
 
 if __name__ == '__main__':
     folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
-    save_folder='C:/Users/bettii/thesis/plots/postflight/'
+    
     
     read=False #read again the files?
     estimated=True
@@ -21,24 +22,13 @@ if __name__ == '__main__':
     ti=20389100
     tf=None#28700000
     if read: 
-        gyros,sc,quats=readAndSave(folder,initial_time=ti,final_time=None)
+        gyros,sc,est=readAndSave(folder,initial_time=ti,final_time=None)
     else:
-        gyros,sc,quats=openPickles(folder,quats=False)
+        gyros,sc,est=openPickles(folder,ests=True)
     
 
-    kal3=Estimator3(gyros,sc)
-
-    if not estimated:
-        dt=0.01
-        Qd=(4.848e-6*0.3)**2*dt*np.eye(3) #dtheta
-
-        print "Estimating 3 states Kalman filter..."
-        kal3.estimate(Qd=Qd[:3,:3],ts=ti,te=tf,progress=True)
-        print "Saving..."
-        kal3.est.to_pickle(save_folder+Estimator3.EST_FILENAME)
-    else:
-        print "Opening..."
-        kal3.est=pd.read_pickle(save_folder+Estimator3.EST_FILENAME)
+    kal3=Estimator6(gyros,sc)
+    kal3.est=est
     
     print "Plotting..."
     
@@ -68,12 +58,12 @@ if __name__ == '__main__':
     print 'Dataframe shape:', df.shape
     styles=['b.',{'color':'g','linestyle':'None','marker':'*','ms':10}]
     f=plotQuaternions(df[['qest','qI2G']],styles=styles,legend=True,labels=['Estimator','Starcamera'], time_label=time_label)
-    f.savefig(save_folder+"estimator_pc_3_opt.png")
+    f.savefig(save_folder+"estimator.png")
      
     Ps=pd.DataFrame()
     Ps['Kalman 3']=kal3.est['P']
-    f=plotCovs(Ps,styles=['b','g','r'],legend=True, time_label=time_label,function=lambda x: np.sqrt(x)/4.848e-6,rotate=True,ylabels=[r'$\sigma_{RA}$ (arcsec)',r'$\sigma_{DEC}$ (arcsec)',r'$\sigma_{ROLL}$ (arcsec)'])
-    f.savefig(save_folder+"covs_pc.png")
+    f=plotCovs(Ps,styles=['b','g','r'],legend=True, time_label=time_label,function=lambda x: np.sqrt(abs(x))/4.848e-6,rotate=True,ylabels=[r'$\sigma_{RA}$ (arcsec)',r'$\sigma_{DEC}$ (arcsec)',r'$\sigma_{ROLL}$ (arcsec)'])
+    f.savefig(save_folder+"covs_estimator.png")
     
     
     ests=[kal3.est]

@@ -8,7 +8,7 @@ Main script
 print 'Imports...'
 from matplotlib.style import use
 from utils.dataset import pd,DataSet,plt,np
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
+from utils.field import Field,getDtypes
 from utils.quat import Quat,sin,cos
 
 

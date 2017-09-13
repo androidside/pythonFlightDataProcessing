@@ -6,7 +6,7 @@ Main script
 @author: Marc Casalprim
 '''
 print 'Imports...'
-
+from utils.config import os
 from utils.estimator import readAndSave,openPickles
 from estimators.estimators import Estimator3,Estimator6,Estimator15,pd
 from utils.dataset import plt,np,plotQuaternions,plotColumns,plotCovs,plotInnovations
@@ -15,16 +15,18 @@ from utils.dataset import plt,np,plotQuaternions,plotColumns,plotCovs,plotInnova
 if __name__ == '__main__':
     folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
     save_folder=folder
-    
+    img_folder=save_folder+'postflight/'
+    if not os.path.exists(img_folder):
+        os.makedirs(img_folder)
     read=False
-    estimated=False
+    estimated=True
     
     ti=20389100
     tf=None#28700000
     if read: 
         gyros,sc,quats=readAndSave(folder,initial_time=ti,final_time=None)
     else:
-        gyros,sc,quats=openPickles(folder,quats=False)
+        gyros,sc,quats=openPickles(folder,ests=False)
     
 
     kal3=Estimator3(gyros,sc)
@@ -35,7 +37,7 @@ if __name__ == '__main__':
         
         Qd=np.eye(15)
         dt=0.01
-        Qd[:3,:3]=(4.848e-6*1e-3)**2*dt*np.eye(3) #dtheta
+        Qd[:3,:3]=(4.848e-6*0.03)**2*dt*np.eye(3) #dtheta
         Qd[3:6,3:6]=8e-7**2*dt*np.eye(3) #k
         Qd[6:12,6:12]=9e-7**2*dt*np.eye(6) #m
         Qd[12:15,12:15]=(4.848e-6*1e-4)**2*dt*np.eye(3) #bias
@@ -61,7 +63,7 @@ if __name__ == '__main__':
     
     print "Plotting..."
     
-    save_folder='C:/Users/bettii/thesis/plots/postflight/'
+
    
     kalOrg.est=kalOrg.est.iloc[:-1]
     kal3.est=kal3.est.iloc[:-1]
@@ -100,35 +102,35 @@ if __name__ == '__main__':
     print 'K15 Dataframe shape:', df.shape
     styles=['b.',{'color':'g','linestyle':'None','marker':'*','ms':10}]
     f=plotQuaternions(df[['qest','qI2G']],styles=styles,legend=True,labels=['Estimator','Starcamera'], time_label=time_label)
-    f.savefig(save_folder+"estimator_pc_15.png")
+    f.savefig(img_folder+"estimator_pc_15.png")
     f=plotColumns(kal15.est[['biasX','biasY','biasZ']].apply(lambda x: x/4.848e-6), xlabel=time_label, units='(arcsec/s)',ylabels=[r'$bias_X$',r'$bias_Y$',r'$bias_Z$'])
-    f.savefig(save_folder+"biases_pc_15.png") 
+    f.savefig(img_folder+"biases_pc_15.png") 
     
     df=pd.merge(kalOrg.est,sc,how='outer',left_index=True,right_index=True)
     print 'K6 Dataframe shape:', df.shape
     styles=['b.',{'color':'g','linestyle':'None','marker':'*','ms':10}]
     f=plotQuaternions(df[['qest','qI2G']],styles=styles,legend=True,labels=['Estimator','Starcamera'], time_label=time_label)
-    f.savefig(save_folder+"estimator_pc.png")
+    f.savefig(img_folder+"estimator_pc.png")
     f=plotColumns(kalOrg.est[['biasX','biasY','biasZ']].apply(lambda x: x/4.848e-6), xlabel=time_label, units='(arcsec/s)',ylabels=[r'$bias_X$',r'$bias_Y$',r'$bias_Z$'])
-    f.savefig(save_folder+"biases_pc.png")  
+    f.savefig(img_folder+"biases_pc.png")  
     
     df=pd.merge(kal3.est,sc,how='outer',left_index=True,right_index=True)
     print 'K3 Dataframe shape:', df.shape
     
     f=plotQuaternions(df[['qest','qI2G']],styles=styles,legend=True,labels=['Estimator','Starcamera'], time_label=time_label)
-    f.savefig(save_folder+"estimator_pc_3.png")
+    f.savefig(img_folder+"estimator_pc_3.png")
     
     Ps=pd.DataFrame()
     Ps['Kalman 6']=kalOrg.est['P']
     Ps=pd.merge(Ps,kal3.est[['P']],how='outer',left_index=True,right_index=True).dropna().rename(columns={'P':'Kalman 3'})
     Ps=pd.merge(Ps,kal15.est[['P']],how='outer',left_index=True,right_index=True).dropna().rename(columns={'P':'Kalman 15'})
     f=plotCovs(Ps,styles=['b','g','r'],legend=True, time_label=time_label,function=lambda x: np.sqrt(x)/4.848e-6,rotate=True,ylabels=[r'$\sigma_{RA}$ (arcsec)',r'$\sigma_{DEC}$ (arcsec)',r'$\sigma_{ROLL}$ (arcsec)'])
-    f.savefig(save_folder+"covs_pc.png")
+    f.savefig(img_folder+"covs_pc.png")
     
     ests=[kal3.est,kalOrg.est,kal15.est]
     labels=['Kalman 3','Kalman 6','Kalman 15']
     styles=[{'color':'b','marker':'s','ms':3},{'color':'r','marker':'^','ms':3},{'color':'g','marker':'o','ms':3}]
-    fig=plotInnovations(ests,sc, conv=lambda x: abs(x), units='deg',labels=labels, styles=styles, legend=True, sync=True)
-    fig.savefig(save_folder+"errs.png")
+    fig=plotInnovations(ests,sc, conv=lambda x: abs(x), units='deg',labels=labels, styles=styles, legend=True, sync=False)
+    fig.savefig(img_folder+"errs.png")
     print "Show"
     plt.show()

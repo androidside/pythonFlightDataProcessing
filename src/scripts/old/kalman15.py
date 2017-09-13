@@ -14,7 +14,7 @@ from matplotlib import rcParams
 
 from utils.dataset import DataSet,plt,extractGyrosAndStarcam,pd
 from utils.field import Field
-from estimators import Estimator15,timer
+from estimators.estimators import Estimator15, timer
 
 
 if __name__ == '__main__':

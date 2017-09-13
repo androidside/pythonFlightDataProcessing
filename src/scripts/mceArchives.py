@@ -6,25 +6,18 @@ Prints the frame numbers that are in each Archive inside the root_folder
 @author: Marc Casalprim
 '''
 
+
 print 'Imports...'
-import os
-import matplotlib as mpl
+from utils.config import flightDisksFolders
+from utils.dataset import load_single_field
 
-
-from matplotlib.style import use
-
-from utils.dataset import DataSet,plt,sns,np, load_single_field
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
 
 if __name__ == '__main__':
 
-    folders=[]
-    root_folder='F:/GondolaFlightArchive/'
-    subdirs=next(os.walk(root_folder))[1]
-    folders=[root_folder+subdir+'/' for subdir in subdirs]
- 
+    folders=flightDisksFolders
+
     fieldsList=[]
     print "Folder name      \tfinal mceFN"
     field='bettii.RTLowPriority.mceFrameNumber'

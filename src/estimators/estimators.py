@@ -47,6 +47,9 @@ class Estimator(object):
         if 'biasX' in self.est.columns:
             f=plotColumns(self.est[['biasX','biasY','biasZ']].apply(lambda x: x/4.848e-6), xlabel=time_label, units='(arcsec/s)',ylabels=[r'$bias_X$',r'$bias_Y$',r'$bias_Z$'])
             if save_folder is not None: f.savefig(save_folder+"biases.png")
+        if 'P' in self.est.columns:
+            f=plotColumns(self.est[['biasX','biasY','biasZ']].apply(lambda x: x/4.848e-6), xlabel=time_label, units='(arcsec/s)',ylabels=[r'$bias_X$',r'$bias_Y$',r'$bias_Z$'])
+            if save_folder is not None: f.savefig(save_folder+"biases.png")
 
     def save(self,folder='./'):
         """Save the dataframes in pickle files"""
@@ -66,7 +69,7 @@ class Estimator3(Estimator):
     Class implementing the a 3 states Kalman filter.
     '''
     EST_FILENAME=Estimator.EST_FILENAME+"3"
-    def estimate(self,P0=0*np.eye(3),q0=None,Qd=np.eye(3),SCg=5,ts=None,te=None,progress=False):
+    def estimate(self,P0=None,q0=None,Qd=np.eye(3),SCg=5,ts=None,te=None,progress=False):
         gyros=self.gyros.loc[ts:te]
         if progress:
             start_time = timer()
@@ -85,6 +88,7 @@ class Estimator3(Estimator):
                 gyros=gyros.loc[ig:]
                 sc=self.sc.iloc[1:]
         else: sc=self.sc.loc[ts:te]
+        if P0 is None: P0=Qd
         nextSCindex=0
         i0=gyros.index[0]            
         q_prop=q0
@@ -162,7 +166,7 @@ class Estimator6(Estimator):
     Class implementing the original 6 state Kalman filter.
     '''
     EST_FILENAME=Estimator.EST_FILENAME+"6"
-    def estimate(self,P0=0*np.eye(6),b0=np.zeros(3),q0=None,Qd=np.eye(6),SCg=5,ts=None,te=None,progress=False):
+    def estimate(self,P0=None,b0=np.zeros(3),q0=None,Qd=np.eye(6),SCg=5,ts=None,te=None,progress=False):
         gyros=self.gyros.loc[ts:te]
         if progress:
             start_time = timer()
@@ -181,6 +185,7 @@ class Estimator6(Estimator):
                 gyros=gyros.loc[ig:]
                 sc=self.sc.iloc[1:]
         else: sc=self.sc.loc[ts:te]
+        if P0 is None: P0=Qd
         nextSCindex=0
         i0=gyros.index[0]            
         q_prop=q0
@@ -268,7 +273,7 @@ class Estimator15(Estimator):
     Class implementing the 15 state Kalman filter.
     '''
     EST_FILENAME=Estimator.EST_FILENAME+"15" 
-    def estimate(self,P0=0*np.eye(15),b0=np.zeros(3),k0=np.zeros(3),m0=np.zeros(6),SCg=5,q0=None,Qd=np.eye(15),ts=None,te=None,progress=False):
+    def estimate(self,P0=None,b0=np.zeros(3),k0=np.zeros(3),m0=np.zeros(6),SCg=5,q0=None,Qd=np.eye(15),ts=None,te=None,progress=False):
         gyros=self.gyros.loc[ts:te]
         if progress:
             start_time = timer()
@@ -287,6 +292,7 @@ class Estimator15(Estimator):
                 gyros=gyros.loc[ig:]
                 sc=self.sc.iloc[1:]
         else: sc=self.sc.loc[ts:te]
+        if P0 is None: P0=Qd
         nextSCindex=0
         i0=gyros.index[0]            
         q_prop=q0

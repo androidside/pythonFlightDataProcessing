@@ -1,6 +1,6 @@
 '''Created on 28 abr. 2017
 
-Conatins useful functions to read and plot the fields archived by Aurora. The DataSet class reads and creates a pandas.Dataframe object containing the desired fields.
+Conatins useful functions to read and plot the fields archived by Aurora. The DataSet class reads and creates a ``pandas.Dataframe`` object containing the desired fields.
 
 @author: Marc Casalprim
 '''
@@ -13,7 +13,7 @@ from thermometers import unwrapCounter
 
 
 def load_single_field(filename, datatype, nValues=None, start=None):
-    """Reads a binary file. It uses the np.fromfile function.
+    """Reads a binary file. It uses the ``np.fromfile`` function.
     
     :param filename: complete filename of the field to read
     :param datatype: data type of the binary file (eg. int32 -> 'i4')
@@ -54,7 +54,7 @@ def load_fields(fieldsList, folder=None, nValues=None, start=None):
     :param folder: folder where the fields will be read
     :param nValues: number of values we want to read (if None, all of them)
     :param start: value from where we start counting nValues (if None, starting from the end of file)
-    :return: dictionary of np.array keyed by the field's label
+    :return: dictionary of ``np.array`` keyed by the field's label
     :rtype: dict
     
     """
@@ -65,7 +65,7 @@ def load_fields(fieldsList, folder=None, nValues=None, start=None):
     return df
         
 def genQuaternions(dataframe, quats={'qest':['qi', 'qj', 'qk', 'qr'], 'qI2G':['qi_sc', 'qj_sc', 'qk_sc', 'qr_sc'], 'qI2S':['ra_sc', 'dec_sc', 'roll_sc']}, norm=False, filter=False):
-    '''Generates a dictionary of lists of :meth:~`utils.quat.Quat` objects using the columns of the dataframe defined by the quats dictionary values.
+    '''Generates a dictionary of lists of ``:meth:~`utils.quat.Quat``` objects using the columns of the dataframe defined by the quats dictionary values.
     The returned dictionary will have the same keys as quats
     
     :param dataframe: pandas.DataFrame object, with
@@ -97,14 +97,14 @@ def genQuaternions(dataframe, quats={'qest':['qi', 'qj', 'qk', 'qr'], 'qI2G':['q
      
     return lists
 
-def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], label_triggers='triggers', label_scerrors=['ra_err', 'dec_err', 'roll_err']):
+def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], label_triggers='triggers', labels_scerrors=['ra_err', 'dec_err', 'roll_err']):
     '''Returns three dataframes with the Groscopes, Starcamera and Quaternions data respectively.
     Synchronizes the Starcamera with the triggers. Useful for the Estimator classes.
     
     :param dataframe: pandas dataframe containing all the infromation to extract
     :param labels_gyros: columns of the dataframe that contain the gyroscopes information
     :param label_triggers: column of the dataframe that contains the triggers information
-    :param label_scerrors: columns of the dataframe that contain the star camera uncertainties information
+    :param labels_scerrors: columns of the dataframe that contain the star camera uncertainties information
     :return: gyros,sc,quats: pandas dataframes with the gyroscopes, star camera and quaternions data respectively.
     '''
     SClabels = ['qI2G', 'qI2S']
@@ -118,21 +118,35 @@ def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], 
     subdf = dataframe.loc[triggers.index].drop_duplicates(subset=['dec_sc', 'ra_sc', 'roll_sc']).dropna()
     index = triggers.loc[subdf.index].index  # values #here we can index the sc dataframe with the triggers (using .values instead of .index), they dont seem to be
     sc = pd.DataFrame(genQuaternions(subdf, norm=True, filter=True), index=index)[SClabels].dropna()
-    if label_scerrors is not None: sc[label_scerrors] = dataframe[label_scerrors].loc[sc.index]
+    if labels_scerrors is not None: sc[labels_scerrors] = dataframe[labels_scerrors].loc[sc.index]
     sc[label_triggers] = triggers.loc[subdf.index]
     print "Number of solutions: %s" % len(sc)
     print "Generating estimator quaternions..."
-    quats = pd.DataFrame(genQuaternions(dataframe, quats={'qest':['qi', 'qj', 'qk', 'qr']}, norm=True), index=dataframe.index)
+    quats = genQuaternions(dataframe, quats={'qest':['qi', 'qj', 'qk', 'qr']}, norm=True)['qest']
     print "Filtering..."
-    quats = filterQuats(quats)
-    
 
+    Ps = extractPs(dataframe)
+    est = dataframe[['biasX','biasY','biasZ']]
+    est['P']=Ps
+    est['qest']=quats
+    est = filterQuats(est)
+    
  
     if labels_gyros is not None: gyros = dataframe[labels_gyros].dropna().interpolate(method='values')
     else: gyros = None
     # print 'Done'  
-    return gyros, sc, quats
-    
+    return gyros, sc, est
+def extractPs(dataframe):
+    data=dataframe[['P00','P01','P02','P10','P11','P12','P20','P21','P22']]
+    L=len(data.P00)
+    Ps=[np.eye(3)]*L
+
+    for i in range(L):
+        m=(data.iloc[i].as_matrix())
+        P=m.reshape((3,3))
+        Ps[i]=P
+    return Ps
+        
 class DataSet():
     '''Class containing useful methods to read and generate a pandas dataframe containing the desired fields.
     Derived from Maxime's original codes. The dataframe is stored as the attribute df.
@@ -706,9 +720,10 @@ def plotInnovations(ests,sc, time_label='Palestine Time', units='arcsec', conv=l
     fig.tight_layout()
     return fig
 def plotCovs(df, time_label='Palestine Time', ylabels=None, labels=None, styles=['b', 'r', 'g', 'k'], legend=False, xlim=None, function=lambda x: x, rotate=False):
-    '''Plot the first three diagonal elements of P of the pd.Dataframe df in a 3x1 subplots layout (P11,P22,P33)
+    '''Plot the first three diagonal elements of the matrices in the dataframe df in a 3x1 subplots layout (P11,P22,P33)
     
     :param df: a pd.Dataframe containing exclusively columns of np.matrix objects greater than 3x3
+    :ptype: ``pd.Dataframe``
     :param time_label: label of the x axis
     :param ylabels: y axis labels of the three subplots, in order top-bottom
     :param labels: legend labels of every column (if None, use df.columns as labels)
@@ -720,16 +735,24 @@ def plotCovs(df, time_label='Palestine Time', ylabels=None, labels=None, styles=
     :return: figure
     :rtype: matplotlib.figure
     '''
+    
     N = len(df.columns)
-    fig, (axRA, axDEC, axROLL) = plt.subplots(3, 1, sharex=True, sharey=True)
-    if ylabels is None:
-        axROLL.set_ylabel(r'$P_{00}$')
-        axDEC.set_ylabel(r'$P_{11}$')
-        axRA.set_ylabel(r'$P_{22}$')
+    if N>1:
+        if labels is None: labels = df.columns
+        fig, (axRA, axDEC, axROLL) = plt.subplots(3, 1, sharex=True, sharey=True)
+        if ylabels is None:
+            axROLL.set_ylabel(r'$P_{00}$')
+            axDEC.set_ylabel(r'$P_{11}$')
+            axRA.set_ylabel(r'$P_{22}$')
+        else:
+            axRA.set_ylabel(ylabels[0])
+            axDEC.set_ylabel(ylabels[1])
+            axROLL.set_ylabel(ylabels[2])
     else:
-        axRA.set_ylabel(ylabels[0])
-        axDEC.set_ylabel(ylabels[1])
-        axROLL.set_ylabel(ylabels[2])
+        fig, axRA = plt.subplots(1, 1, sharex=True, sharey=True)
+        axDEC=axRA;axROLL=axRA;
+        if labels is None: labels=[r'$P_{00}$',r'$P_{11}$',r'$P_{00}$']
+        styles=[{}]
     axROLL.set_xlabel(time_label)
     M = np.matrix([[0.693865, 0, 0.720106], [0, 1, 0], [-0.720106, 0, 0.693865]])
     for i in range(N):
@@ -750,10 +773,8 @@ def plotCovs(df, time_label='Palestine Time', ylabels=None, labels=None, styles=
             axRA.plot(index, RAdata, **style)
             axDEC.plot(index, DECdata, **style)
             axROLL.plot(index, ROLLdata, **style)
-    if labels is None: labels = df.columns
+    
     if xlim is not None:
-        axRA.set_xlim(xlim)
-        axDEC.set_xlim(xlim)
         axROLL.set_xlim(xlim)
     if legend:
         axRA.legend(labels, loc=0, markerscale=2, numpoints=1)

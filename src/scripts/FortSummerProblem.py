@@ -14,7 +14,7 @@ import pandas as pd
 from numpy import sin,cos,arctan2,pi,sqrt
 from matplotlib.style import use
 from utils.quat import Quat
-from utils.dataset import DataSet,plt,sns, genQuaternions
+from utils.dataset import DataSet,plt, genQuaternions
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 

@@ -9,7 +9,7 @@ Plot raw data from a field. Merging archives if we want.
 print 'Imports...'
 import os
 
-from utils.dataset import DataSet,plt,sns,np,pd, load_single_field
+from utils.dataset import DataSet,plt,np,pd, load_single_field
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 

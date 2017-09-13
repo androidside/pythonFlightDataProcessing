@@ -14,8 +14,7 @@ import matplotlib as mpl
 import pandas as pd
 from matplotlib.style import use
 from utils.dataset import DataSet,plt,extractGyrosAndStarcam
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-from utils.quat import Quat,normalize,sin,cos
+from utils.field import Field
 
 
 if __name__ == '__main__':
@@ -48,7 +47,7 @@ if __name__ == '__main__':
     print 'Dataframe shape:', ds.df.shape
     
 
-    _,sc,quats=extractGyrosAndStarcam(ds.df,labels_gyros=None,label_scerrors=None)
+    _,sc,quats=extractGyrosAndStarcam(ds.df,labels_gyros=None,labels_scerrors=None)
     qGyros2Starcam=sc.qI2S.iloc[0]*sc.qI2G.iloc[0].inv() #(Quat((-0.367,0,0))*Quat((0,-44.9828,0))*Quat((0,0,-0.79))).inv()
     print "qStarcam2Gyros:",qGyros2Starcam.inv()
     

@@ -10,12 +10,13 @@ Biases
 @author: Marc Casalprim
 '''
 print 'Imports...'
+from matplotlib.style import use
+
 import matplotlib as mpl
 import pandas as pd
-from matplotlib.style import use
-from utils.dataset import DataSet,plt,genQuaternions
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-from utils.quat import Quat,normalize,sin,cos
+from utils.dataset import DataSet, plt, genQuaternions
+from utils.field import Field
+from utils.quat import Quat, normalize, sin, cos
 
 
 if __name__ == '__main__':

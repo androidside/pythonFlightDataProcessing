@@ -1,7 +1,7 @@
 '''
 Created on Jul 12, 2017
 
-Thermometry conversion class using demodRaw values from TRead messages. It emulates the Calibrator java class at gov.nasa.gsfc.aurora.common.piperthermometry
+Thermometry conversion class using demodRaw values from TRead messages. It emulates the Calibrator `java class at gov.nasa.gsfc.aurora.common.piperthermometry`
 
 @author: bettii
 '''
