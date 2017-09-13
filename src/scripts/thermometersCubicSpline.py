@@ -6,13 +6,11 @@ Script for plotting thermometers from a single folder. Interpolating the data wi
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import os
-import matplotlib as mpl
-from matplotlib.style import use
-from utils.dataset import DataSet,plt,np,pd,load_fields
-from utils.field import Field,getFieldsContaining
+from utils.config import os,plt
+from utils.dataset import np,pd,load_fields
+from utils.field import getFieldsContaining
 from utils.thermometers import ThermometerNumber,ThermometerLocationByNumber,ThermometerNumberByLocation,ThermometerName
-from scipy.stats import linregress,mode
+from scipy.stats import mode
 from scipy import interpolate
 
 def filt(y):
@@ -101,14 +99,11 @@ if __name__ == '__main__':
     
         df=pd.DataFrame(fieldsNew,index=time)
         labels=df.columns
-          
-        use('seaborn-colorblind')
-        mpl.rcParams['axes.grid']=True
         
     
     
         
-        M=1 #downsample factor
+        M=1 #downsample factor overriden
         df=df.iloc[::M]
         
         print "Generating plots.."

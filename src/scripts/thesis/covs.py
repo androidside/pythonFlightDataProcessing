@@ -9,11 +9,8 @@ See utils.dataset.plotCovs() to obtain similar results
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib
-import os
-import pandas as pd
-from matplotlib.style import use
-from utils.dataset import DataSet,plt,np,filterDataframe
+
+from utils.dataset import os,pd,DataSet,plt,np,filterDataframe
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
@@ -71,13 +68,7 @@ if __name__ == '__main__':
     aux=filterDataframe(ds.df.copy(),N=7,R=0.5)
     aux=filterDataframe(aux,N=3,R=0.9)
     ds.df=aux
-    #===========================================================================
-    # aux.P11.plot()
-    # plt.show()
-    #===========================================================================
-    use('seaborn-bright')
-    matplotlib.rcParams['axes.grid']=True
-    plt.rc('font', family='serif')
+
     
     print "Plotting..."
     time_label='Time'

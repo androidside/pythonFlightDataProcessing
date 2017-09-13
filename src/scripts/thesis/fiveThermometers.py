@@ -5,27 +5,17 @@ Script for plotting thermometers data from different archives
 
 @author: Marc Casalprim
 '''
-print 'Imports...'
-import os
-import matplotlib as mpl
-from matplotlib.style import use
-from utils.dataset import DataSet,plt,np,pd
-from utils.field import Field,getFieldsContaining
-from utils.thermometers import ThermometerNumber,ThermometerLocationByNumber
-from scipy.stats import linregress
 
-def flatness(x):
-    slope, intercept, r_value, p_value, std_err = linregress(range(len(x)),x)
-    return std_err
+print 'Imports...'
+from utils.config import os,flightDisksFolders, save_folder
+from utils.dataset import DataSet,plt,np,pd
+from utils.field import Field
+from utils.thermometers import ThermometerNumber,ThermometerLocationByNumber
 
 if __name__ == '__main__':
 
-    folders=[]
-    root_folder='F:/GondolaFlightArchive/'
-    subdirs=next(os.walk(root_folder))[1]
-    folders=[root_folder+subdir+'/' for subdir in subdirs]
+    folders=flightDisksFolders
 
-    save_folder='C:/Users/bettii/thesis/'
     img_folder=save_folder+'plots/thermometers/'
     if not os.path.exists(img_folder):
         os.makedirs(img_folder)
@@ -58,17 +48,13 @@ if __name__ == '__main__':
     #ds.df=ds.df.ix[pd.to_datetime('06/09/2017 06:00:00'):] #slicing
     print ds.df.shape
 
-    labels=ds.df.columns
-      
-    use('seaborn-colorblind')
-    mpl.rcParams['axes.grid']=True
-    plt.rc('font', family='serif')
-    
+    labels=ds.df.columns   
 
     time_label='Time'
     
     M=1 #downsample factor
     ds.df=ds.df.iloc[::M]
+    
     print ds.df.shape
     print "Generating plots.."
 

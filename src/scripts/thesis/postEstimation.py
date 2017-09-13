@@ -7,16 +7,9 @@ Main script
 '''
 print 'Imports...'
 
-from timeit import default_timer as timer
-
-import numpy as np
-
-from matplotlib.style import use
-from matplotlib import rcParams
-
 from utils.estimator import readAndSave,openPickles
-from estimators.estimators import Estimator3,Estimator6,Estimator15,plt,pd
-from utils.dataset import plotQuaternions,plotColumns,plotCovs,plotInnovations
+from estimators.estimators import Estimator3,Estimator6,Estimator15,pd
+from utils.dataset import plt,np,plotQuaternions,plotColumns,plotCovs,plotInnovations
 
 
 if __name__ == '__main__':
@@ -67,9 +60,6 @@ if __name__ == '__main__':
         kalOrg.est=pd.read_pickle(save_folder+Estimator6.EST_FILENAME)
     
     print "Plotting..."
-    use('seaborn-bright')
-    rcParams['axes.grid']=True
-    plt.rc('font', family='serif')
     
     save_folder='C:/Users/bettii/thesis/plots/postflight/'
    

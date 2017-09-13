@@ -6,12 +6,8 @@ Plot of the Power Spectrum Density of the Gyroscopes
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-from matplotlib.style import use
 from utils.dataset import DataSet,plt,pd
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-from scipy.signal.spectral import periodogram
-from numpy.fft import fft,ifft
 
 if __name__ == '__main__':
   
@@ -37,7 +33,7 @@ if __name__ == '__main__':
 
     #===========================================================================
     
-    ds = DataSet(folder=folder,fieldsList=fieldsList,min=initial_time,max=final_time,verbose=True,rpeaks=False,timeIndex=False)
+    ds = DataSet(folder=folder,fieldsList=fieldsList,min=initial_time,max=final_time,verbose=True,rpeaks=False,timeIndex=True)
     
     ds.df.to_pickle(folder+'gyros.pkl')
     
@@ -46,10 +42,7 @@ if __name__ == '__main__':
     print "Converting to Palestine Time..."
     ds.df.index = ds.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)
     
-    use('seaborn-bright')
-    mpl.rcParams['axes.grid'] = True
-    plt.rc('font', family='serif')
-    
+    print "Plotting"
     fig = plt.figure()
     ax = plt.subplot(111, xlabel='Palestine Time', ylabel='Angular velocity [arcsec/s]')
     data = ds.df[gyros].dropna()
@@ -57,5 +50,5 @@ if __name__ == '__main__':
     plt.legend(markerscale=3, numpoints=20)
     fig.tight_layout()
     
-
+    print "Show"
     plt.show()

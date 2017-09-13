@@ -5,30 +5,24 @@ Script for plotting thermometers data from different archives. The thermometers 
 
 @author: Marc Casalprim
 '''
+
 print 'Imports...'
-import os
-import matplotlib as mpl
-from matplotlib.style import use
+from utils.config import flightDisksFolders
 from utils.dataset import DataSet,plt,np,pd
-from utils.field import Field,getFieldsContaining
+from utils.field import getFieldsContaining
 from utils.thermometers import ThermometerNumber,ThermometerLocationByNumber
 from scipy.stats import linregress
 
 def flatness(x):
-    slope, intercept, r_value, p_value, std_err = linregress(range(len(x)),x)
+    _, _, _, _, std_err = linregress(range(len(x)),x)
     return std_err
 
 if __name__ == '__main__':
 
-    folders=[]
-    root_folder='F:/GondolaFlightArchive/'
-    subdirs=next(os.walk(root_folder))[1]
-    folders=[root_folder+subdir+'/' for subdir in subdirs]
+    folders=flightDisksFolders
 
     save_folder='C:/Users/bettii/thermometers/'
     img_folder=save_folder+"plotsByTempAndFlatness/"
-    
-
     
     folder=folders[0]
     fieldsList=getFieldsContaining('bettii.ThermometersDemuxedCelcius.J',folder)
@@ -71,13 +65,10 @@ if __name__ == '__main__':
         group[classes[i]]=labels[i*N:(i+1)*N]
     Ncpp=5 #number of curves per plot
     
-    use('seaborn-colorblind')
-    mpl.rcParams['axes.grid']=True
-    
 
     time_label='Palestine Time'
     
-    M=1 #downsample factor
+    M=1 #overriding downsample
     ds.df=ds.df.iloc[::M]
     
     print "Generating plots.."

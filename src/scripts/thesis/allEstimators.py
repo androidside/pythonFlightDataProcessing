@@ -9,18 +9,17 @@ print 'Imports...'
 
 import numpy as np
 
-from matplotlib.style import use
-from matplotlib import rcParams
-
+from utils.config import plt
 from utils.estimator import readAndSave,openPickles
-from estimators.estimators import Estimator15,Estimator6,plt,pd
+from estimators.estimators import Estimator15,Estimator6,pd
 
 
 if __name__ == '__main__':
     folder="F:/GondolaFlightArchive/17-06-09_01_51_04/"
     save_folder=folder
-    read=True
-    estimated=False
+    
+    read=False
+    estimated=True
     
     if read: 
         gyros,sc,quats=readAndSave(folder)
@@ -45,8 +44,6 @@ if __name__ == '__main__':
         kal15.est=pd.read_pickle(save_folder+Estimator15.EST_FILENAME)
         kalOrg.est=pd.read_pickle(save_folder+Estimator6.EST_FILENAME)
     print "Plotting..."
-    use('classic')
-    rcParams['axes.grid']=True
     
     kal15.plot()
     kalOrg.plot()

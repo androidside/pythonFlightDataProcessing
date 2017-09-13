@@ -6,17 +6,9 @@ Main script
 @author: Marc Casalprim
 '''
 print 'Imports...'
-
-from timeit import default_timer as timer
-
-import numpy as np
-
-from matplotlib.style import use
-from matplotlib import rcParams
-
 from utils.estimator import readAndSave,openPickles
-from estimators.estimators import Estimator3,Estimator6,Estimator15,plt,pd
-from utils.dataset import plotQuaternions,plotColumns,plotCovs,plotInnovations
+from estimators.estimators import Estimator3
+from utils.dataset import plt,pd,np,plotQuaternions,plotCovs,plotInnovations
 
 
 if __name__ == '__main__':
@@ -49,9 +41,6 @@ if __name__ == '__main__':
         kal3.est=pd.read_pickle(save_folder+Estimator3.EST_FILENAME)
     
     print "Plotting..."
-    use('seaborn-bright')
-    rcParams['axes.grid']=True
-    plt.rc('font', family='serif')
     
    
     kal3.est=kal3.est.iloc[:-1]
@@ -75,18 +64,16 @@ if __name__ == '__main__':
         time=ftime+index
         sc.index=time
     
-    #===========================================================================
-    # df=pd.merge(kal3.est,sc,how='outer',left_index=True,right_index=True)
-    # print 'Dataframe shape:', df.shape
-    # styles=['b.',{'color':'g','linestyle':'None','marker':'*','ms':10}]
-    # f=plotQuaternions(df[['qest','qI2G']],styles=styles,legend=True,labels=['Estimator','Starcamera'], time_label=time_label)
-    # f.savefig(save_folder+"estimator_pc_3_opt.png")
-    # 
-    # Ps=pd.DataFrame()
-    # Ps['Kalman 3']=kal3.est['P']
-    # f=plotCovs(Ps,styles=['b','g','r'],legend=True, time_label=time_label,function=lambda x: np.sqrt(x)/4.848e-6,rotate=True,ylabels=[r'$\sigma_{RA}$ (arcsec)',r'$\sigma_{DEC}$ (arcsec)',r'$\sigma_{ROLL}$ (arcsec)'])
-    # f.savefig(save_folder+"covs_pc.png")
-    #===========================================================================
+    df=pd.merge(kal3.est,sc,how='outer',left_index=True,right_index=True)
+    print 'Dataframe shape:', df.shape
+    styles=['b.',{'color':'g','linestyle':'None','marker':'*','ms':10}]
+    f=plotQuaternions(df[['qest','qI2G']],styles=styles,legend=True,labels=['Estimator','Starcamera'], time_label=time_label)
+    f.savefig(save_folder+"estimator_pc_3_opt.png")
+     
+    Ps=pd.DataFrame()
+    Ps['Kalman 3']=kal3.est['P']
+    f=plotCovs(Ps,styles=['b','g','r'],legend=True, time_label=time_label,function=lambda x: np.sqrt(x)/4.848e-6,rotate=True,ylabels=[r'$\sigma_{RA}$ (arcsec)',r'$\sigma_{DEC}$ (arcsec)',r'$\sigma_{ROLL}$ (arcsec)'])
+    f.savefig(save_folder+"covs_pc.png")
     
     
     ests=[kal3.est]

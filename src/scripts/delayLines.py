@@ -7,9 +7,7 @@ Plot, delay lines control loops
 '''
 print 'Imports...'
 import os
-import matplotlib as mpl
-from matplotlib.style import use
-from utils.dataset import DataSet,plt,np,pd
+from utils.dataset import DataSet,plt,pd
 from utils.field import Field
 from timeit import default_timer as timer
 
@@ -67,9 +65,6 @@ if __name__ == '__main__':
     df=df.ix[:pd.datetime(2017,06,9,03,07)]
     print "Dataframe shape:", df.shape
     print "Generating plots.."
-    
-    use('ggplot')
-    mpl.rcParams['axes.grid']=True
     
 
     time_label='Palestine Time'

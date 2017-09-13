@@ -5,29 +5,21 @@ Plot raw data from a field. Without time. Useful when the archive ended abruptly
 
 @author: Marc Casalprim
 '''
-
 print 'Imports...'
-import os
-import matplotlib as mpl
-
-
-from matplotlib.style import use
-
-from utils.dataset import DataSet,plt,sns,np, load_single_field
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
+from utils.config import flightDisksFolders,plt,M
+from utils.dataset import load_single_field
+from utils.field import Field
 
 
 if __name__ == '__main__':
 
-    folders=[]
-    root_folder='D:/GondolaFlightArchive/'
-    subdirs=next(os.walk(root_folder))[1]
-    folders=[root_folder+subdir+'/' for subdir in subdirs]
- 
+    folders=flightDisksFolders
+
+
     field='bettii.ThermometersDemuxedCelcius.mceFrameNumber'
-    fieldsList=[]
-    print "Folder name      \t"+field
     data=[]
+    
+    print "Folder name      \t"+field
     for folder in folders:
         d=load_single_field(folder+field,datatype=Field.DTYPES[field])
         data=data+list(d)
@@ -39,3 +31,5 @@ if __name__ == '__main__':
     plt.suptitle(field)
     print "Show.."
     plt.show()
+ 
+    

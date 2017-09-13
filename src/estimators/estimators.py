@@ -5,7 +5,6 @@ Created on 29 may. 2017
 '''
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from timeit import default_timer as timer
 from scipy.linalg import expm
 from utils.dataset import plotColumns,plotQuaternions

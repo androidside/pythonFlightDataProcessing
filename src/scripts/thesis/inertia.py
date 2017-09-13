@@ -6,11 +6,8 @@ Inertia value Jz calculation from a hanging test on ground
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-from matplotlib.style import use
-import numpy as np
-from utils.dataset import DataSet,plt,pd
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
+from utils.dataset import DataSet,plt,pd,np
+from utils.field import Field,getDtypes
 
 
 if __name__ == '__main__':
@@ -67,10 +64,6 @@ if __name__ == '__main__':
     print"Torque: %s Nms \nWdot: %s rad/s2" % (mtorque,mwdot)
     print "Inertia Jz: %0.2f kg m^2" % Jz     
     
-    use('seaborn-bright')
-    mpl.rcParams['axes.grid']=True
-    #plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
     
     time_label='Time (s)'
     plt.figure()
@@ -92,8 +85,5 @@ if __name__ == '__main__':
     # ax.plot(t[:-1],Jzt)
     #===========================================================================
     
-    #ut=data.ut_ccmg.add(data.manual_speed)
-    #mdict={'ut':ut.values,'az_speed':data.gyroZ.values,'mceFN':data.index.values,'wheels_angle':data.wheels_angle.values}
-    #io.savemat('C:/Users/marc/Documents/MATLAB/IDccmg_3005.mat',mdict)
 
     plt.show()

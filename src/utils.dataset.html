@@ -1,0 +1,145 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module utils.dataset</title>
+<meta charset="utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong><a href="utils.html"><font color="#ffffff">utils</font></a>.dataset</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///C:/cygwin/home/bettii/pythonflightdataprocessing/src/utils/dataset.py">c:\cygwin\home\bettii\pythonflightdataprocessing\src\utils\dataset.py</a></font></td></tr></table>
+    <p><tt>Created&nbsp;on&nbsp;28&nbsp;abr.&nbsp;2017<br>
+&nbsp;<br>
+@author:&nbsp;Marc&nbsp;Casalprim</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+<a href="os.html">os</a><br>
+</td><td width="25%" valign=top><a href="pandas.html">pandas</a><br>
+<a href="matplotlib.pyplot.html">matplotlib.pyplot</a><br>
+</td><td width="25%" valign=top><a href="seaborn.apionly.html">seaborn.apionly</a><br>
+<a href="scipy.stats.html">scipy.stats</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="utils.dataset.html#DataSet">DataSet</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="DataSet">class <strong>DataSet</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="DataSet-PSD"><strong>PSD</strong></a>(self, column, draw<font color="#909090">=True</font>, save<font color="#909090">=False</font>, loglog<font color="#909090">=True</font>, ax_key<font color="#909090">=None</font>, minPlot<font color="#909090">=None</font>, name<font color="#909090">=None</font>, minMax<font color="#909090">=[]</font>, units<font color="#909090">='(arcsec/s)$^2$/Hz'</font>)</dt></dl>
+
+<dl><dt><a name="DataSet-__init__"><strong>__init__</strong></a>(self, folder<font color="#909090">=None</font>, freq<font color="#909090">=400.0</font>, min<font color="#909090">=None</font>, max<font color="#909090">=None</font>, folder_export<font color="#909090">=None</font>, nValues<font color="#909090">=None</font>, start<font color="#909090">=None</font>, verbose<font color="#909090">=False</font>, rpeaks<font color="#909090">=False</font>, estimator<font color="#909090">=False</font>, starcam<font color="#909090">=False</font>, fieldsList<font color="#909090">=[]</font>, foldersList<font color="#909090">=[]</font>, droplist<font color="#909090">=[]</font>, timeIndex<font color="#909090">=False</font>)</dt><dd><tt>return&nbsp;a&nbsp;<a href="#DataSet">DataSet</a>&nbsp;object&nbsp;containing&nbsp;df,&nbsp;a&nbsp;Pandas&nbsp;data&nbsp;frame&nbsp;indexed&nbsp;on&nbsp;the&nbsp;mceFramenumber<br>
+Loads&nbsp;a&nbsp;list&nbsp;of&nbsp;fields&nbsp;fieldsList,&nbsp;the&nbsp;estimator&nbsp;data&nbsp;or&nbsp;the&nbsp;starcamera&nbsp;data&nbsp;dpeending&nbsp;on&nbsp;the&nbsp;correct&nbsp;parameters<br>
+Keyword&nbsp;arguments:<br>
+folder&nbsp;--&nbsp;folder&nbsp;where&nbsp;the&nbsp;fields&nbsp;in&nbsp;fieldsList&nbsp;are&nbsp;located<br>
+freq&nbsp;&nbsp;&nbsp;--&nbsp;frequency&nbsp;of&nbsp;the&nbsp;mce&nbsp;(default&nbsp;400Hz)<br>
+min&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;minimum&nbsp;mceFN&nbsp;value<br>
+max&nbsp;&nbsp;&nbsp;&nbsp;--&nbsp;maximum&nbsp;mceFN&nbsp;value<br>
+folder_export&nbsp;--&nbsp;folder&nbsp;where&nbsp;the&nbsp;plots&nbsp;will&nbsp;be&nbsp;saved<br>
+nValues&nbsp;--&nbsp;number&nbsp;of&nbsp;values&nbsp;to&nbsp;read&nbsp;from&nbsp;the&nbsp;files&nbsp;(if&nbsp;None,&nbsp;all&nbsp;the&nbsp;file&nbsp;is&nbsp;read)<br>
+start&nbsp;&nbsp;--&nbsp;value&nbsp;from&nbsp;where&nbsp;we&nbsp;start&nbsp;to&nbsp;read&nbsp;(if&nbsp;None,&nbsp;we&nbsp;count&nbsp;nValues&nbsp;from&nbsp;the&nbsp;end)<br>
+verbose&nbsp;--&nbsp;Print&nbsp;progress&nbsp;of&nbsp;the&nbsp;dataframe&nbsp;generation<br>
+rpeaks&nbsp;--&nbsp;Remove&nbsp;rows&nbsp;were&nbsp;all&nbsp;fields&nbsp;have&nbsp;values&nbsp;less&nbsp;than&nbsp;1&nbsp;(typical&nbsp;error&nbsp;when&nbsp;using&nbsp;telemetry&nbsp;archives)<br>
+estimator&nbsp;--&nbsp;read&nbsp;estimator&nbsp;data?<br>
+starcam&nbsp;--&nbsp;read&nbsp;starcam&nbsp;data?<br>
+fieldsList&nbsp;--&nbsp;list&nbsp;of&nbsp;utils.field.Field&nbsp;objects,&nbsp;representing&nbsp;the&nbsp;fields&nbsp;to&nbsp;store&nbsp;on&nbsp;the&nbsp;dataframe.<br>
+foldersList&nbsp;--&nbsp;list&nbsp;of&nbsp;folders,&nbsp;data&nbsp;will&nbsp;be&nbsp;merged<br>
+droplist&nbsp;--&nbsp;list&nbsp;of&nbsp;columns&nbsp;to&nbsp;drop&nbsp;before&nbsp;returning&nbsp;<a href="#DataSet">DataSet</a>&nbsp;object</tt></dd></dl>
+
+<dl><dt><a name="DataSet-integralPlot"><strong>integralPlot</strong></a>(self, val, minMax<font color="#909090">=[]</font>, ylabel<font color="#909090">=''</font>, save<font color="#909090">=False</font>, show<font color="#909090">=True</font>, realTime<font color="#909090">=True</font>, name<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="DataSet-kde"><strong>kde</strong></a>(self, column, show<font color="#909090">=True</font>, ax_key<font color="#909090">=None</font>, save<font color="#909090">=False</font>)</dt></dl>
+
+<dl><dt><a name="DataSet-multiPSD"><strong>multiPSD</strong></a>(self, columns, show<font color="#909090">=True</font>, save<font color="#909090">=False</font>, loglog<font color="#909090">=False</font>, name<font color="#909090">=None</font>, minMax<font color="#909090">=[]</font>, units<font color="#909090">='(arcsec/s)$^2$/Hz'</font>)</dt></dl>
+
+<dl><dt><a name="DataSet-readEstimator"><strong>readEstimator</strong></a>(self, folder<font color="#909090">=None</font>, timeDivider<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="DataSet-readField"><strong>readField</strong></a>(self, field, folder<font color="#909090">=None</font>, rpeaks<font color="#909090">=True</font>, verbose<font color="#909090">=False</font>, nValues<font color="#909090">=None</font>, start<font color="#909090">=None</font>, timeIndex<font color="#909090">=False</font>)</dt></dl>
+
+<dl><dt><a name="DataSet-readListFields"><strong>readListFields</strong></a>(self, fieldsList, folder<font color="#909090">=None</font>, rpeaks<font color="#909090">=True</font>, verbose<font color="#909090">=False</font>, nValues<font color="#909090">=None</font>, start<font color="#909090">=None</font>, timeIndex<font color="#909090">=False</font>)</dt><dd><tt>Reads&nbsp;a&nbsp;list&nbsp;of&nbsp;fields</tt></dd></dl>
+
+<dl><dt><a name="DataSet-readMultipleFolders"><strong>readMultipleFolders</strong></a>(self, fieldsList, foldersList, rpeaks<font color="#909090">=False</font>, verbose<font color="#909090">=False</font>, timeIndex<font color="#909090">=True</font>)</dt><dd><tt>Stores&nbsp;in&nbsp;self.<strong>df</strong>&nbsp;a&nbsp;new&nbsp;pd.DatFrame&nbsp;object&nbsp;containing<br>
+the&nbsp;fieldsList&nbsp;data&nbsp;from&nbsp;all&nbsp;the&nbsp;folders&nbsp;in&nbsp;foldersList.<br>
+The&nbsp;indexing&nbsp;of&nbsp;the&nbsp;DataFrame&nbsp;is&nbsp;a&nbsp;DatetimeIndex&nbsp;by&nbsp;default<br>
+(timeIndex=True),&nbsp;using&nbsp;the&nbsp;date&nbsp;and&nbsp;time&nbsp;of&nbsp;the&nbsp;folder&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="DataSet-readStarcamera"><strong>readStarcamera</strong></a>(self, folder<font color="#909090">=None</font>, timeDivider<font color="#909090">=1</font>)</dt></dl>
+
+<dl><dt><a name="DataSet-simple2DPlot"><strong>simple2DPlot</strong></a>(self, field1, field2, minMax<font color="#909090">=[]</font>, xlabel<font color="#909090">=''</font>, ylabel<font color="#909090">=''</font>, ax_key<font color="#909090">=None</font>, save<font color="#909090">=False</font>, draw<font color="#909090">=True</font>, realTime<font color="#909090">=True</font>, name<font color="#909090">=None</font>, kde<font color="#909090">=False</font>, color<font color="#909090">='#3b5b92'</font>)</dt></dl>
+
+<dl><dt><a name="DataSet-simplePlot"><strong>simplePlot</strong></a>(self, val, minMax<font color="#909090">=[]</font>, ylabel<font color="#909090">=''</font>, origin<font color="#909090">=0</font>, ax_key<font color="#909090">=None</font>, save<font color="#909090">=False</font>, draw<font color="#909090">=True</font>, realTime<font color="#909090">=True</font>, name<font color="#909090">=None</font>, color<font color="#909090">='#3b5b92'</font>)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-extractDuplicates"><strong>extractDuplicates</strong></a>(df, th<font color="#909090">=0.001</font>)</dt><dd><tt>Removes&nbsp;rows&nbsp;where&nbsp;there&nbsp;are&nbsp;duplicates&nbsp;of&nbsp;the&nbsp;quaternions&nbsp;at&nbsp;the&nbsp;first&nbsp;column&nbsp;of&nbsp;the&nbsp;dataframe&nbsp;df</tt></dd></dl>
+ <dl><dt><a name="-extractGyrosAndStarcam"><strong>extractGyrosAndStarcam</strong></a>(dataframe, labels_gyros<font color="#909090">=['gyroX', 'gyroY', 'gyroZ']</font>, label_triggers<font color="#909090">='triggers'</font>, label_scerrors<font color="#909090">=['ra_err', 'dec_err', 'roll_err']</font>)</dt><dd><tt>Returns&nbsp;three&nbsp;dataframes&nbsp;with&nbsp;the&nbsp;Groscopes,&nbsp;Starcamera&nbsp;and&nbsp;Quaternions&nbsp;data&nbsp;respectively.<br>
+Synchronizes&nbsp;the&nbsp;Starcamera&nbsp;with&nbsp;the&nbsp;triggers.&nbsp;Useful&nbsp;for&nbsp;the&nbsp;Estimator&nbsp;classes.<br>
+:param&nbsp;dataframe:&nbsp;pandas&nbsp;dataframe&nbsp;containing&nbsp;all&nbsp;the&nbsp;infromation&nbsp;to&nbsp;extract<br>
+:param&nbsp;labels_gyros:&nbsp;columns&nbsp;of&nbsp;the&nbsp;dataframe&nbsp;that&nbsp;contain&nbsp;the&nbsp;gyroscopes&nbsp;information<br>
+:param&nbsp;label_triggers:&nbsp;column&nbsp;of&nbsp;the&nbsp;dataframe&nbsp;that&nbsp;contains&nbsp;the&nbsp;triggers&nbsp;information<br>
+:param&nbsp;label_scerrors:&nbsp;columns&nbsp;of&nbsp;the&nbsp;dataframe&nbsp;that&nbsp;contain&nbsp;the&nbsp;star&nbsp;camera&nbsp;uncertainties&nbsp;information<br>
+:returns&nbsp;gyros,sc,quats:&nbsp;pandas&nbsp;dataframes&nbsp;with&nbsp;the&nbsp;gyroscopes,&nbsp;star&nbsp;camera&nbsp;and&nbsp;quaternions&nbsp;data&nbsp;respectively.</tt></dd></dl>
+ <dl><dt><a name="-filterArray"><strong>filterArray</strong></a>(x, N<font color="#909090">=200</font>, R<font color="#909090">=0.9</font>)</dt><dd><tt>Smoothes&nbsp;peaks&nbsp;from&nbsp;the&nbsp;np.array&nbsp;x.&nbsp;N:size&nbsp;of&nbsp;the&nbsp;peak,&nbsp;R:&nbsp;Recouvrement&nbsp;of&nbsp;the&nbsp;gliding&nbsp;window</tt></dd></dl>
+ <dl><dt><a name="-filterDataframe"><strong>filterDataframe</strong></a>(df, N<font color="#909090">=3</font>, R<font color="#909090">=0.9</font>)</dt><dd><tt>Removes&nbsp;peaks&nbsp;from&nbsp;the&nbsp;dataframe&nbsp;df</tt></dd></dl>
+ <dl><dt><a name="-filterQuats"><strong>filterQuats</strong></a>(df, onlyQuats<font color="#909090">=True</font>)</dt><dd><tt>Removes&nbsp;peaks&nbsp;from&nbsp;the&nbsp;quaternions&nbsp;of&nbsp;the&nbsp;dataframe&nbsp;df</tt></dd></dl>
+ <dl><dt><a name="-genQuaternions"><strong>genQuaternions</strong></a>(dataframe, quats<font color="#909090">={'qI2G': ['qi_sc', 'qj_sc', 'qk_sc', 'qr_sc'], 'qI2S': ['ra_sc', 'dec_sc', 'roll_sc'], 'qest': ['qi', 'qj', 'qk', 'qr']}</font>, norm<font color="#909090">=False</font>, filter<font color="#909090">=False</font>)</dt><dd><tt>Generates&nbsp;a&nbsp;dictionary&nbsp;of&nbsp;lists&nbsp;of&nbsp;utils.quat.Quat&nbsp;objects&nbsp;using&nbsp;the&nbsp;columns&nbsp;of&nbsp;the&nbsp;dataframe&nbsp;defined&nbsp;by&nbsp;the&nbsp;quats&nbsp;dictionary&nbsp;values.<br>
+The&nbsp;returned&nbsp;dictionary&nbsp;will&nbsp;have&nbsp;the&nbsp;same&nbsp;keys&nbsp;as&nbsp;quats<br>
+:param&nbsp;dataframe:&nbsp;pandas.DataFrame&nbsp;object,&nbsp;with<br>
+:param&nbsp;quats:&nbsp;dictionary&nbsp;defining&nbsp;the&nbsp;columns&nbsp;to&nbsp;read&nbsp;that&nbsp;will&nbsp;be&nbsp;passed&nbsp;to&nbsp;the&nbsp;utils.Quat&nbsp;contructor<br>
+:param&nbsp;norm:&nbsp;normalize&nbsp;quaternion?<br>
+:param&nbsp;filter:&nbsp;filter&nbsp;the&nbsp;quaternions?<br>
+:returns:&nbsp;dictionary&nbsp;of&nbsp;utils.Quat&nbsp;lists,&nbsp;keyed&nbsp;by&nbsp;quats&nbsp;keys.</tt></dd></dl>
+ <dl><dt><a name="-load_fields"><strong>load_fields</strong></a>(fieldsList, folder<font color="#909090">=None</font>, nValues<font color="#909090">=None</font>, start<font color="#909090">=None</font>)</dt><dd><tt>Reads&nbsp;the&nbsp;fields&nbsp;in&nbsp;fieldsList&nbsp;that&nbsp;are&nbsp;in&nbsp;the&nbsp;folder<br>
+:param&nbsp;fieldsList:&nbsp;list&nbsp;of&nbsp;utisl.field.Field&nbsp;to&nbsp;read<br>
+:param&nbsp;folder:&nbsp;folder&nbsp;where&nbsp;the&nbsp;fields&nbsp;will&nbsp;be&nbsp;read<br>
+:param&nbsp;nValues:&nbsp;number&nbsp;of&nbsp;values&nbsp;we&nbsp;want&nbsp;to&nbsp;read&nbsp;(if&nbsp;None,&nbsp;all&nbsp;of&nbsp;them)<br>
+:param&nbsp;start:&nbsp;value&nbsp;from&nbsp;where&nbsp;we&nbsp;start&nbsp;counting&nbsp;nValues&nbsp;(if&nbsp;None,&nbsp;starting&nbsp;from&nbsp;the&nbsp;end&nbsp;of&nbsp;file)<br>
+:returns&nbsp;dictionary&nbsp;of&nbsp;np.array&nbsp;keyed&nbsp;by&nbsp;the&nbsp;field's&nbsp;label</tt></dd></dl>
+ <dl><dt><a name="-load_single_field"><strong>load_single_field</strong></a>(filename, datatype, nValues<font color="#909090">=None</font>, start<font color="#909090">=None</font>)</dt><dd><tt>Reads&nbsp;a&nbsp;binary&nbsp;file.&nbsp;It&nbsp;uses&nbsp;the&nbsp;np.fromfile&nbsp;function.<br>
+:param&nbsp;filename:&nbsp;complete&nbsp;filename&nbsp;of&nbsp;the&nbsp;field&nbsp;to&nbsp;read<br>
+:param&nbsp;datatype:&nbsp;data&nbsp;type&nbsp;of&nbsp;the&nbsp;binary&nbsp;file&nbsp;(eg.&nbsp;int32&nbsp;-&gt;&nbsp;'i4')<br>
+:param&nbsp;nValues:&nbsp;number&nbsp;of&nbsp;values&nbsp;we&nbsp;want&nbsp;to&nbsp;read&nbsp;(if&nbsp;None,&nbsp;all&nbsp;of&nbsp;them)<br>
+:param&nbsp;start:&nbsp;value&nbsp;from&nbsp;where&nbsp;we&nbsp;start&nbsp;counting&nbsp;nValues&nbsp;(if&nbsp;None,&nbsp;starting&nbsp;from&nbsp;the&nbsp;end&nbsp;of&nbsp;file)<br>
+:return&nbsp;numpy&nbsp;array&nbsp;with&nbsp;the&nbsp;values&nbsp;of&nbsp;the&nbsp;field</tt></dd></dl>
+ <dl><dt><a name="-plotColumns"><strong>plotColumns</strong></a>(df, units<font color="#909090">=''</font>, xlabel<font color="#909090">='Index'</font>, ylabels<font color="#909090">=None</font>)</dt><dd><tt>Plot&nbsp;the&nbsp;N&nbsp;columns&nbsp;of&nbsp;the&nbsp;pd.Dataframe&nbsp;df&nbsp;in&nbsp;a&nbsp;Nx1&nbsp;subplots&nbsp;layout</tt></dd></dl>
+ <dl><dt><a name="-plotCovs"><strong>plotCovs</strong></a>(df, time_label<font color="#909090">='Palestine Time'</font>, ylabels<font color="#909090">=None</font>, labels<font color="#909090">=None</font>, styles<font color="#909090">=['b', 'r', 'g', 'k']</font>, legend<font color="#909090">=False</font>, xlim<font color="#909090">=None</font>, function<font color="#909090">=&lt;function &lt;lambda&gt;&gt;</font>, rotate<font color="#909090">=False</font>)</dt><dd><tt>Plot&nbsp;the&nbsp;first&nbsp;three&nbsp;diagonal&nbsp;elements&nbsp;of&nbsp;P&nbsp;of&nbsp;the&nbsp;pd.Dataframe&nbsp;df&nbsp;in&nbsp;a&nbsp;3x1&nbsp;subplots&nbsp;layout&nbsp;(P11,P22,P33)</tt></dd></dl>
+ <dl><dt><a name="-plotInnovations"><strong>plotInnovations</strong></a>(dataframesList, time_label<font color="#909090">='Palestine Time'</font>, labels<font color="#909090">=None</font>, styles<font color="#909090">=['b', 'r', 'g', 'k']</font>, legend<font color="#909090">=False</font>, xlim<font color="#909090">=None</font>)</dt></dl>
+ <dl><dt><a name="-plotQuaternions"><strong>plotQuaternions</strong></a>(df, time_label<font color="#909090">='Palestine Time'</font>, labels<font color="#909090">=None</font>, styles<font color="#909090">=['b', 'r', 'g', 'k']</font>, legend<font color="#909090">=False</font>, xlim<font color="#909090">=None</font>)</dt><dd><tt>Plot&nbsp;the&nbsp;quaternions&nbsp;of&nbsp;the&nbsp;pd.Dataframe&nbsp;df&nbsp;in&nbsp;a&nbsp;3x1&nbsp;subplots&nbsp;layout&nbsp;(RA,DEC,ROLL)</tt></dd></dl>
+ <dl><dt><a name="-toTimeIndex"><strong>toTimeIndex</strong></a>(dataframe, folder, freq<font color="#909090">=400.0</font>)</dt><dd><tt>Returns&nbsp;the&nbsp;same&nbsp;dataframe&nbsp;but&nbsp;with&nbsp;the&nbsp;indices&nbsp;in&nbsp;DateTime&nbsp;format.<br>
+The&nbsp;input&nbsp;dataframe&nbsp;must&nbsp;have&nbsp;mceFrameNumber&nbsp;indices.<br>
+The&nbsp;time&nbsp;in&nbsp;the&nbsp;folder&nbsp;is&nbsp;considered&nbsp;as&nbsp;the&nbsp;starting&nbsp;time&nbsp;for&nbsp;the&nbsp;first&nbsp;mce&nbsp;frame&nbsp;number.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>blue</strong> = '#3b5b92'<br>
+<strong>colors</strong> = ['#3b5b92', 'g', '#d9544d']<br>
+<strong>lt_blue</strong> = '#a2bffe'<br>
+<strong>red</strong> = '#d9544d'</td></tr></table>
+</body></html>

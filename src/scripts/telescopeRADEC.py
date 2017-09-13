@@ -6,12 +6,8 @@ Plot and save telescope RA and DEC
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-import pandas as pd
-from matplotlib.style import use
 from utils.dataset import DataSet,plt,plotColumns
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-from utils.quat import Quat,normalize,sin,cos
+from utils.field import Field
 
 
 if __name__ == '__main__':

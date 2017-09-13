@@ -6,71 +6,31 @@ Script for scripts simultaneously data from different archives
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import os
 import re
-import matplotlib as mpl
-from matplotlib.style import use
-from utils.dataset import DataSet, plt, np, pd
+from utils.config import os,flightDisksFolders,plt,save_folder,img_folder,M
+from utils.dataset import DataSet, np, pd
 from utils.field import Field, getFieldsContaining
 
 
 
 if __name__ == '__main__':
+    folders=flightDisksFolders
     
-    #Flags
-    root=True #use root folder(disks) or list of folders(telemetry)?
-    
+    img_folder=save_folder+'plots/merged/' #folders where the figures will be stored
+    if not os.path.exists(img_folder):
+        os.makedirs(img_folder)
+        
+    #Flags    
     #data to read and plot
     gyros = False
     momdump = False
     magnetometer = False
     thermometers = False
-    currentSensors = False
-    altitude = True
+    currentSensors = True
+    altitude = False
     
     titles=False #show titles on the figures
-    
-    save_folder='C:/Users/bettii/thesis/'
-    img_folder=save_folder+'plots/merged/' #folders where the figures will be stored
-    
-    if not os.path.exists(save_folder):
-        os.makedirs(save_folder)
-    if not os.path.exists(img_folder):
-        os.makedirs(img_folder)
-    
-    #Plotting parameters
-    use('seaborn-bright')
-    mpl.rcParams['axes.grid']=True
-    plt.rc('font', family='serif')
-      
-    if root:
-        root_folder='F:/GondolaFlightArchive/' #disks data
-        subdirs=next(os.walk(root_folder))[1]
-        folders=[root_folder+subdir+'/' for subdir in subdirs]
-    else:
-        folders=[]
-        folders.append('F:/LocalBettiiArchive/17-06-08_17_07_45-/') #telemtry data
-        folders.append('F:/LocalBettiiArchive/17-06-08_20_43_41-/')
-        folders.append('F:/LocalBettiiArchive/17-06-08_20_54_26-/')
-        folders.append('F:/LocalBettiiArchive/17-06-08_22_09_44-/')
-        folders.append('F:/LocalBettiiArchive/17-06-08_22_19_34-/')
-        folders.append('F:/LocalBettiiArchive/17-06-09_00_27_01-/')
-        folders.append('F:/LocalBettiiArchive/17-06-09_01_54_43-/')
-        folders.append('F:/LocalBettiiArchive/17-06-09_02_12_33-/')
-        folders.append('F:/LocalBettiiArchive/17-06-09_02_40_53-/')
-        folders.append('F:/LocalBettiiArchive/17-06-09_02_59_03-/')
-        folders.append('F:/LocalBettiiArchive/17-06-09_04_11_03-/')
         
-        #==========================EMPTY Archives===================================
-        #  folders.append('F:/LocalBettiiArchive/17-06-09_04_16_13-/')
-        #  folders.append('F:/LocalBettiiArchive/17-06-09_04_19_53-/')
-        #  folders.append('F:/LocalBettiiArchive/17-06-09_04_20_34-/')
-        # folders.append('F:/LocalBettiiArchive/17-06-09_04_26_51-/')
-        # folders.append('F:/LocalBettiiArchive/17-06-09_04_28_38-/')
-        # folders.append('F:/LocalBettiiArchive/17-06-09_04_41_34-/')
-        #===========================================================================
-        folders.append('F:/LocalBettiiArchive/17-06-09_06_29_36-/')
-    
     fieldsList = []
     if gyros:
         fieldsList.append(Field('bettii.GyroReadings.angularVelocityX', label='Gyro X', dtype='i4', conversion=0.0006304))
@@ -115,9 +75,7 @@ if __name__ == '__main__':
         fieldsList = fieldsList + l1 + l2 + lv
           
     ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False)
-    #ds.df = ds.df.iloc[:-1000]
-    M = 1  # downsample factor
-    ds.df = ds.df.iloc[::M]
+    ds.df = ds.df.iloc[:-1000:M]
     
     print "Converting to Palestine Time..."
     ds.df.index = ds.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)

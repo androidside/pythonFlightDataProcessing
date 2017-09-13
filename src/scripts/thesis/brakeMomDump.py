@@ -12,8 +12,6 @@ Script for scripts simultaneously data from different archives
 '''
 print 'Imports...'
 import os
-import matplotlib as mpl
-from matplotlib.style import use
 from utils.dataset import DataSet,plt,np,pd
 from utils.field import Field
 from timeit import default_timer as timer
@@ -63,10 +61,6 @@ if __name__ == '__main__':
         print "Elapsed time:",timer()-start_time,"seconds."   
     
     print "Generating plots.."
-    
-    use('seaborn-bright')
-    mpl.rcParams['axes.grid']=True
-    plt.rc('font', family='serif')
 
     time_label='Palestine Time'
     
