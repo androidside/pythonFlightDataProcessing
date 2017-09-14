@@ -7,9 +7,6 @@ In addition, a RT plot of the diagonal values of the P rotated by the qGyros2Sta
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-import warnings
-from matplotlib.style import use
 from utils.dataset import DataSet,plt,np,pd
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
@@ -36,12 +33,6 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='by'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='bz'))
     
-    use('seaborn-bright') 
-    #mpl.rcParams['toolbar'] = 'None'
-    mpl.rcParams['axes.grid'] = True
-    warnings.filterwarnings("ignore")
-    #mpl.rcParams['axes.formatter.useoffset'] = False
-
     
     ds = DataSet(folder,rpeaks=True)
     ds.readListFields(fieldsList, nValues=1000,verbose=True,rpeaks=False)   

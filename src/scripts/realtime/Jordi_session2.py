@@ -6,8 +6,6 @@ Main script
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-from matplotlib.style import use
 from utils.dataset import DataSet,plt
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
@@ -30,9 +28,6 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='gyroZ',dtype='i4',conversion=0.0006324))
-    use('classic') 
-    mpl.rcParams['toolbar'] = 'None'
-    mpl.rcParams['axes.grid'] = True
     
     ds = DataSet(folder,rpeaks=True)
     ds.readListFields(fieldsList, nValues=1000,verbose=True)   

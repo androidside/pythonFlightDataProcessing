@@ -6,8 +6,8 @@ Main script
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-from utils.dataset import DataSet,plt,sns
+
+from utils.dataset import DataSet,plt
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 
@@ -32,9 +32,6 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.PIDOutputMomDump.integral',label='I MomDump'))
     fieldsList.append(Field('bettii.PIDOutputMomDump.derivative',label='D MomDump'))
     fieldsList.append(Field('bettii.StepperGalil.wheelsAngle',label='wheels_angle'))
-
-    mpl.style.use('classic') 
-    mpl.rcParams['toolbar'] = 'None'
 
     
     ds = DataSet(folder,rpeaks=True)

@@ -6,7 +6,7 @@ Plot raw data from a field. Merging archives if we want.
 @author: Marc Casalprim
 '''
 print 'Imports...'
-from utils.config import flightDisksFolders,plt,M
+from utils.config import flightDisksFolders,plt
 from utils.dataset import load_single_field
 from utils.field import Field
 
@@ -33,6 +33,7 @@ if __name__ == '__main__':
     
 
     print "Plotting.."
+    M=100 #downsampling factor
     plt.plot(time[::M],data[::M])
     plt.ylabel(field)
     plt.xlabel(time_field)

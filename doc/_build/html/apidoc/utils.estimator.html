@@ -58,16 +58,67 @@
   <div class="section" id="module-utils.estimator">
 <span id="utils-estimator-module"></span><h1>utils.estimator module<a class="headerlink" href="#module-utils.estimator" title="Permalink to this headline">¶</a></h1>
 <p>Created on Jul 24, 2017</p>
-<p>&#64;author: bettii</p>
+<p>Defines two functions that are useful when dealing with the estimators.
+readAndSave reads the infromation and stores it in pickle files.
+openPickle opens the saved pickles.
+In this way we read and generate all the useful dataframes just once, saving time.</p>
+<p>&#64;author: Marc Casalprim</p>
 <dl class="function">
 <dt id="utils.estimator.openPickles">
-<code class="descclassname">utils.estimator.</code><code class="descname">openPickles</code><span class="sig-paren">(</span><em>folder</em>, <em>quats=True</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.estimator.openPickles" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descclassname">utils.estimator.</code><code class="descname">openPickles</code><span class="sig-paren">(</span><em>folder</em>, <em>openEst=True</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.estimator.openPickles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads the information relevant to the estimator and creates different dataframes. It uses <code class="docutils literal"><span class="pre">extractGyrosAndStarcam()</span></code>.
+The generated dataframes are stored in pickle files.</p>
+<p>columns of gyros: [&#8216;gyroX&#8217;, &#8216;gyroY&#8217;, &#8216;gyroZ&#8217;]
+columns of sc: [&#8216;qI2G&#8217;,&#8217;qI2S&#8217;,&#8217;triggers&#8217;]
+columns of est: [&#8216;qest&#8217;,&#8217;biasX&#8217;,&#8217;biasY&#8217;,&#8217;biasZ&#8217;,&#8217;P&#8217;]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>folder</strong> &#8211; folder where the files are located</li>
+<li><strong>openEst</strong> &#8211; open estimator dataframe? (if False, saves time and est will be a empty dataframe)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">gyros,sc,est</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(pandas.Dataframe,pandas.Dataframe,pandas.Dataframe)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="function">
 <dt id="utils.estimator.readAndSave">
 <code class="descclassname">utils.estimator.</code><code class="descname">readAndSave</code><span class="sig-paren">(</span><em>folder</em>, <em>initial_time=1000</em>, <em>final_time=None</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.estimator.readAndSave" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reads the information relevant to the estimator and creates different dataframes. It uses <code class="docutils literal"><span class="pre">extractGyrosAndStarcam()</span></code>.
+The generated dataframes are stored in pickle files.</p>
+<p>columns of gyros: [&#8216;gyroX&#8217;, &#8216;gyroY&#8217;, &#8216;gyroZ&#8217;]
+columns of sc: [&#8216;qI2G&#8217;,&#8217;qI2S&#8217;,&#8217;triggers&#8217;]
+columns of est: [&#8216;qest&#8217;,&#8217;biasX&#8217;,&#8217;biasY&#8217;,&#8217;biasZ&#8217;,&#8217;P&#8217;]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>folder</strong> &#8211; folder where the fields are located and the files will be stored</li>
+<li><strong>initial_time</strong> &#8211; mce frame number where we start</li>
+<li><strong>final_time</strong> &#8211; mce frame number where we end (if None, until the end of the files)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">gyros,sc,est</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(pandas.Dataframe,pandas.Dataframe,pandas.Dataframe)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 

@@ -6,7 +6,6 @@ Real Time plots of crossElevation,elevation and target and telescope RA,DEC
 @author: Marc Casalprim
 '''
 print 'Imports...'
-from matplotlib.style import use
 from utils.dataset import DataSet,plt
 from utils.field import Field
 
@@ -26,8 +25,6 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTHighPriority.TelescopeRaDeg'))
     fieldsList.append(Field('bettii.RTHighPriority.targetDEC'))
     fieldsList.append(Field('bettii.RTHighPriority.targetRA'))
-      
-    use('ggplot') 
     
     initial_time=None #in frame number
     final_time = None #in frame number

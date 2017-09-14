@@ -1,7 +1,7 @@
 '''
 Created on Jun 5, 2017
 
-Useful function to handle the FIR detectors information.
+Useful functions to handle the FIR detectors information.
 
 @author: Marc Casalprim
 '''
@@ -22,6 +22,9 @@ detId={
     3:'D'
     }
 def generateDictMap():
+    '''Associates every field to a detector pixel and generates a dictionary ``dictMap`` of the mapping, keyed by the field name.
+    Each entry of the dictionary has 3-tuple describing the (row,column,detectorId)
+    '''
     with open(detMapfile,'rb') as f:
         for line in f.read().split('\r')[1:-1]:
             l= line.split()
@@ -33,7 +36,7 @@ def generateDictMap():
                 dictMap['error_r'+l[1]+'_c'+str(col+12)]=(int(l[2])-1,int(l[3])-1,3)#detD
                 
 def dataframe2matrices(dataframe):
-    """Converts the fields data in dataframes to 4 3D matrices 
+    """Converts the fields in dataframe to 4 3D matrices 
     representing the detector images evolution in time"""
     L=len(dataframe.index)
 
@@ -54,7 +57,7 @@ def dataframe2matrices(dataframe):
     return det
 
 def data2matrices(data,index=None,center=True,dead=[]):
-    """Converts the fields data in data to 4 3D matrices 
+    """Converts the fields in data to 4 3D matrices 
     representing the detector images evolution in time"""
     L=len(index)
     if index is None : index=range(len(data[data.keys()[0]]))
@@ -76,6 +79,10 @@ def data2matrices(data,index=None,center=True,dead=[]):
     return det
 
 def getFFTs(matrix,sindex=0,eindex=None):
+    '''Returns the first half of the FFT of the matrices inside the dictionary ``matrix``.
+    It assumes the time is in the 3rd dimension.
+    :rtype: dict
+    '''
     ft={}
     for k in range(4):
         psd=abs(fft(matrix[k],axis=2))
@@ -141,7 +148,7 @@ def plotData(data,axes,downsample=4):
     axes[axes.keys()[0]][0,0].figure.canvas.draw() #draw canvas from the first ax (is the same for all of them)
 def getIndexRangeLastStroke(CDLposTarget,CDLmceFN,masterMceFn):
     L=len(masterMceFn)
-    t2=np.diff(np.diff(CDLposTarget))
+    t2=np.diff(np.diff(CDLposTarget)) #second derivative of target
     th=0 #threshold for the second derivative
     
     ups=np.where(t2>th)[0]+1 #indexes of change of slope in target

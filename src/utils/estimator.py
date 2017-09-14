@@ -1,7 +1,12 @@
 '''
 Created on Jul 24, 2017
 
-@author: bettii
+Defines two functions that are useful when dealing with the estimators.
+readAndSave reads the infromation and stores it in pickle files.
+openPickle opens the saved pickles.
+In this way we read and generate all the useful dataframes just once, saving time.
+
+@author: Marc Casalprim
 '''
 
 from timeit import default_timer as timer
@@ -17,6 +22,19 @@ QUATS_FILENAME="quats_dataframe"
 ORG_FILENAME="org_dataframe"
 
 def readAndSave(folder,initial_time=1000,final_time = None):
+    '''Reads the information relevant to the estimator and creates different dataframes. It uses ``extractGyrosAndStarcam()``.
+    The generated dataframes are stored in pickle files.
+    
+    columns of gyros: ['gyroX', 'gyroY', 'gyroZ']
+    columns of sc: ['qI2G','qI2S','triggers']
+    columns of est: ['qest','biasX','biasY','biasZ','P']
+    
+    :param folder: folder where the fields are located and the files will be stored
+    :param initial_time: mce frame number where we start
+    :param final_time: mce frame number where we end (if None, until the end of the files)
+    :return: gyros,sc,est
+    :rtype: (pandas.Dataframe,pandas.Dataframe,pandas.Dataframe)   
+    '''
     start_time = timer()
     fieldsList=[]     
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqi',label='qi_sc'))
@@ -78,14 +96,26 @@ def readAndSave(folder,initial_time=1000,final_time = None):
     print "Saved"
     return gyros,sc,est
 
-def openPickles(folder,ests=True):
+def openPickles(folder,openEst=True):
+    '''Reads the information relevant to the estimator and creates different dataframes. It uses ``extractGyrosAndStarcam()``.
+    The generated dataframes are stored in pickle files.
+    
+    columns of gyros: ['gyroX', 'gyroY', 'gyroZ']
+    columns of sc: ['qI2G','qI2S','triggers']
+    columns of est: ['qest','biasX','biasY','biasZ','P']
+    
+    :param folder: folder where the files are located
+    :param openEst: open estimator dataframe? (if False, saves time and est will be a empty dataframe)
+    :return: gyros,sc,est
+    :rtype: (pandas.Dataframe,pandas.Dataframe,pandas.Dataframe)   
+    '''
     start_time = timer()
     print "Reading..."
     gyros = pd.read_pickle(folder+GYROS_FILENAME)
     print 'Gyros shape:', gyros.shape
     sc    = pd.read_pickle(folder+SC_FILENAME)
     print 'SC shape:', sc.shape
-    if ests:
+    if openEst:
         est = pd.read_pickle(folder+EST_FILENAME) 
         print 'Quats shape:', est.shape
     else: est=pd.DataFrame()

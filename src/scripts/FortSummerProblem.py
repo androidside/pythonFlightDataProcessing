@@ -6,13 +6,11 @@ It's already been solved!
 
 @author: Marc Casalprim
 '''
-from scipy.optimize.optimize import fmin
 print 'Imports...'
 
-import matplotlib as mpl
+
 import pandas as pd
 from numpy import sin,cos,arctan2,pi,sqrt
-from matplotlib.style import use
 from utils.quat import Quat
 from utils.dataset import DataSet,plt, genQuaternions
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
@@ -118,8 +116,6 @@ if __name__ == '__main__':
     ds.df=pd.merge(ds.df,teldata,how='outer',left_index=True,right_index=True)
     
     print "Plotting..."
-    use('classic')
-    mpl.rcParams['axes.grid'] = True
     
     #scripts RA and DEC target vs estimated
     plt.figure(1)

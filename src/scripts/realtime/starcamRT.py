@@ -5,9 +5,7 @@ Real Time script scripts Starcamera solutions in the Gyroscopes reference frame,
 
 @author: Marc Casalprim
 '''
-from test._mock_backport import inplace
 print 'Imports...'
-import matplotlib as mpl
 from utils.dataset import pd,DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from utils.quat import Quat,sin,cos
@@ -24,8 +22,7 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraDecDeg',label='dec_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRollDeg',label='roll_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraRaDeg',label='ra_sc'))  
-    mpl.style.use('classic') 
-    mpl.rcParams['toolbar'] = 'None'
+
     initial_time=None #in frame number
     final_time = None #in frame number
     

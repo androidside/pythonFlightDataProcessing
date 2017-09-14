@@ -58,7 +58,7 @@
   <div class="section" id="module-utils.detector">
 <span id="utils-detector-module"></span><h1>utils.detector module<a class="headerlink" href="#module-utils.detector" title="Permalink to this headline">¶</a></h1>
 <p>Created on Jun 5, 2017</p>
-<p>Useful function to handle the FIR detectors information.</p>
+<p>Useful functions to handle the FIR detectors information.</p>
 <p>&#64;author: Marc Casalprim</p>
 <dl class="function">
 <dt id="utils.detector.createDataAxes">
@@ -73,21 +73,23 @@
 <dl class="function">
 <dt id="utils.detector.data2matrices">
 <code class="descclassname">utils.detector.</code><code class="descname">data2matrices</code><span class="sig-paren">(</span><em>data</em>, <em>index=None</em>, <em>center=True</em>, <em>dead=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.detector.data2matrices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the fields data in data to 4 3D matrices 
+<dd><p>Converts the fields in data to 4 3D matrices 
 representing the detector images evolution in time</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="utils.detector.dataframe2matrices">
 <code class="descclassname">utils.detector.</code><code class="descname">dataframe2matrices</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.detector.dataframe2matrices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Converts the fields data in dataframes to 4 3D matrices 
+<dd><p>Converts the fields in dataframe to 4 3D matrices 
 representing the detector images evolution in time</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="utils.detector.generateDictMap">
 <code class="descclassname">utils.detector.</code><code class="descname">generateDictMap</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#utils.detector.generateDictMap" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Associates every field to a detector pixel and generates a dictionary <code class="docutils literal"><span class="pre">dictMap</span></code> of the mapping, keyed by the field name.
+Each entry of the dictionary has 3-tuple describing the (row,column,detectorId)</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="utils.detector.getDeadPixels">
@@ -97,7 +99,10 @@ representing the detector images evolution in time</p>
 <dl class="function">
 <dt id="utils.detector.getFFTs">
 <code class="descclassname">utils.detector.</code><code class="descname">getFFTs</code><span class="sig-paren">(</span><em>matrix</em>, <em>sindex=0</em>, <em>eindex=None</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.detector.getFFTs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the first half of the FFT of the matrices inside the dictionary <code class="docutils literal"><span class="pre">matrix</span></code>.
+It assumes the time is in the 3rd dimension.
+:rtype: dict</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="utils.detector.getIndexRangeLastStroke">

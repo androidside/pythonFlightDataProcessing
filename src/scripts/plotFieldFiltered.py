@@ -7,7 +7,7 @@ Plot data from a field. The peaks of field data are filtered using utils.dataset
 '''
 
 print 'Imports...'
-from utils.config import flightDisksFolders,plt,M
+from utils.config import flightDisksFolders,plt
 from utils.dataset import load_single_field,filterArray
 from utils.field import Field
 
@@ -37,6 +37,7 @@ if __name__ == '__main__':
     #data=filterArray(data,N=20000,R=0.5)
     
     print "Plotting.."
+    M=100 #downsampling factor
     plt.plot(time[::M],data[::M])
     plt.ylabel(field)
     plt.xlabel(time_field)

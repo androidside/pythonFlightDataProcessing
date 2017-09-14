@@ -6,8 +6,6 @@ Plot of the Power Spectrum Density of the Gyroscopes
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-from matplotlib.style import use
 from utils.dataset import DataSet,plt,np
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from scipy.signal.spectral import periodogram
@@ -41,9 +39,6 @@ if __name__ == '__main__':
     print 'Dataframe shape:', ds.df.shape
     data=ds.df.dropna()
     #data.index=data.index/ds.freq #index in seconds
-    use('seaborn-bright')
-    mpl.rcParams['axes.grid'] = True
-    plt.rc('font', family='serif')
     
     gyros = ['gyroX','gyroY','gyroZ']
     

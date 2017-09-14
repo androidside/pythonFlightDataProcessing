@@ -7,9 +7,8 @@ Useful for model identification, or finding the Inertia value in MatLab.
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib
 import numpy as np
-from utils.dataset import DataSet,plt,sns
+from utils.dataset import DataSet,plt
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 from scipy import io
 

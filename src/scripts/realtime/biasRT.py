@@ -6,8 +6,6 @@ RT plottin gof the estimated biases.
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-from matplotlib.style import use
 from utils.dataset import DataSet,plt
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
@@ -25,10 +23,6 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasXarcsec',label='bx'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='by'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='bz'))
-    use('classic') 
-    mpl.rcParams['toolbar'] = 'None'
-    mpl.rcParams['axes.grid'] = True
-    #mpl.rcParams['axes.formatter.useoffset'] = False
 
     
     ds = DataSet(folder,rpeaks=True)

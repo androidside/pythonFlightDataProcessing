@@ -152,9 +152,10 @@ The indexing of the DataFrame is a DatetimeIndex by default
 
 <dl class="function">
 <dt id="utils.dataset.extractGyrosAndStarcam">
-<code class="descclassname">utils.dataset.</code><code class="descname">extractGyrosAndStarcam</code><span class="sig-paren">(</span><em>dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], label_triggers='triggers', label_scerrors=['ra_err', 'dec_err', 'roll_err']</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.extractGyrosAndStarcam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns three dataframes with the Groscopes, Starcamera and Quaternions data respectively.
+<code class="descclassname">utils.dataset.</code><code class="descname">extractGyrosAndStarcam</code><span class="sig-paren">(</span><em>dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], label_triggers='triggers', labels_scerrors=['ra_err', 'dec_err', 'roll_err']</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.extractGyrosAndStarcam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns three dataframes with the Groscopes, Starcamera and Estimator data respectively.
 Synchronizes the Starcamera with the triggers. Useful for the Estimator classes.</p>
+<p>the dataframe must contain, at least: the following columns: [&#8216;qI2G&#8217;, &#8216;qI2S&#8217;,&#8217;dec_sc&#8217;, &#8216;ra_sc&#8217;, &#8216;roll_sc&#8217;,&#8217;qi&#8217;, &#8216;qj&#8217;, &#8216;qk&#8217;, &#8216;qr&#8217;,&#8217;gyroX&#8217;, &#8216;gyroY&#8217;, &#8216;gyroZ&#8217;,&#8217;biasX&#8217;,&#8217;biasY&#8217;,&#8217;biasZ&#8217;,&#8217;P00&#8217;,&#8217;P01&#8217;,&#8217;P02&#8217;,&#8217;P10&#8217;,&#8217;P11&#8217;,&#8217;P12&#8217;,&#8217;P20&#8217;,&#8217;P21&#8217;,&#8217;P22&#8217;]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -163,15 +164,23 @@ Synchronizes the Starcamera with the triggers. Useful for the Estimator classes.
 <li><strong>dataframe</strong> &#8211; pandas dataframe containing all the infromation to extract</li>
 <li><strong>labels_gyros</strong> &#8211; columns of the dataframe that contain the gyroscopes information</li>
 <li><strong>label_triggers</strong> &#8211; column of the dataframe that contains the triggers information</li>
-<li><strong>label_scerrors</strong> &#8211; columns of the dataframe that contain the star camera uncertainties information</li>
+<li><strong>labels_scerrors</strong> &#8211; columns of the dataframe that contain the star camera uncertainties information</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">gyros,sc,quats: pandas dataframes with the gyroscopes, star camera and quaternions data respectively.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">gyros,sc,est: pandas dataframes with the gyroscopes, star camera and estimator data respectively.</p>
 </td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="utils.dataset.extractPs">
+<code class="descclassname">utils.dataset.</code><code class="descname">extractPs</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.extractPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a 3x3 covariance matrix from the columns [&#8216;P00&#8217;,&#8217;P01&#8217;,&#8217;P02&#8217;,&#8217;P10&#8217;,&#8217;P11&#8217;,&#8217;P12&#8217;,&#8217;P20&#8217;,&#8217;P21&#8217;,&#8217;P22&#8217;] of the <code class="docutils literal"><span class="pre">dataframe</span></code>
+:param dataframe: a pandas.Dataframe with at least 9 columns
+:rtype: 3x3 <code class="docutils literal"><span class="pre">np.matrix</span></code></p>
 </dd></dl>
 
 <dl class="function">
@@ -349,8 +358,8 @@ The returned dictionary will have the same keys as quats</p>
 
 <dl class="function">
 <dt id="utils.dataset.plotCovs">
-<code class="descclassname">utils.dataset.</code><code class="descname">plotCovs</code><span class="sig-paren">(</span><em>df, time_label='Palestine Time', ylabels=None, labels=None, styles=['b', 'r', 'g', 'k'], legend=False, xlim=None, function=&lt;function &lt;lambda&gt; at 0x00000000097E04A8&gt;, rotate=False</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.plotCovs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the first three diagonal elements of P of the pd.Dataframe df in a 3x1 subplots layout (P11,P22,P33)</p>
+<code class="descclassname">utils.dataset.</code><code class="descname">plotCovs</code><span class="sig-paren">(</span><em>df, time_label='Palestine Time', ylabels=None, labels=None, styles=['b', 'r', 'g', 'k'], legend=False, xlim=None, function=&lt;function &lt;lambda&gt; at 0x0000000009623B38&gt;, rotate=False</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.plotCovs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the first three diagonal elements of the matrices in the dataframe df in a 3x1 subplots layout (P11,P22,P33)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -368,10 +377,13 @@ The returned dictionary will have the same keys as quats</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">figure</p>
+<tr class="field-even field"><th class="field-name">Ptype:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">pd.Dataframe</span></code></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matplotlib.figure</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">figure</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matplotlib.figure</p>
 </td>
 </tr>
 </tbody>
@@ -380,7 +392,7 @@ The returned dictionary will have the same keys as quats</p>
 
 <dl class="function">
 <dt id="utils.dataset.plotInnovations">
-<code class="descclassname">utils.dataset.</code><code class="descname">plotInnovations</code><span class="sig-paren">(</span><em>ests, sc, time_label='Palestine Time', units='arcsec', conv=&lt;function &lt;lambda&gt; at 0x00000000097E03C8&gt;, labels=None, styles=['b', 'r', 'g', 'k'], legend=False, xlim=None, sync=False, rotation=True</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.plotInnovations" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">utils.dataset.</code><code class="descname">plotInnovations</code><span class="sig-paren">(</span><em>ests, sc, time_label='Palestine Time', units='arcsec', conv=&lt;function &lt;lambda&gt; at 0x0000000009623A58&gt;, labels=None, styles=['b', 'r', 'g', 'k'], legend=False, xlim=None, sync=False, rotation=True</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.plotInnovations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the errors between the estimated attitudes in the list of dataframes ests and the star camera solutions in the dataframe sc</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

@@ -1,0 +1,224 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Introduction &#8212; Python Flight Data Processing 1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src" href="apidoc/modules.html" />
+    <link rel="prev" title="Welcome to Python Flight Data Processing’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="apidoc/modules.html" title="src"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Python Flight Data Processing’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Python Flight Data Processing 1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to Python Flight Data Processing’s documentation! This project is intended to make the life
+easier when plotting and analyzing some data of the Aurora archives.</p>
+<p>The three main classes that were created for this project are:</p>
+<ul class="simple">
+<li><a class="reference internal" href="apidoc/utils.html#utils.field.Field" title="utils.field.Field"><code class="xref py py-class docutils literal"><span class="pre">Field</span></code></a>, describes a field</li>
+<li><a class="reference internal" href="apidoc/utils.html#utils.dataset.DataSet" title="utils.dataset.DataSet"><code class="xref py py-class docutils literal"><span class="pre">DataSet</span></code></a>, implements the process of reading a list of fields from a folder or a list of folders</li>
+<li><code class="xref py py-class docutils literal"><span class="pre">Estimator</span></code>, estimates the attitude using the sensors data and has methods to plot the results</li>
+</ul>
+<p>Another common class is <a class="reference internal" href="apidoc/utils.html#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-class docutils literal"><span class="pre">Quat</span></code></a>, that provides easy  manipulation of quaternion objects. This project also relays heavily on the <a class="reference external" href="https://matplotlib.org/index.html">matplotlib</a> for the plots and on the <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/">pandas</a> modules, as it uses the <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> data structure to store the time-series information.</p>
+<div class="section" id="example">
+<h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
+<p>A good start to understand better how all of this works is with a simple example. The following code is available at <a class="reference internal" href="apidoc/scripts.html#module-scripts.plotField" title="scripts.plotField"><code class="xref py py-mod docutils literal"><span class="pre">scripts.plotField</span></code></a> and plots directly the gyroscopes data:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">utils.config</span> <span class="k">import</span> <span class="n">flightDisksFolders</span><span class="p">,</span><span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">utils.dataset</span> <span class="k">import</span> <span class="n">DataSet</span><span class="p">,</span><span class="n">pd</span><span class="p">,</span> <span class="n">plotColumns</span>
+<span class="kn">from</span> <span class="nn">utils.field</span> <span class="k">import</span> <span class="n">Field</span>
+
+<span class="n">folders</span><span class="o">=</span><span class="n">flightDisksFolders</span>
+
+<span class="n">fieldsList</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">fieldsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="s1">&#39;bettii.GyroReadings.angularVelocityX&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gyro X&#39;</span><span class="p">,</span><span class="n">conversion</span><span class="o">=</span><span class="mf">0.0006304</span><span class="p">))</span>
+<span class="n">fieldsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="s1">&#39;bettii.GyroReadings.angularVelocityY&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gyro Y&#39;</span><span class="p">,</span><span class="n">conversion</span><span class="o">=</span><span class="mf">0.0006437</span><span class="p">,</span><span class="nb">range</span><span class="o">=</span><span class="mf">2e5</span><span class="p">))</span>
+<span class="n">fieldsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="s1">&#39;bettii.GyroReadings.angularVelocityZ&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gyro Z&#39;</span><span class="p">,</span><span class="n">conversion</span><span class="o">=</span><span class="mf">0.0006324</span><span class="p">,</span><span class="nb">range</span><span class="o">=</span><span class="mf">2e5</span><span class="p">))</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">DataSet</span><span class="p">(</span><span class="n">fieldsList</span><span class="o">=</span><span class="n">fieldsList</span><span class="p">,</span><span class="n">foldersList</span><span class="o">=</span><span class="n">folders</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">rpeaks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">M</span><span class="o">=</span><span class="mi">100</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[::</span><span class="n">M</span><span class="p">]</span> <span class="c1">#Downsample</span>
+
+<span class="nb">print</span> <span class="s2">&quot;Converting to Palestine Time...&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># Palestine time conversion (Archives folder names are in UTC)</span>
+
+<span class="nb">print</span> <span class="s2">&quot;Cropping time&quot;</span>
+<span class="n">time_start</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+<span class="n">time_end</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_start</span><span class="p">:</span><span class="n">time_end</span><span class="p">]</span>
+
+<span class="n">time_label</span> <span class="o">=</span> <span class="s1">&#39;Palestine Time&#39;</span>
+
+<span class="nb">print</span> <span class="s2">&quot;Plotting..&quot;</span>
+<span class="n">plotColumns</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="n">time_label</span><span class="p">)</span>
+
+<span class="n">plotColumns</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="n">time_label</span><span class="p">,</span><span class="n">ylabels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Angular velocity&#39;</span><span class="p">],</span><span class="n">ncols</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nb">print</span> <span class="s2">&quot;Show...&quot;</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>After running the previous script we will obtain two new figures:</p>
+<a class="reference internal image-reference" href="_images/gyros1.png"><img alt="_images/gyros1.png" src="_images/gyros1.png" style="width: 45%;" /></a>
+<a class="reference internal image-reference" href="_images/gyros2.png"><img alt="_images/gyros2.png" src="_images/gyros2.png" style="width: 45%;" /></a>
+<p>Now we will analyze in more detail the different parts of the script.</p>
+<p>Imports:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">utils.config</span> <span class="k">import</span> <span class="n">flightDisksFolders</span><span class="p">,</span><span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">utils.dataset</span> <span class="k">import</span> <span class="n">DataSet</span><span class="p">,</span><span class="n">pd</span><span class="p">,</span> <span class="n">plotColumns</span>
+<span class="kn">from</span> <span class="nn">utils.field</span> <span class="k">import</span> <span class="n">Field</span>
+</pre></div>
+</div>
+<p>The goal of these imports is to load in our environment some names that will be used later.
+When we run the first line, the module utils.config runs and we keep the variables <code class="docutils literal"><span class="pre">flightDisksFolders</span></code>– a list of Archive folder names– and <code class="docutils literal"><span class="pre">plt</span></code> – the matplotlib.pyplot object already configured –.</p>
+<p>After the imports, a list of fields is generated:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fieldsList</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">fieldsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="s1">&#39;bettii.GyroReadings.angularVelocityX&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gyro X&#39;</span><span class="p">,</span><span class="n">conversion</span><span class="o">=</span><span class="mf">0.0006304</span><span class="p">))</span>
+<span class="n">fieldsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="s1">&#39;bettii.GyroReadings.angularVelocityY&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gyro Y&#39;</span><span class="p">,</span><span class="n">conversion</span><span class="o">=</span><span class="mf">0.0006437</span><span class="p">,</span><span class="nb">range</span><span class="o">=</span><span class="mf">2e5</span><span class="p">))</span>
+<span class="n">fieldsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="s1">&#39;bettii.GyroReadings.angularVelocityZ&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gyro Z&#39;</span><span class="p">,</span><span class="n">conversion</span><span class="o">=</span><span class="mf">0.0006324</span><span class="p">,</span><span class="nb">range</span><span class="o">=</span><span class="mf">2e5</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Each Field is constructed in a similar manner. If we focus on the second gyroscope, we are defining a custom label <code class="docutils literal"><span class="pre">Gyro</span> <span class="pre">Y</span></code> that will be used as the column name in the generated dataframe and also as the default label for the legends in the plots. The <code class="docutils literal"><span class="pre">conversion</span></code> keyword argument is a factor that will be multiplied at every data point in the field. In the case of the gyroscopes this conversion is performed to obtain the information in arcsec/s units. Finally, the <code class="docutils literal"><span class="pre">range</span></code> parameter defines a valid range for the data. If there is any data point outside +-range, it will be discarded. This is useful to filter some undesired parsing errors.</p>
+<p>All the reading process of the different files is performed inside the DataSet construction:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">DataSet</span><span class="p">(</span><span class="n">fieldsList</span><span class="o">=</span><span class="n">fieldsList</span><span class="p">,</span><span class="n">foldersList</span><span class="o">=</span><span class="n">folders</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">rpeaks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The line is quite self-explanatory. After running succesfully this part, we will have a <code class="docutils literal"><span class="pre">pandas.Dataframe</span></code> at the attribute <code class="docutils literal"><span class="pre">ds.df</span></code>. If the verbose argument is <code class="docutils literal"><span class="pre">True</span></code> we will see the evolution of the reading process in our console. The only confusing term is <code class="docutils literal"><span class="pre">rpeaks</span></code>. This option, when it is True, will remove all the instants where the absolute value of all the fields in the dataframe are below 1. The reason behind that is because there are some group of fields that suddenly jump to values close to 0 at the same exact time.</p>
+<p>When dealing with large amounts of data, the handling of the plots can be very slow. For that reason, a downsample is performed before calling the plotting functions:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">M</span><span class="o">=</span><span class="mi">100</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[::</span><span class="n">M</span><span class="p">]</span> <span class="c1">#Downsample</span>
+</pre></div>
+</div>
+<p>In this case we are picking one sample of every 100.</p>
+<p>When merging multiple folders, the indexing of the generated dataframe is always in time, not in frame numbers. That is because between folders, a reset of the frame number counter can occur.
+If we only read from a single folder, the <code class="docutils literal"><span class="pre">timeIndex</span></code> argument of DataSet decides wether we use frame numbers or time. The option by default is to use the frame numbers.</p>
+<p>The time information is extracted from the folders name. If we use the disks folders, the time zone will be different. That is why we substract 5 hours to obtain the time at the launch site:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="s2">&quot;Converting to Palestine Time...&quot;</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># Palestine time conversion (Archives folder names are in UTC)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal"><span class="pre">pandas</span></code> library offers a easy way to slice dataframes:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="s2">&quot;Cropping time&quot;</span>
+<span class="n">time_start</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+<span class="n">time_end</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">ds</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_start</span><span class="p">:</span><span class="n">time_end</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Here, we are getting the data that is only between 2017/06/08 13:00 and 2017/06/09 10:00.</p>
+</div>
+<div class="section" id="external-documentation">
+<h2>External documentation<a class="headerlink" href="#external-documentation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a href="#id1"><span class="problematic" id="id2">`Pandas Documentation `pandas`_`_</span></a></li>
+<li><a class="reference external" href="https://matplotlib.org/users/tutorials.html">Matplotlib Tutorials</a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#example">Example</a></li>
+<li><a class="reference internal" href="#external-documentation">External documentation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Python Flight Data Processing’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="apidoc/modules.html"
+                        title="next chapter">src</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/intro.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="apidoc/modules.html" title="src"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Python Flight Data Processing’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Python Flight Data Processing 1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Marc Casalprim.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
+  </body>
+</html>

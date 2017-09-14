@@ -19,6 +19,7 @@ Quaternion provides a class for manipulating quaternion objects.  This class pro
     Modified 2017 by Marc Casalprim
     fixed 3 dimensional constructor
     Removed time consuming operations
+    Added getAngles, vec2skew, DCM2FordAngles
 """
 
 
@@ -27,10 +28,10 @@ import numpy as np
 from math import cos, sin, radians, degrees, atan2, sqrt, acos, pi, asin
 
 class Quat(object):
-    """
-    Quaternion class
+    """Quaternion class
     
     Example usage::
+    
      >>> from Quaternion import Quat
      >>> quat = Quat((12,45,45))
      >>> quat.ra, quat.dec, quat.roll
@@ -40,24 +41,31 @@ class Quat(object):
      >>> q2 = Quat([ 0.38857298, -0.3146602 ,  0.23486498,  0.8335697])
      >>> q2.ra
      11.999999315925008
+    
     Multiplication and division operators are overloaded for the class to 
     perform appropriate quaternion multiplication and division.
+    
     Example usage::
     
      >>> q1 = Quat((20,30,40))
      >>> q2 = Quat((30,40,50))
      >>> q = q1 / q2
+    
     Performs the operation as q1 * inverse q2
+    
     Example usage::
+    
      >>> q1 = Quat((20,30,40))
      >>> q2 = Quat((30,40,50))
      >>> q = q1 * q2
-    :param attitude: initialization attitude for quat
-    ``attitude`` may be:
-      * another Quat
-      * a 4 element array (expects x,y,z,w quat form)
-      * a 3 element array (expects ra,dec,roll in degrees)
-      * a 3x3 transform/rotation matrix
+    
+    :param attitude: initialization attitude for quat ``attitude`` may be:
+
+    * another Quat
+    * a 4 element array (expects x,y,z,w quat form)
+    * a 3 element array (expects ra,dec,roll in degrees)
+    * a 3x3 transform/rotation matrix
+    
     """
     def __init__(self, attitude):
         self._q = None
@@ -504,12 +512,18 @@ def DCM2FordAngles(matrix,rollArnab=0,prVersions=False):
     return q
 
 def vec2skew(v):
-    '''Return the skew-matrix related to the vector `v`
+    r"""Return the skew-symmetric matrix :math:`\lfloor{\bm{v}_\times}\rfloor` related to the vector ``v``
+    
+    .. math::
+        &\lfloor{\bm{v}_\times}\rfloor=\begin{bmatrix}  0     &   v_3   &  -v_2   \\
+                                                         -v_3   &   0     &   v_1   \\
+                                                          v_2   &  -v_1   &   0  \\\end{bmatrix}
+        \ ,\ \bm{v}\times\bm{u}=\lfloor{\bm{v}_\times}\rfloor\bm{u}
     
     :param v: a 3-dimensional vector
-    :return: a skew-matrix
+    :return: a skew-symmetric matrix
     :rtype:  3x3 np.matrix
-    '''
+    """
     v1=v[0];v2=v[1];v3=v[2];
     return np.matrix([[0,-v3,v2],[v3,0,-v1],[-v2,v1,0]])
     
@@ -530,6 +544,24 @@ def cost(x,q,order):
     return np.dot(qdif.equatorial,qdif.equatorial)
 from scipy.optimize import fmin
 def getAngles(q,order='YPR'):
+    '''Returns the three angles (Yaw,-Pitch,Roll) that describe the quaternion ``q`` applied in the defined multiplication order
+    
+    Example usage::
+    
+     >>> q = Quat((20,30,40))
+     >>> angles=getAngles(q,order='YPR')
+     >>> print angles
+     [ 34.72446346   8.05229897  47.93141757]
+     >>> Y=Quat((angles[0],0,0))
+     >>> P=Quat((0,angles[1],0))
+     >>> R=Quat((0,0,angles[2]))
+     >>> Y*P*R
+     [ 20.0000036   30.00002361  40.00001084]
+    
+    :param q: a utils.quat.Quat object
+    :param order: desired multiplication order (ie. 'RPY' is R*P*Y)
+    :return: 3-dimensional np.array, [Yaw,-Pitch,Roll] angles in degrees
+    '''
     xo=q.equatorial
     xopt=fmin(cost,xo,args=(q,order),disp=False)
     return xopt

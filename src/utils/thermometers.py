@@ -57,8 +57,8 @@ PiperNames={'demodRaw0':"Exchanger",
              'std_demodRaw3':"BatwingLeft",
              }
 def getTemperaturesFromRawDataFrame(rawdf):
-    """Returns a new dataframe with the calculated temperatures.
-    Raw DataFrame format: all columns from Standard message start with std_"""
+    r"""Returns a new dataframe with the calculated temperatures.
+    Raw DataFrame format: all columns from Standard message start with "std\_" """ #is "std_" (the backslash is to escape rST targets)
     data={}
     for column in rawdf.columns:
         if "demodRaw" in column and column in calibrators.keys():

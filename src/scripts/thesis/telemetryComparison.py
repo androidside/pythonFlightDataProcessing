@@ -6,7 +6,7 @@ Plot comparison between the data collected from the telemtry vs. the data in the
 @author: Marc Casalprim
 '''
 print 'Imports...'
-from utils.config import os,flightTelemetryFolders, flightDisksFolders, save_folder, M
+from utils.config import os,flightTelemetryFolders, flightDisksFolders, save_folder
 from utils.dataset import DataSet, plt, pd
 from utils.field import Field
 
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False)
     dsd= DataSet(fieldsList=fieldsList, foldersList=foldersD, verbose=True, rpeaks=False)
     
-
+    M=100 #downsampling factor
     ds.df = ds.df.iloc[::M]
     dsd.df = dsd.df.iloc[::M]
     

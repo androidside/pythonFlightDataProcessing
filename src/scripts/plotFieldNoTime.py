@@ -6,7 +6,7 @@ Plot raw data from a field. Without time. Useful when the archive ended abruptly
 @author: Marc Casalprim
 '''
 print 'Imports...'
-from utils.config import flightDisksFolders,plt,M
+from utils.config import flightDisksFolders,plt
 from utils.dataset import load_single_field
 from utils.field import Field
 

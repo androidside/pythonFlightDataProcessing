@@ -98,17 +98,19 @@ def genQuaternions(dataframe, quats={'qest':['qi', 'qj', 'qk', 'qr'], 'qI2G':['q
     return lists
 
 def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], label_triggers='triggers', labels_scerrors=['ra_err', 'dec_err', 'roll_err']):
-    '''Returns three dataframes with the Groscopes, Starcamera and Quaternions data respectively.
+    '''Returns three dataframes with the Groscopes, Starcamera and Estimator data respectively.
     Synchronizes the Starcamera with the triggers. Useful for the Estimator classes.
+    
+    the dataframe must contain, at least: the following columns: ['qI2G', 'qI2S','dec_sc', 'ra_sc', 'roll_sc','qi', 'qj', 'qk', 'qr','gyroX', 'gyroY', 'gyroZ','biasX','biasY','biasZ','P00','P01','P02','P10','P11','P12','P20','P21','P22']
     
     :param dataframe: pandas dataframe containing all the infromation to extract
     :param labels_gyros: columns of the dataframe that contain the gyroscopes information
     :param label_triggers: column of the dataframe that contains the triggers information
     :param labels_scerrors: columns of the dataframe that contain the star camera uncertainties information
-    :return: gyros,sc,quats: pandas dataframes with the gyroscopes, star camera and quaternions data respectively.
+    :return: gyros,sc,est: pandas dataframes with the gyroscopes, star camera and estimator data respectively.
     '''
-    SClabels = ['qI2G', 'qI2S']
-
+    labels_sc = ['qI2G', 'qI2S']
+    labels_biases=['biasX','biasY','biasZ']
     print "Creating Starcam dataframe..."
     triggers = dataframe[label_triggers].drop_duplicates()
     L = 1e300
@@ -117,7 +119,7 @@ def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], 
         triggers = triggers[[(triggers.loc[mceFN] < max(triggers.index) and triggers.loc[mceFN] > (min(triggers.index) - 10000)) for mceFN in triggers.index]]
     subdf = dataframe.loc[triggers.index].drop_duplicates(subset=['dec_sc', 'ra_sc', 'roll_sc']).dropna()
     index = triggers.loc[subdf.index].index  # values #here we can index the sc dataframe with the triggers (using .values instead of .index), they dont seem to be
-    sc = pd.DataFrame(genQuaternions(subdf, norm=True, filter=True), index=index)[SClabels].dropna()
+    sc = pd.DataFrame(genQuaternions(subdf, norm=True, filter=True), index=index)[labels_sc].dropna()
     if labels_scerrors is not None: sc[labels_scerrors] = dataframe[labels_scerrors].loc[sc.index]
     sc[label_triggers] = triggers.loc[subdf.index]
     print "Number of solutions: %s" % len(sc)
@@ -126,7 +128,7 @@ def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], 
     print "Filtering..."
 
     Ps = extractPs(dataframe)
-    est = dataframe[['biasX','biasY','biasZ']]
+    est = dataframe[labels_biases]
     est['P']=Ps
     est['qest']=quats
     est = filterQuats(est)
@@ -137,6 +139,10 @@ def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], 
     # print 'Done'  
     return gyros, sc, est
 def extractPs(dataframe):
+    '''Generates a 3x3 covariance matrix from the columns ['P00','P01','P02','P10','P11','P12','P20','P21','P22'] of the ``dataframe``
+    :param dataframe: a pandas.Dataframe with at least 9 columns
+    :rtype: 3x3 ``np.matrix``
+     '''
     data=dataframe[['P00','P01','P02','P10','P11','P12','P20','P21','P22']]
     L=len(data.P00)
     Ps=[np.eye(3)]*L
@@ -598,23 +604,31 @@ def toTimeIndex(dataframe, folder, freq=400.):
     dataframe.index = time
     return dataframe   
 
-def plotColumns(df, units='', xlabel='Index', ylabels=None):
-    """Plot the N columns of the pd.Dataframe df in a Nx1 subplots layout
+def plotColumns(df, units='', xlabel='Index', ylabels=None,ncols=1):
+    """Plot the N columns of the pd.Dataframe df in a subplots layout with ncols columns
     
     :param df: pd.Dataframe object
     :param units: string to add at the end of the ylabels
     :param xlabel: label of the x axis
     :param ylabels: labels of the y axis (if None, ylabels=df.columns)
+    :param ncols: number of columns of the subplots layout
     :return: figure
     """
     data = df.dropna()
     N = len(data.columns)
-    fig, axes = plt.subplots(N, 1, sharex=True, sharey=True)
-    for i in range(N):
-        column = data.columns[i]
-        data[column].plot(ax=axes[i])
-        if ylabels is None: axes[i].set_ylabel(column + ' ' + units)
-        else: axes[i].set_ylabel(ylabels[i] + ' ' + units)
+    if ncols>0:
+        nrows=int(np.ceil(N*1.0/ncols))
+        fig, axes = plt.subplots(nrows, ncols, sharex=True, sharey=True)
+        for i in range(N):
+            column = data.columns[i]
+            data[column].plot(ax=axes[i])
+            if ylabels is None: axes[i].set_ylabel(column + ' ' + units)
+            else: axes[i].set_ylabel(ylabels[i] + ' ' + units)
+    else:
+        ax=data.plot()
+        ax.set_ylabel(ylabels[-1])
+        axes=[ax]
+        fig=ax.figure
     axes[-1].set_xlabel(xlabel)
     fig.tight_layout()
     return fig
@@ -751,7 +765,7 @@ def plotCovs(df, time_label='Palestine Time', ylabels=None, labels=None, styles=
     else:
         fig, axRA = plt.subplots(1, 1, sharex=True, sharey=True)
         axDEC=axRA;axROLL=axRA;
-        if labels is None: labels=[r'$P_{00}$',r'$P_{11}$',r'$P_{00}$']
+        if labels is None: labels=[r'$P_{00}$',r'$P_{11}$',r'$P_{22}$']
         styles=[{}]
     axROLL.set_xlabel(time_label)
     M = np.matrix([[0.693865, 0, 0.720106], [0, 1, 0], [-0.720106, 0, 0.693865]])

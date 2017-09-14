@@ -7,7 +7,7 @@ Script for scripts simultaneously data from different archives
 '''
 print 'Imports...'
 import re
-from utils.config import os,flightDisksFolders,plt,save_folder,img_folder,M
+from utils.config import os,flightDisksFolders,plt,save_folder,img_folder
 from utils.dataset import DataSet, np, pd
 from utils.field import Field, getFieldsContaining
 
@@ -75,6 +75,7 @@ if __name__ == '__main__':
         fieldsList = fieldsList + l1 + l2 + lv
           
     ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False)
+    M=100 #downsampling factor
     ds.df = ds.df.iloc[:-1000:M]
     
     print "Converting to Palestine Time..."

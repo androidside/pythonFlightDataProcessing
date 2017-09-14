@@ -6,12 +6,9 @@ Real Time scripts of the error between the SC and Estimator.
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-import pandas as pd
-from matplotlib.style import use
-from utils.dataset import DataSet,plt
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-from utils.quat import Quat,normalize,sin,cos
+from utils.dataset import DataSet,plt,pd
+from utils.field import Field,getDtypes
+from utils.quat import Quat
 
 
 if __name__ == '__main__':
@@ -31,9 +28,6 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.qi'))
     fieldsList.append(Field('bettii.RTLowPriority.qj'))
     fieldsList.append(Field('bettii.RTLowPriority.qk'))
-    use('classic') 
-    mpl.rcParams['toolbar'] = 'None'
-    mpl.rcParams['axes.grid'] = True
     
     ds = DataSet(folder,rpeaks=True)
     ds.readListFields(fieldsList, nValues=3000,verbose=True,rpeaks=False)   

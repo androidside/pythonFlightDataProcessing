@@ -1,16 +1,29 @@
 '''
 Created on 01 may 2017
 
+Functions and methods useful to read the fields in an Aurora archive.
+
 @author: Marc Casalprim
 '''
 import os
 
 class Field(object):
     '''
-    Class describing a field
+    Class describing a field located in an Aurora archive.
+    
+            
+    :param fieldName: name of the field, the whole file name
+    :param dtype: string describing the datatype of the field (ie. 'f8' is a 64 bit float)
+    :param indexName: file name of the time index associated with this field. If None, is fieldName.rsplit('.', 1)[0] + '.mceFrameNumber'
+    :param indexType: string describing the datatype of the index field (ie. 'i8' is a 64 bit int)
+    :param label: short name for the field.  In ``utils.dataset.Dataset`` it is used as the name for the dataframe columns. (if None, last word of the fieldName)
+    :param conversion: multiplying factor of the data, useful to convert units
+    :param function: function that will be applied to to the field data
+    :param range: valid range of the field, any value outside +-range will be discarted. Useful to remove parsing errors.
     '''
-    #DTYPES is a dictionary mapping each fieldName to a datatype
-    #It can be generated using the getDtypes(folder) function
+    # DTYPES is a dictionary mapping each fieldName to a datatype
+    # It can be generated using the getDtypes(folder) function
+    DTYPES = dict()
     DTYPES = {'error_r11_c3': 'i8', 'error_r11_c2': 'i8', 'error_r11_c1': 'i8',
     'sq1fb_r17_c20': 'i8', 'error_r11_c7': 'i8', 'error_r11_c6': 'i8',
     'error_r11_c5': 'i8', 'error_r11_c4': 'i8', 'error_r11_c9': 'i8',
@@ -1119,55 +1132,55 @@ class Field(object):
     'bettii.RTHighPriority.SCLoopsSinceLastSolution': 'i4',
     'bettii.RTLowPriority.MeasurementErrorCovarianceMatrixR21': 'f8'}
 
-    def __init__(self, fieldName,dtype='f8',indexName=None,indexType='i8',label=None,conversion=1,function=lambda x: x,range=1e10):
+    def __init__(self, fieldName, dtype='f8', indexName=None, indexType='i8', label=None, conversion=1, function=lambda x: x, range=1e10):
         '''
         Constructor
         '''
-        if indexName is None: indexName=fieldName.rsplit('.',1)[0]+'.mceFrameNumber' #the index seems to be always in this format
-        if label is None: label=fieldName.split('.')[-1] #we get the last word of the fieldname for the label
-        if label == 'mceFrameNumber': #it seems to be a index, we index it by itself
-            label=fieldName
-            dtype=indexType
-            indexName=fieldName
-        if self.DTYPES is None or fieldName not in self.DTYPES: self.dtype= dtype 
+        if indexName is None: indexName = fieldName.rsplit('.', 1)[0] + '.mceFrameNumber'  # the index seems to be always in this format
+        if label is None: label = fieldName.split('.')[-1]  # we get the last word of the fieldname for the label
+        if label == 'mceFrameNumber':  # it seems to be a index, we index it by itself
+            label = fieldName
+            dtype = indexType
+            indexName = fieldName
+        if self.DTYPES is None or fieldName not in self.DTYPES: self.dtype = dtype 
         else: self.dtype = self.DTYPES[fieldName]
-        self.fieldName = fieldName #filename of the field
-        self.function = function #function to apply on the field data
-        self.indexName = indexName #field name of the field's index
-        self.indexType = indexType #dtype of the index
-        self.label = label #label used as columnLabel on the pd.Dataframe generated in DataSet class
-        self.conversion = conversion #multiplying factor, to convert the units if we want
-        self.range=range #acceptable range
+        self.fieldName = fieldName  # filename of the field
+        self.function = function  # function to apply on the field data
+        self.indexName = indexName  # field name of the field's index
+        self.indexType = indexType  # dtype of the index
+        self.label = label  # label used as columnLabel on the pd.Dataframe generated in DataSet class
+        self.conversion = conversion  # multiplying factor, to convert the units if we want
+        self.range = range  # acceptable range
 
 
 
-def getFieldsContaining(substring,folder,indexName=None,dtype='f8'):
+def getFieldsContaining(substring, folder, indexName=None, dtype='f8'):
     """ Return a list of fields in the folder containing substring """
     print 'Generating fields list...'
-    fieldsList=[]
+    fieldsList = []
     for filename in os.listdir(folder):
         if substring in filename:
-            field=Field(filename,indexName=indexName,dtype=getFormat(filename, folder))
+            field = Field(filename, indexName=indexName, dtype=getFormat(filename, folder))
             fieldsList.append(field)
-    if len(fieldsList)==1: return fieldsList[0]
+    if len(fieldsList) == 1: return fieldsList[0]
     return fieldsList
 
-def getFieldsRegex(regex,folder):
+def getFieldsRegex(regex, folder):
     """ Return a list of fields in the folder matching the regular expression regex """
     import re
     print 'Generating fields list...'
-    fieldsList=[]
+    fieldsList = []
     for filename in os.listdir(folder):
         if re.match(regex, filename) is not None:
-            field=Field(filename,dtype=getFormat(filename, folder))
+            field = Field(filename, dtype=getFormat(filename, folder))
             fieldsList.append(field)
-    if len(fieldsList)==1: return fieldsList[0]
+    if len(fieldsList) == 1: return fieldsList[0]
     return fieldsList
 
-def getFormat(fieldName,folder):
+def getFormat(fieldName, folder):
     """ Return the dtype of the fieldName using the format file in folder """
-    formatFile= open(folder+'format')
-    dic={'INT32':'i4',
+    formatFile = open(folder + 'format')
+    dic = {'INT32':'i4',
          'INT64':'i8',
          'UINT8':'u1',
          'FLOAT32':'f4',
@@ -1175,25 +1188,25 @@ def getFormat(fieldName,folder):
     try:
         for line in formatFile:
             if fieldName in line:
-                dtype=dic[line.split()[2]]
+                dtype = dic[line.split()[2]]
                 return dtype
-        #return 'f8'    
+        # return 'f8'    
     finally:
         formatFile.close()
 def getDtypes(folder):
     """ Return the dtypes of all fieldNames using the format file in folder """
-    formatFile= open(folder+'format')
-    dic={'INT32':'i4',
+    formatFile = open(folder + 'format')
+    dic = {'INT32':'i4',
          'INT64':'i8',
          'UINT8':'u1',
          'FLOAT32':'f4',
          'FLOAT64':'f8'}
-    dtypes={}
+    dtypes = {}
     try:
         for line in formatFile:
             try:
-                fieldName,typ=line.split()[0:3:2]
-                dtypes[fieldName]=dic[typ] 
+                fieldName, typ = line.split()[0:3:2]
+                dtypes[fieldName] = dic[typ] 
             except Exception as err:
                 pass
 

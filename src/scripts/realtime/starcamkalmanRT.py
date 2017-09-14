@@ -6,11 +6,9 @@ Real Time scripts of the Starcamera solutions and Estimated attitudes in the Gyr
 @author: Marc Casalprim
 '''
 print 'Imports...'
-import matplotlib as mpl
-from matplotlib.style import use
 from utils.dataset import pd,DataSet,plt,np
-from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
-from utils.quat import Quat,sin,cos
+from utils.field import Field,getDtypes
+from utils.quat import Quat
 
 
 if __name__ == '__main__':
@@ -29,8 +27,6 @@ if __name__ == '__main__':
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqk',label='qk_sc'))
     fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraQuaternionFXPqr',label='qr_sc')) 
 
-    use('classic') 
-    mpl.rcParams['toolbar'] = 'None'
     initial_time=None #in frame number
     final_time = None #in frame number
     

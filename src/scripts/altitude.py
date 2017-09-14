@@ -6,7 +6,7 @@ Altitude scripts without indexing, because we dont have a valid index for GpsRea
 @author: Marc Casalprim
 '''
 print 'Imports...'
-from utils.config import folders,plt
+from utils.config import plt, flightDisksFolders
 from utils.dataset import np, load_fields
 from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
@@ -14,6 +14,7 @@ from utils.field import Field,getDtypes#,getFieldsContaining,getFieldsRegex
 
 if __name__ == '__main__':
     
+    folders=flightDisksFolders
     Field.DTYPES=getDtypes(folders[0])
     
     fieldsList=[]

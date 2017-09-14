@@ -4,17 +4,78 @@ scripts.optimization package
 Submodules
 ----------
 
-.. toctree::
+scripts.optimization.biases module
+----------------------------------
 
-   scripts.optimization.biases
-   scripts.optimization.biases_plot
-   scripts.optimization.c_bias
-   scripts.optimization.c_bias_plot
-   scripts.optimization.cmatrix
-   scripts.optimization.cmatrix_plot
-   scripts.optimization.k_m_bias
-   scripts.optimization.k_m_bias_plot
-   scripts.optimization.optimq
+.. automodule:: scripts.optimization.biases
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.optimization.biases_plot module
+---------------------------------------
+
+.. automodule:: scripts.optimization.biases_plot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.optimization.c_bias module
+----------------------------------
+
+.. automodule:: scripts.optimization.c_bias
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.optimization.c_bias_plot module
+---------------------------------------
+
+.. automodule:: scripts.optimization.c_bias_plot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.optimization.cmatrix module
+-----------------------------------
+
+.. automodule:: scripts.optimization.cmatrix
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.optimization.cmatrix_plot module
+----------------------------------------
+
+.. automodule:: scripts.optimization.cmatrix_plot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.optimization.k_m_bias module
+------------------------------------
+
+.. automodule:: scripts.optimization.k_m_bias
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.optimization.k_m_bias_plot module
+-----------------------------------------
+
+.. automodule:: scripts.optimization.k_m_bias_plot
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.optimization.optimq module
+----------------------------------
+
+.. automodule:: scripts.optimization.optimq
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

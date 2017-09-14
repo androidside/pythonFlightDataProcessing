@@ -6,9 +6,8 @@ Plot data from a field, using DataSet class. Merging archives if we want.
 @author: Marc Casalprim
 '''
 print 'Imports...'
-from utils.config import flightDisksFolders,plt,M
-
-from utils.dataset import DataSet,load_single_field,pd, plotColumns
+from utils.config import flightDisksFolders,plt
+from utils.dataset import DataSet,pd,plotColumns
 from utils.field import Field
 
 
@@ -17,10 +16,12 @@ if __name__ == '__main__':
     folders=flightDisksFolders
     
     fieldsList=[]
-    fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='Gyro X',dtype='i4',conversion=0.0006304))
-    fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='Gyro Y',dtype='i4',conversion=0.0006437,range=2e5))
-    fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='Gyro Z',dtype='i4',conversion=0.0006324,range=2e5))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='Gyro X',conversion=0.0006304))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='Gyro Y',conversion=0.0006437,range=2e5))
+    fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ',label='Gyro Z',conversion=0.0006324,range=2e5))
     ds = DataSet(fieldsList=fieldsList,foldersList=folders,verbose=True,rpeaks=False)
+    
+    M=100
     ds.df = ds.df.iloc[::M] #Downsample
     
     print "Converting to Palestine Time..."
@@ -35,6 +36,8 @@ if __name__ == '__main__':
     
     print "Plotting.."
     plotColumns(ds.df,xlabel=time_label)
+
+    plotColumns(ds.df,xlabel=time_label,ylabels=['Angular velocity'],ncols=0)
     
     print "Show..."
     plt.show()

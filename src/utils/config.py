@@ -7,19 +7,17 @@ Module that configures ``matplotlib``. It also contains some common variables fo
 '''
 import os
 import matplotlib as mpl
-mpl.use('Qt4Agg') #change backend
+mpl.use('Qt4Agg') #change matplotlib backend
 from matplotlib.style import use
 import matplotlib.pyplot as plt
 
 #Plotting parameters
-use('classic')
+use('seaborn-bright') #style
 
 mpl.rcParams['axes.grid']=True
-plt.rc('font', family='serif')
+#plt.rc('font', family='serif')
 mpl.rcParams['date.autoformatter.hour']  = '%H:%M'
 mpl.rcParams['date.autoformatter.minute']  = '%H:%M:%S'
-
-M=100 #downsampling factor
 
 save_folder='C:/Users/bettii/flightData/'
 img_folder=save_folder+'plots/' #folders where the figures will be stored by default
