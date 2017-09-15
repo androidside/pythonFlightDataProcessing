@@ -23,19 +23,19 @@ if __name__ == '__main__':
     #Flags    
     #data to read and plot
     gyros = False
-    momdump = False
+    momdump = True
     magnetometer = False
     thermometers = False
-    currentSensors = True
+    currentSensors = False
     altitude = False
     
     titles=False #show titles on the figures
         
     fieldsList = []
     if gyros:
-        fieldsList.append(Field('bettii.GyroReadings.angularVelocityX', label='Gyro X', dtype='i4', conversion=0.0006304))
-        fieldsList.append(Field('bettii.GyroReadings.angularVelocityY', label='Gyro Y', dtype='i4', conversion=0.0006437, range=2e5))
-        fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ', label='Gyro Z', dtype='i4', conversion=0.0006324, range=2e5))
+        fieldsList.append(Field('bettii.GyroReadings.angularVelocityX', label='Gyro X', conversion=0.0006304))
+        fieldsList.append(Field('bettii.GyroReadings.angularVelocityY', label='Gyro Y', conversion=0.0006437, range=2e5))
+        fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ', label='Gyro Z', conversion=0.0006324, range=2e5))
       
     
     if altitude: fieldsList.append(Field('bettii.GpsReadings.altitudeMeters', indexName='bettii.RTLowPriority.mceFrameNumber', label='altitude'))
@@ -45,7 +45,7 @@ if __name__ == '__main__':
         fieldsList.append(Field('bettii.Magnetometer.PitchDeg', label='mPitch'))
         fieldsList.append(Field('bettii.Magnetometer.RollDeg', label='mRoll'))
     
-    if momdump: fieldsList.append(Field('bettii.PIDOutputMomDump.ut'))
+    if momdump: fieldsList.append(Field('bettii.PIDOutputMomDump.ut', conversion=0.01)) #lambda function=np.sqrt or if you want to do something more complex  function=lambda x: np.sqrt(x) +3 I can also do it in the dataframe, see below or Thesis postEstimation.py
     if thermometers:
         therm = []
         therm.append(Field('bettii.ThermometersDemuxedCelcius.J3L28', label='Rotator', range=100))
@@ -53,37 +53,41 @@ if __name__ == '__main__':
         therm.append(Field('bettii.ThermometersDemuxedCelcius.J4L35', label='Flight computer', range=100))  # 35
         therm.append(Field('bettii.ThermometersDemuxedCelcius.J1L16', label='Structure points', range=100))  # 91
         therm.append(Field('bettii.ThermometersDemuxedCelcius.J4L5', label='Right siderostat', range=100))  # 83
-        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_X', label='Temp. Gyro X', conversion=0.01))
-        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_Y', label='Temp. Gyro Y', conversion=0.01))
-        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_Z', label='Temp. Gyro Z', conversion=0.01))
+        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_X', label='Temp. Gyro X', range=100, conversion=0.01))
+        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_Y', label='Temp. Gyro Y', range=100,conversion=0.01))
+        fieldsList.append(Field('bettii.GyroReadings.temperatureDegF_Z', label='Temp. Gyro Z',range=100, conversion=0.01))
         therm_labels = [field.label for field in therm]
         fieldsList = fieldsList + therm
     if currentSensors:
         folder = folders[0]
         l1 = getFieldsContaining('bettii.currentReadout.currentReadout_UPBOne', folder)
         l2 = getFieldsContaining('bettii.currentReadout.currentReadout_UPBTwo', folder)
-        lv = getFieldsContaining('bettii.currentReadout.voltage', folder)
+        lv=[]
+        lv.append(Field('bettii.currentReadout.voltageReadout_UPBOne_5VChannel', label='5V line UPB1', range=10))
+        lv.append(Field('bettii.currentReadout.voltageReadout_UPBTwo_5VChannel', label='5V line UPB2', range=10))
         for field in l1:
-            number=re.findall(r'\d+', field.label)[0]
+            number=re.findall(r'\d+', field.label)[0] #find regular expression (r) that contains a number (\d) even if its surrounded by characters (+). It returns a vector so take the first value, #\d means digit, and + means "one or more"
             if 'negative' in field.label: l1.remove(field)#number='-'+number
-            field.label=number+'V'
+            field.label=number+'V line UPB1'
         currentsUPB1_labels = [field.label for field in l1]
-        currentsUPB2_labels = [field.label for field in l2]
+        for field in l2:
+            number=re.findall(r'\d+', field.label)[0] #find regular expression (r) that contains a number (\d) even if its surrounded by characters (+). It returns a vector so take the first value, #\d means digit, and + means "one or more"
+            field.label=number+'V line UPB2'
+        currentsUPB2_labels = [field.label for field in l2]       
         voltages_labels = [field.label for field in lv]
         for field in l1 + l2 + lv:
             field.range = 10
         fieldsList = fieldsList + l1 + l2 + lv
           
     ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False)
-    M=100 #downsampling factor
-    ds.df = ds.df.iloc[:-1000:M]
+    #ds.df = ds.df.iloc[:-1000]
+    M = 1  # downsample factor
+    ds.df = ds.df.iloc[:-100:M] #ie: ds.df.iloc[:-1000:M] do not plot the last 1000 samples (fn are too high)
     
     print "Converting to Palestine Time..."
     ds.df.index = ds.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)
 
     time_label = 'Palestine Time'
-    
-
     
     print "Generating plots.."
     
@@ -158,7 +162,7 @@ if __name__ == '__main__':
         fig = plt.figure()
         if titles: fig.suptitle("Rotator output", fontsize=15, y=1)
         ax = plt.subplot(111, xlabel=time_label, ylabel='Command [counts/s]')
-        data = ds.df.ut.dropna()
+        data = ds.df.ut.dropna() #.apply(lambda x: np.sqrt(x) +3)
         data.plot(ax=ax, style='b+', markersize=1.0)
         fig.tight_layout()
         fig.savefig(img_folder + "rotator.png")
