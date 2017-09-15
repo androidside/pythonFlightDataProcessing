@@ -159,14 +159,14 @@ class DataSet():
     '''Class containing useful methods to read and generate a pandas dataframe containing the desired fields.
     Derived from Maxime's original codes. The dataframe is stored as the attribute df.
     '''
-    def __init__(self, folder=None, freq=400., min=None, max=None, folder_export=None, nValues=None, start=None, verbose=False, rpeaks=False, estimator=False, starcam=False, fieldsList=[], foldersList=[], droplist=[], timeIndex=False):
+    def __init__(self, folder=None, freq=400., min=None, max=22880070, folder_export=None, nValues=None, start=None, verbose=False, rpeaks=False, estimator=False, starcam=False, fieldsList=[], foldersList=[], droplist=[], timeIndex=False):
         '''Constructs a DataSet object
         Loads a list of fields fieldsList, the estimator data or the starcamera data dpeending on the correct parameters
         
         :param folder: folder where the fields in fieldsList are located
         :param freq: frequency of the mce (default 400Hz)
         :param min: minimum mceFN value
-        :param max: maximum mceFN value
+        :param max: maximum mceFN value (default is 22880070, the maximum FN obtained during the flight)
         :param folder_export: folder where the plots will be saved
         :param nValues: number of values to read from the files (if None, all the file is read)
         :param start: value from where we start to read (if None, we count nValues from the end)
@@ -285,7 +285,7 @@ class DataSet():
             if label in self.df.keys() and len(self.df[label].as_matrix()) == len(field_data): #if field already in df and has the same number of values
                 if verbose: print label + ' already in dataframe.'
             else:
-                indmin = 50000  # minimum index, frame number (the archives start with low mceframenumbers and then jump to the actual frame n umber)
+                indmin = 3  # minimum index, frame number (the archives start with low mceframenumbers and then jump to the actual frame n umber)
                 if field.fieldName == 'bettii.GpsReadings.altitudeMeters' or 'PiperThermo' in field.fieldName:  # its PIPER or GPS data (theres no mceframenumber)
                     time = self.times['bettii.RTLowPriority.mceFrameNumber']  # get another mceFN vector of this archive
                     L = len(field_data)
@@ -304,6 +304,7 @@ class DataSet():
                 df_tmp = df_tmp[~df_tmp.index.duplicated(keep='first')]  # remove values with duplicated index
                 df_tmp = df_tmp[np.abs(df_tmp[label].as_matrix()) <= field.range]  # keep only the ones that are within fields range.
                 df_tmp = df_tmp[df_tmp.index > indmin]  # keep only meaningful index (a FN less than indmin is impossible)
+                df_tmp = df_tmp[df_tmp.index >= df_tmp.index[0]]  # keep only meaningful index (a FN less than the first index is impossible)
                 if False and not df_tmp.empty: #disabled part of the code to remove outliers
                     z = (np.abs(df_tmp.index) - np.mean(df_tmp.index)) / np.std(df_tmp.index)
                     df_tmp = df_tmp[z < 2]  # keep only meaningful index (drop outliers >2sigmas), seems dangerous but there are always bad mceFN that mess the entire plot
@@ -346,11 +347,13 @@ class DataSet():
                 i = i + 1
                 if verbose: print str(100 * i / len(foldersList) / len(fieldsList)) + '%',
                 self.readField(field, folder=folder, rpeaks=rpeaks, verbose=verbose, timeIndex=False)
-            if verbose: print ''
-            self.df = self.df.dropna(axis=0, how='all')
+            if verbose: print "Sorting index..."
+            self.df = self.df.dropna(axis=0, how='all').sort_index()
+            self.df = self.df.loc[self.min:self.max, :]
             # if True, change mceFN indexing to a DatetimeIndex
             # Using folder name as the time for the first mce frame
             if timeIndex and len(self.df.index) > 0:
+                if verbose: print "Converting index..."
                 text = folder.split('/')[-2]
                 ftime_str = text[0:8] + ' ' + text[9:17].replace('_', ':')  # foldertime
                 ftime = pd.to_datetime(ftime_str, yearfirst=True)

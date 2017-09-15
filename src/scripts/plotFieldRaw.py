@@ -15,8 +15,8 @@ if __name__ == '__main__':
 
     folders=flightDisksFolders
     
-    field='bettii.GyroReadings.angularVelocityX'
-    time_field='bettii.GyroReadings.mceFrameNumber'
+    field='bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered'
+    time_field='bettii.RTLowPriority.mceFrameNumber'
 
     print "Folder name      \t"+field
     data=[]
@@ -34,7 +34,8 @@ if __name__ == '__main__':
 
     print "Plotting.."
     M=100 #downsampling factor
-    plt.plot(time[::M],data[::M])
+    L=min(len(time),len(data)) #force the two vectors to have the same length (sudden stop of the archiving)
+    plt.plot(time[:L:M],data[:L:M])
     plt.ylabel(field)
     plt.xlabel(time_field)
     print "Show.."

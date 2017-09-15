@@ -1,19 +1,6 @@
-Introduction
-############
-Welcome to Python Flight Data Processing's documentation! This project is intended to make the life 
-easier when plotting and analyzing some data of the Aurora archives.
-
-The three main classes that were created for this project are:
-
-* :class:`~utils.field.Field`, describes a field
-* :class:`~utils.dataset.DataSet`, implements the process of reading a list of fields from a folder or a list of folders
-* :class:`~estimators.estimators.Estimator`, estimates the attitude using the sensors data and has methods to plot the results
-
-Another common class is :class:`~utils.quat.Quat`, that provides easy  manipulation of quaternion objects. This project also relays heavily on the `matplotlib`_ for the plots and on the `pandas`_ modules, as it uses the :class:`pandas.DataFrame` data structure to store the time-series information. 
-
-Example
-==============
-A good start to understand better how all of this works is with a simple example. The following code is available at :mod:`scripts.plotField` and plots directly the gyroscopes data::
+An Introductory Example
+=======================
+A good start to understand better how all of this works is with a simple example. The following code is available at :mod:`scripts.plotGyros` and plots directly the gyroscopes data::
 
 	from utils.config import flightDisksFolders,plt
 	from utils.dataset import DataSet,pd, plotColumns
@@ -97,7 +84,7 @@ The time information is extracted from the folders name. If we use the disks fol
 	print "Converting to Palestine Time..."
 	ds.df.index = ds.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)
 
-The ``pandas`` library offers a easy way to slice dataframes::
+The ``pandas`` library offers an easy way to slice dataframes::
 
 	print "Cropping time"
 	time_start=pd.datetime(2017, 6, 8, 13)
@@ -124,6 +111,77 @@ In addition, note how we can obtain similar results just using the functionaliti
 	ax.set_ylabel('Angular velocity')
 	plt.show()
 
+Bad values
+==========
+Peaks
+-----
+Some fields show peaks, specially the ones at bettii.RTLowPriority and bettii.RTHighPrioirty
+The peaks are classified in two types:
+* sudden returns to values close to 0. These peaks seem to be synchronized, they affect almost all the fields at the same time.
+* jumps to high values. Probably due to parsing errors.
+
+To solve this issues, two main solutions are proposed.
+
+The first and easiest one is to use the ``rpeaks`` flag in the DataSet constructor. When ``rpeaks`` is ``True``, all the rows with all the values below to 1 will be removed.
+The fields range attribute is useful to remove undesired parsing errors. This parameter defines a valid range for the field data. Then, the readField function will remove any data point of the field that is not contained in the +-range interval.
+Once we have constructed our dataset, it is possible that we still have some residual errors. To remove them, a hard filtering technique can be applied with the filterArray function. We can also filter an entire Dataframe with filterDataframe.
+
+Bad mce frame numbers
+-----------------------------
+When a new Aurora archive is created, some of the fields start with leading low values and have 0 values once every two samples at least. The mceFramenumber fields are also affected by the peaks issues commented above. To solve these problems, the readField function -- that is called when we create a DataSet object -- will remove any invalid frame number (zero values and values inferior to the first frame number will be discarded). Also, to avoid possible parsing peaks, a maximum default value of 22880070 frame counts is used.
+
+Example
+--------
+As an example of the problem, here we show the raw values of the `bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered` field. The script plotFieldRaw was used::
+
+    folders=flightDisksFolders
+    
+    field='bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered'
+    time_field='bettii.RTLowPriority.mceFrameNumber'
+
+    print "Folder name      \t"+field
+    data=[]
+    time=[]
+    #folders=['F:/GondolaFlightArchive/17-06-09_01_51_04/']
+    for folder in folders:
+        d=load_single_field(folder+field,datatype=Field.DTYPES[field])
+        t=load_single_field(folder+time_field,datatype=Field.DTYPES[time_field])
+        data=data+list(d)
+        L=len(d)
+        time=time+list(t[:L])
+        name=folder.split('/')[-2]
+        print name+":\t"+str(len(d))+" raw values. "+str(len(t))+' FN values.'
+    
+
+    print "Plotting.."
+    M=100 #downsampling factor
+    plt.plot(time[:L:M],data[:L:M])
+    plt.ylabel(field)
+    plt.xlabel(time_field)
+    print "Show.."
+    plt.show()
+
++-------------------------------------+--------------------------------------------+
+| .. image:: ./images/raw.png         | .. image:: ./images/raw_100.png            |
+|    :height: 400                     |    :height: 400                            |
+|                                     |                                            |
+| Raw values of the field             | One of every 100 raw values of the field   |
++-------------------------------------+--------------------------------------------+
+
+We can see how the majority of bad values dissapear if we downsample the raw values by a factor of 100. A better option will be to use the DataSet class together with the filterDataframe function::
+
+    fieldsList=[Field('bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered',label='triggers',range=3e7)]
+    ds = DataSet(fieldsList=fieldsList,foldersList=folders,verbose=True,rpeaks=False)
+    print "Plot"
+
+	
++-------------------------------------+--------------------------------------------+
+| .. image:: ./images/dataframe.png   | .. image:: ./images/dataframe_filt.png     |
+|    :height: 400                     |    :height: 400                            |
+|                                     |                                            |
+| ``ds.df.triggers.plot()``           | ``filterDataframe(ds.df).triggers.plot()`` |
++-------------------------------------+--------------------------------------------+
+	
 External documentation
 ======================
 For more information about the libraries used:
