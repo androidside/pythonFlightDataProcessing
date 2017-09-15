@@ -20,7 +20,8 @@ use('seaborn-bright') #style
 
 mpl.rcParams['axes.grid']=True
 #plt.rc('font', family='serif') #Serif font, more Latex-like
-mpl.rcParams['date.autoformatter.hour']  = '%H:%M' #format of the date axes when the autoformatter decides it should be in hour precision
+mpl.rcParams['date.autoformatter.hour']  = '%b %d at %H:%M' #format of the date axes when the autoformatter decides it should be in hour precision
+#mpl.rcParams['date.autoformatter.hour']  = '%H:%M' 
 mpl.rcParams['date.autoformatter.minute']  = '%H:%M:%S' #format of the date axes when the autoformatter decides it should be in minute precision
 
 #Useful variables
