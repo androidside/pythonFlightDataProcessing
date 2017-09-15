@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Introduction &#8212; Python Flight Data Processing 1 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <title>Introduction &#8212; Python Flight Data Processing 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1',
+        VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="index.html" title="Welcome to Python Flight Data Processing’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Python Flight Data Processing 1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -59,9 +59,9 @@ easier when plotting and analyzing some data of the Aurora archives.</p>
 <ul class="simple">
 <li><a class="reference internal" href="apidoc/utils.html#utils.field.Field" title="utils.field.Field"><code class="xref py py-class docutils literal"><span class="pre">Field</span></code></a>, describes a field</li>
 <li><a class="reference internal" href="apidoc/utils.html#utils.dataset.DataSet" title="utils.dataset.DataSet"><code class="xref py py-class docutils literal"><span class="pre">DataSet</span></code></a>, implements the process of reading a list of fields from a folder or a list of folders</li>
-<li><code class="xref py py-class docutils literal"><span class="pre">Estimator</span></code>, estimates the attitude using the sensors data and has methods to plot the results</li>
+<li><a class="reference internal" href="apidoc/estimators.html#estimators.estimators.Estimator" title="estimators.estimators.Estimator"><code class="xref py py-class docutils literal"><span class="pre">Estimator</span></code></a>, estimates the attitude using the sensors data and has methods to plot the results</li>
 </ul>
-<p>Another common class is <a class="reference internal" href="apidoc/utils.html#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-class docutils literal"><span class="pre">Quat</span></code></a>, that provides easy  manipulation of quaternion objects. This project also relays heavily on the <a class="reference external" href="https://matplotlib.org/index.html">matplotlib</a> for the plots and on the <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/">pandas</a> modules, as it uses the <code class="docutils literal"><span class="pre">pandas.DataFrame</span></code> data structure to store the time-series information.</p>
+<p>Another common class is <a class="reference internal" href="apidoc/utils.html#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-class docutils literal"><span class="pre">Quat</span></code></a>, that provides easy  manipulation of quaternion objects. This project also relays heavily on the <a class="reference external" href="https://matplotlib.org/index.html">matplotlib</a> for the plots and on the <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/">pandas</a> modules, as it uses the <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code> data structure to store the time-series information.</p>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
 <p>A good start to understand better how all of this works is with a simple example. The following code is available at <a class="reference internal" href="apidoc/scripts.html#module-scripts.plotField" title="scripts.plotField"><code class="xref py py-mod docutils literal"><span class="pre">scripts.plotField</span></code></a> and plots directly the gyroscopes data:</p>
@@ -111,7 +111,7 @@ easier when plotting and analyzing some data of the Aurora archives.</p>
 </pre></div>
 </div>
 <p>The goal of these imports is to load in our environment some names that will be used later.
-When we run the first line, the module utils.config runs and we keep the variables <code class="docutils literal"><span class="pre">flightDisksFolders</span></code>– a list of Archive folder names– and <code class="docutils literal"><span class="pre">plt</span></code> – the matplotlib.pyplot object already configured –.</p>
+When we execute the first line, the module <a class="reference internal" href="apidoc/utils.html#module-utils.config" title="utils.config"><code class="xref py py-mod docutils literal"><span class="pre">utils.config</span></code></a> runs and we keep the variables <code class="docutils literal"><span class="pre">flightDisksFolders</span></code>– a list of Archive folder names– and <code class="docutils literal"><span class="pre">plt</span></code> – a matplotlib.pyplot object already configured.</p>
 <p>After the imports, a list of fields is generated:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fieldsList</span><span class="o">=</span><span class="p">[]</span>
 <span class="n">fieldsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="s1">&#39;bettii.GyroReadings.angularVelocityX&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gyro X&#39;</span><span class="p">,</span><span class="n">conversion</span><span class="o">=</span><span class="mf">0.0006304</span><span class="p">))</span>
@@ -146,11 +146,29 @@ If we only read from a single folder, the <code class="docutils literal"><span c
 </pre></div>
 </div>
 <p>Here, we are getting the data that is only between 2017/06/08 13:00 and 2017/06/09 10:00.</p>
+<p>To generate the plots, the function <a class="reference internal" href="apidoc/utils.html#utils.dataset.plotColumns" title="utils.dataset.plotColumns"><code class="xref py py-meth docutils literal"><span class="pre">utils.dataset.plotColumns()</span></code></a> is used. This function plots all the columns of the dataframe in a single figure. The <code class="docutils literal"><span class="pre">ncols</span></code> parameter determines the number of columns of the subplots layout. If ncols is set to 0, there will be a single subplot with all the lines overlapped.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="s2">&quot;Plotting..&quot;</span>
+<span class="n">plotColumns</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="n">time_label</span><span class="p">)</span>
+<span class="n">plotColumns</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="n">time_label</span><span class="p">,</span><span class="n">ylabels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Angular velocity&#39;</span><span class="p">],</span><span class="n">ncols</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The final line <code class="xref py py-meth docutils literal"><span class="pre">plt.show()</span></code> will show all the figures created. It is a blocking method, the script will stop there until all the figures are closed.</p>
+<p>In addition, note how we can obtain similar results just using the functionalities that offer the library <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/">pandas</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">axes</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">time_label</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">time_label</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Angular velocity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="external-documentation">
 <h2>External documentation<a class="headerlink" href="#external-documentation" title="Permalink to this headline">¶</a></h2>
+<p>For more information about the libraries used:</p>
 <ul class="simple">
-<li><a href="#id1"><span class="problematic" id="id2">`Pandas Documentation `pandas`_`_</span></a></li>
+<li><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/">Pandas Documentation</a></li>
 <li><a class="reference external" href="https://matplotlib.org/users/tutorials.html">Matplotlib Tutorials</a></li>
 </ul>
 </div>
@@ -162,6 +180,9 @@ If we only read from a single folder, the <code class="docutils literal"><span c
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/bettii_logo.png" alt="Logo"/>
+            </a></p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Introduction</a><ul>
@@ -213,7 +234,7 @@ If we only read from a single folder, the <code class="docutils literal"><span c
         <li class="right" >
           <a href="index.html" title="Welcome to Python Flight Data Processing’s documentation!"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Python Flight Data Processing 1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

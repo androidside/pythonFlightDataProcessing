@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>utils package &#8212; Python Flight Data Processing 1 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <title>utils package &#8212; Python Flight Data Processing 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1',
+        VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="tests.html" title="tests package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">src</a> &#187;</li> 
       </ul>
     </div>  
@@ -78,14 +78,21 @@
 </div>
 <div class="section" id="module-utils.config">
 <span id="utils-config-module"></span><h2>utils.config module<a class="headerlink" href="#module-utils.config" title="Permalink to this headline">¶</a></h2>
-<p>Created on Sep 12, 2017</p>
-<p>Module that configures <code class="docutils literal"><span class="pre">matplotlib</span></code>. It also contains some common variables for the scripts.</p>
-<p>&#64;author: Marc Casalprim</p>
+<p>Module that configures the <code class="xref py py-mod docutils literal"><span class="pre">matplotlib</span></code> module.
+It also contains some common variables that are useful for the scripts:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal"><span class="pre">save_folder</span></code> folder where the txt and pickle files can be saved</li>
+<li><code class="docutils literal"><span class="pre">img_folder</span></code> folder where the figures can be saved</li>
+<li><code class="docutils literal"><span class="pre">flightDisksFolders</span></code> List of Aurora archive folders (full path) where there is the SSDs information.</li>
+<li><code class="docutils literal"><span class="pre">flightTelemetryFolders</span></code> List of Aurora archive folders (full path) where there is the information from the telemetry (Rubble).”</li>
+</ul>
+</div></blockquote>
 </div>
 <div class="section" id="module-utils.dataset">
 <span id="utils-dataset-module"></span><h2>utils.dataset module<a class="headerlink" href="#module-utils.dataset" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 abr. 2017</p>
-<p>Conatins useful functions to read and plot the fields archived by Aurora. The DataSet class reads and creates a <code class="docutils literal"><span class="pre">pandas.Dataframe</span></code> object containing the desired fields.</p>
+<p>Conatins useful functions to read and plot the fields archived by Aurora.
+The DataSet class reads and creates a <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code> object containing the desired fields.</p>
 <p>&#64;author: Marc Casalprim</p>
 <dl class="class">
 <dt id="utils.dataset.DataSet">
@@ -95,13 +102,13 @@ Derived from Maxime’s original codes. The dataframe is stored as the attribute
 <dl class="method">
 <dt id="utils.dataset.DataSet.readField">
 <code class="descname">readField</code><span class="sig-paren">(</span><em>field</em>, <em>folder=None</em>, <em>rpeaks=True</em>, <em>verbose=False</em>, <em>nValues=None</em>, <em>start=None</em>, <em>timeIndex=False</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.DataSet.readField" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads a single field and updates the dataframe df accordingly.</p>
+<dd><p>Reads a single field and updates the dataframe <cite>df</cite> accordingly.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>field</strong> – utils.field.Field object to read</li>
+<li><strong>field</strong> – a <a class="reference internal" href="#utils.field.Field" title="utils.field.Field"><code class="xref py py-class docutils literal"><span class="pre">Field</span></code></a> object to read</li>
 <li><strong>folder</strong> – folder where the fileds are located (if None, uses self.folder)</li>
 <li><strong>rpeaks</strong> – remove peaks? (where all the values are zero)</li>
 <li><strong>verbose</strong> – print progress?</li>
@@ -141,16 +148,16 @@ Derived from Maxime’s original codes. The dataframe is stored as the attribute
 <dl class="method">
 <dt id="utils.dataset.DataSet.readMultipleFolders">
 <code class="descname">readMultipleFolders</code><span class="sig-paren">(</span><em>fieldsList</em>, <em>foldersList</em>, <em>rpeaks=False</em>, <em>verbose=False</em>, <em>timeIndex=True</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.DataSet.readMultipleFolders" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stores in self.df a new pd.DatFrame object containing
-the fieldsList data from all the folders in foldersList.
-The indexing of the DataFrame is a DatetimeIndex by default
-(timeIndex=True), using the date and time of the folder name.</p>
+<dd><p>Stores in self.df a new <code class="xref py py-class docutils literal"><span class="pre">DataFrame</span></code> object containing
+the <code class="docutils literal"><span class="pre">fieldsList</span></code> information from all the folders in <code class="docutils literal"><span class="pre">foldersList</span></code>.
+The indexing of the <code class="xref py py-class docutils literal"><span class="pre">DataFrame</span></code> is a <code class="docutils literal"><span class="pre">DatetimeIndex</span></code> by default
+(<code class="docutils literal"><span class="pre">timeIndex=True</span></code>), using the date and time of the folder name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>fieldsList</strong> – list of utils.field.Field objects</li>
+<li><strong>fieldsList</strong> – list of <a class="reference internal" href="#utils.field.Field" title="utils.field.Field"><code class="xref py py-class docutils literal"><span class="pre">Field</span></code></a> objects</li>
 <li><strong>foldersList</strong> – list of folders where the fields are located</li>
 <li><strong>rpeaks</strong> – remove peaks? (where all the values are zero)</li>
 <li><strong>verbose</strong> – print progress?</li>
@@ -193,20 +200,23 @@ The indexing of the DataFrame is a DatetimeIndex by default
 <code class="descclassname">utils.dataset.</code><code class="descname">extractGyrosAndStarcam</code><span class="sig-paren">(</span><em>dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], label_triggers='triggers', labels_scerrors=['ra_err', 'dec_err', 'roll_err']</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.extractGyrosAndStarcam" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns three dataframes with the Groscopes, Starcamera and Estimator data respectively.
 Synchronizes the Starcamera with the triggers. Useful for the Estimator classes.</p>
-<p>the dataframe must contain, at least: the following columns: [‘qI2G’, ‘qI2S’,’dec_sc’, ‘ra_sc’, ‘roll_sc’,’qi’, ‘qj’, ‘qk’, ‘qr’,’gyroX’, ‘gyroY’, ‘gyroZ’,’biasX’,’biasY’,’biasZ’,’P00’,’P01’,’P02’,’P10’,’P11’,’P12’,’P20’,’P21’,’P22’]</p>
+<p>The dataframe must contain, at least, the following columns: [‘qI2G’, ‘qI2S’,’dec_sc’, ‘ra_sc’, ‘roll_sc’,’qi’, ‘qj’, ‘qk’, ‘qr’,’gyroX’, ‘gyroY’, ‘gyroZ’,’biasX’,’biasY’,’biasZ’,’P00’,’P01’,’P02’,’P10’,’P11’,’P12’,’P20’,’P21’,’P22’]</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dataframe</strong> – pandas dataframe containing all the infromation to extract</li>
+<li><strong>dataframe</strong> – a <code class="xref py py-class docutils literal"><span class="pre">DataFrame</span></code> object containing all the infromation to extract</li>
 <li><strong>labels_gyros</strong> – columns of the dataframe that contain the gyroscopes information</li>
 <li><strong>label_triggers</strong> – column of the dataframe that contains the triggers information</li>
 <li><strong>labels_scerrors</strong> – columns of the dataframe that contain the star camera uncertainties information</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">gyros,sc,est: pandas dataframes with the gyroscopes, star camera and estimator data respectively.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">gyros,sc,est: dataframes with the gyroscopes, star camera and estimator data respectively.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">( <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code>, <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code>, <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code> )</p>
 </td>
 </tr>
 </tbody>
@@ -216,30 +226,38 @@ Synchronizes the Starcamera with the triggers. Useful for the Estimator classes.
 <dl class="function">
 <dt id="utils.dataset.extractPs">
 <code class="descclassname">utils.dataset.</code><code class="descname">extractPs</code><span class="sig-paren">(</span><em>dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.extractPs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates a 3x3 covariance matrix from the columns [‘P00’,’P01’,’P02’,’P10’,’P11’,’P12’,’P20’,’P21’,’P22’] of the <code class="docutils literal"><span class="pre">dataframe</span></code>
-:param dataframe: a pandas.Dataframe with at least 9 columns
-:rtype: 3x3 <code class="docutils literal"><span class="pre">np.matrix</span></code></p>
+<dd><p>Generates a 3x3 covariance matrix from the columns [‘P00’,’P01’,’P02’,’P10’,’P11’,’P12’,’P20’,’P21’,’P22’] of the <code class="docutils literal"><span class="pre">dataframe</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dataframe</strong> – a <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code> object with at least the 9 columns listed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">3x3 <code class="xref py py-class docutils literal"><span class="pre">ndarray</span></code></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="utils.dataset.filterArray">
 <code class="descclassname">utils.dataset.</code><code class="descname">filterArray</code><span class="sig-paren">(</span><em>x</em>, <em>N=200</em>, <em>R=0.9</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.filterArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Smoothes peaks of the np.array x.</p>
+<dd><p>Smoothes peaks of the <cite>ndarray</cite> x.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> – np.array to filter</li>
+<li><strong>x</strong> – <cite>ndarray</cite> to filter</li>
 <li><strong>N</strong> – width of the peaks to remove</li>
 <li><strong>R</strong> – overlapping ratio of the gliding window [0,1]</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a filtered np.array with the same dimensions as x</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a filtered <cite>ndarray</cite> with the same dimensions as x</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.array</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><cite>ndarray</cite></p>
 </td>
 </tr>
 </tbody>
@@ -298,21 +316,21 @@ Synchronizes the Starcamera with the triggers. Useful for the Estimator classes.
 <dl class="function">
 <dt id="utils.dataset.genQuaternions">
 <code class="descclassname">utils.dataset.</code><code class="descname">genQuaternions</code><span class="sig-paren">(</span><em>dataframe, quats={'qI2S': ['ra_sc', 'dec_sc', 'roll_sc'], 'qest': ['qi', 'qj', 'qk', 'qr'], 'qI2G': ['qi_sc', 'qj_sc', 'qk_sc', 'qr_sc']}, norm=False, filter=False</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.genQuaternions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates a dictionary of lists of <code class="docutils literal"><span class="pre">:meth:~`utils.quat.Quat`</span></code> objects using the columns of the dataframe defined by the quats dictionary values.
-The returned dictionary will have the same keys as quats</p>
+<dd><p>Generates a dictionary of lists of <a class="reference internal" href="#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-class docutils literal"><span class="pre">Quat</span></code></a> objects using the columns of the dataframe defined by the quats dictionary values.
+The returned dictionary will have the same keys as <code class="docutils literal"><span class="pre">quats</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dataframe</strong> – pandas.DataFrame object, with</li>
-<li><strong>quats</strong> – dictionary defining the columns to read that will be passed to the <a class="reference internal" href="#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-meth docutils literal"><span class="pre">utils.quat.Quat()</span></code></a> contructor</li>
+<li><strong>dataframe</strong> – <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code> object</li>
+<li><strong>quats</strong> – dictionary defining the columns to read that will be passed to the <a class="reference internal" href="#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-class docutils literal"><span class="pre">Quat</span></code></a> constructor</li>
 <li><strong>norm</strong> – normalize quaternion?</li>
 <li><strong>filter</strong> – filter the quaternions?</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dictionary of utils.Quat lists, keyed by quats keys.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dictionary of <a class="reference internal" href="#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-class docutils literal"><span class="pre">Quat</span></code></a> lists, keyed by the keys of <code class="docutils literal"><span class="pre">quats</span></code>.</p>
 </td>
 </tr>
 </tbody>
@@ -335,10 +353,10 @@ The returned dictionary will have the same keys as quats</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dictionary of <code class="docutils literal"><span class="pre">np.array</span></code> keyed by the field’s label</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dictionary of <code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code> objects keyed by the field’s label</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><cite>dict</cite></p>
 </td>
 </tr>
 </tbody>
@@ -348,7 +366,7 @@ The returned dictionary will have the same keys as quats</p>
 <dl class="function">
 <dt id="utils.dataset.load_single_field">
 <code class="descclassname">utils.dataset.</code><code class="descname">load_single_field</code><span class="sig-paren">(</span><em>filename</em>, <em>datatype</em>, <em>nValues=None</em>, <em>start=None</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.load_single_field" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads a binary file. It uses the <code class="docutils literal"><span class="pre">np.fromfile</span></code> function.</p>
+<dd><p>Reads a binary file. It uses the <code class="xref py py-mod docutils literal"><span class="pre">numpy.fromfile</span></code> function.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -364,7 +382,7 @@ The returned dictionary will have the same keys as quats</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">values of the field</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.array</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><cite>ndarray</cite></p>
 </td>
 </tr>
 </tbody>
@@ -374,13 +392,13 @@ The returned dictionary will have the same keys as quats</p>
 <dl class="function">
 <dt id="utils.dataset.plotColumns">
 <code class="descclassname">utils.dataset.</code><code class="descname">plotColumns</code><span class="sig-paren">(</span><em>df</em>, <em>units=''</em>, <em>xlabel='Index'</em>, <em>ylabels=None</em>, <em>ncols=1</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.plotColumns" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the N columns of the pd.Dataframe df in a subplots layout with ncols columns</p>
+<dd><p>Plot all the columns of the <code class="xref py py-class docutils literal"><span class="pre">DataFrame</span></code> object <code class="docutils literal"><span class="pre">df</span></code> in a subplots layout with <code class="docutils literal"><span class="pre">ncols</span></code> columns</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>df</strong> – pd.Dataframe object</li>
+<li><strong>df</strong> – a <code class="xref py py-class docutils literal"><span class="pre">DataFrame</span></code> object</li>
 <li><strong>units</strong> – string to add at the end of the ylabels</li>
 <li><strong>xlabel</strong> – label of the x axis</li>
 <li><strong>ylabels</strong> – labels of the y axis (if None, ylabels=df.columns)</li>
@@ -388,7 +406,7 @@ The returned dictionary will have the same keys as quats</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">figure</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.figure.Figure</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -416,13 +434,7 @@ The returned dictionary will have the same keys as quats</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Ptype:</th><td class="field-body"><p class="first"><code class="docutils literal"><span class="pre">pd.Dataframe</span></code></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">figure</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matplotlib.figure</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.figure.Figure</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -452,10 +464,7 @@ The returned dictionary will have the same keys as quats</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">figure</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matplotlib.figure</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.figure.Figure</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -480,10 +489,7 @@ The returned dictionary will have the same keys as quats</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">figure</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matplotlib.figure</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">matplotlib.figure.Figure</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -494,23 +500,20 @@ The returned dictionary will have the same keys as quats</p>
 <dt id="utils.dataset.toTimeIndex">
 <code class="descclassname">utils.dataset.</code><code class="descname">toTimeIndex</code><span class="sig-paren">(</span><em>dataframe</em>, <em>folder</em>, <em>freq=400.0</em><span class="sig-paren">)</span><a class="headerlink" href="#utils.dataset.toTimeIndex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the same dataframe but with the indices in DateTime format.
-The input dataframe must have mceFrameNumber indices.
+The input <code class="docutils literal"><span class="pre">dataframe</span></code> must have mceFrameNumber indices.
 The time in the folder is considered as the starting time for the first mce frame number.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>dataframe</strong> – pd.Dataframe object</li>
+<li><strong>dataframe</strong> – a <code class="xref py py-class docutils literal"><span class="pre">DataFrame</span></code> object</li>
 <li><strong>folder</strong> – folder name</li>
 <li><strong>freq</strong> – frequency of the index (default 400 Hz)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dataframe with DateTime indices</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">pd.Dataframe</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a dataframe with <code class="docutils literal"><span class="pre">DateTime</span></code> indices</p>
 </td>
 </tr>
 </tbody>
@@ -960,6 +963,9 @@ Raw DataFrame format: all columns from Standard message start with “std_”</p
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bettii_logo.png" alt="Logo"/>
+            </a></p>
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">utils package</a><ul>
@@ -1013,7 +1019,7 @@ Raw DataFrame format: all columns from Standard message start with “std_”</p
         <li class="right" >
           <a href="tests.html" title="tests package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li> 
       </ul>
     </div>

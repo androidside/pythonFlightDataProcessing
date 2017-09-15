@@ -7,9 +7,9 @@ The three main classes that were created for this project are:
 
 * :class:`~utils.field.Field`, describes a field
 * :class:`~utils.dataset.DataSet`, implements the process of reading a list of fields from a folder or a list of folders
-* :class:`~utils.estimators.Estimator`, estimates the attitude using the sensors data and has methods to plot the results
+* :class:`~estimators.estimators.Estimator`, estimates the attitude using the sensors data and has methods to plot the results
 
-Another common class is :class:`~utils.quat.Quat`, that provides easy  manipulation of quaternion objects. This project also relays heavily on the `matplotlib`_ for the plots and on the `pandas`_ modules, as it uses the ``pandas.DataFrame`` data structure to store the time-series information. 
+Another common class is :class:`~utils.quat.Quat`, that provides easy  manipulation of quaternion objects. This project also relays heavily on the `matplotlib`_ for the plots and on the `pandas`_ modules, as it uses the :class:`pandas.DataFrame` data structure to store the time-series information. 
 
 Example
 ==============
@@ -65,7 +65,7 @@ Imports::
 	from utils.field import Field
 
 The goal of these imports is to load in our environment some names that will be used later.
-When we run the first line, the module utils.config runs and we keep the variables ``flightDisksFolders``-- a list of Archive folder names-- and ``plt`` -- the matplotlib.pyplot object already configured --.
+When we execute the first line, the module :mod:`utils.config` runs and we keep the variables ``flightDisksFolders``-- a list of Archive folder names-- and ``plt`` -- a matplotlib.pyplot object already configured.
 
 After the imports, a list of fields is generated::
 
@@ -106,8 +106,27 @@ The ``pandas`` library offers a easy way to slice dataframes::
 	
 Here, we are getting the data that is only between 2017/06/08 13:00 and 2017/06/09 10:00.
 
+To generate the plots, the function :meth:`utils.dataset.plotColumns` is used. This function plots all the columns of the dataframe in a single figure. The ``ncols`` parameter determines the number of columns of the subplots layout. If ncols is set to 0, there will be a single subplot with all the lines overlapped. ::
+
+	print "Plotting.."
+	plotColumns(ds.df,xlabel=time_label)
+	plotColumns(ds.df,xlabel=time_label,ylabels=['Angular velocity'],ncols=0)
+	plt.show()
+
+The final line :meth:`plt.show()` will show all the figures created. It is a blocking method, the script will stop there until all the figures are closed.
+
+In addition, note how we can obtain similar results just using the functionalities that the library `pandas`_ offers::
+
+	axes=ds.df.plot(layout=(3,1),subplots=True)
+	axes[2][0].set_xlabel(time_label)   
+	ax=ds.df.plot()
+	ax.set_xlabel(time_label)
+	ax.set_ylabel('Angular velocity')
+	plt.show()
+
 External documentation
 ======================
+For more information about the libraries used:
 
 * `Pandas Documentation <https://pandas.pydata.org/pandas-docs/stable/>`_
 * `Matplotlib Tutorials <https://matplotlib.org/users/tutorials.html>`_

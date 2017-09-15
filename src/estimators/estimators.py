@@ -1,7 +1,5 @@
-'''
-Created on 29 may. 2017
-
-@author: Marc Casalprim
+'''Provides estimator classes that behave similarly and can estimate
+the attitude using the gyroscopes and star cameras information.
 '''
 import numpy as np
 import pandas as pd
@@ -12,8 +10,10 @@ from utils.quat import Quat,vec2skew
 
 
 class Estimator(object):
-    '''
-    Class describing an estimator.
+    '''Class describing an estimator.
+    The dataframes must follow the following formats:
+    :param gyros: columns needed: gyroX,gyroY,gyroZ
+    :param sc:    columns needed: qI2G,ra_err,dec_err,roll_err
     '''
     
     GYROS_FILENAME="gyros_dataframe"
@@ -23,17 +23,13 @@ class Estimator(object):
     
     def __init__(self, gyros, sc):
         '''Constructor
-        The dataframes must follow the following formats:
-        gyros -- gyroX,gyroY,gyroZ
-        sc    -- qI2G,ra_err,dec_err,roll_err
         '''
         self.gyros=gyros.dropna() #dataframe whith the gyrsocopes data
         self.sc=sc #dataframe with the starcamera data
         self.est=None #resulting dataframe
         
     def plot(self,save_folder=None,time_label='Time (frame number)'):
-        '''
-        Plot the estimated attitude and biases
+        '''Plot the estimated attitude. If there are biases and/or P matrices, it will plot them too.
         '''
         if self.est is None:
             raise Exception("No data to plot. Please, call the estimate() method before scripts.")

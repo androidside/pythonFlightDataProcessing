@@ -1,9 +1,13 @@
 '''
-Created on Sep 12, 2017
+Module that configures the :mod:`matplotlib` module.
+It also contains some common variables that are useful for the scripts:
 
-Module that configures ``matplotlib``. It also contains some common variables for the scripts.
+    * ``save_folder`` folder where the txt and pickle files can be saved
+    * ``img_folder`` folder where the figures can be saved
+    
+    * ``flightDisksFolders`` List of Aurora archive folders (full path) where there is the SSDs information.
+    * ``flightTelemetryFolders`` List of Aurora archive folders (full path) where there is the information from the telemetry (Rubble)."
 
-@author: Marc Casalprim
 '''
 import os
 import matplotlib as mpl
@@ -15,12 +19,14 @@ import matplotlib.pyplot as plt
 use('seaborn-bright') #style
 
 mpl.rcParams['axes.grid']=True
-#plt.rc('font', family='serif')
-mpl.rcParams['date.autoformatter.hour']  = '%H:%M'
-mpl.rcParams['date.autoformatter.minute']  = '%H:%M:%S'
+#plt.rc('font', family='serif') #Serif font, more Latex-like
+mpl.rcParams['date.autoformatter.hour']  = '%H:%M' #format of the date axes when the autoformatter decides it should be in hour precision
+mpl.rcParams['date.autoformatter.minute']  = '%H:%M:%S' #format of the date axes when the autoformatter decides it should be in minute precision
 
-save_folder='C:/Users/bettii/flightData/'
+#Useful variables
+save_folder='C:/Users/bettii/flightData/' #folders where the files will be stored by default
 img_folder=save_folder+'plots/' #folders where the figures will be stored by default
+#check if the folders exist. If not, make them.
 if not os.path.exists(save_folder):
     os.makedirs(save_folder)
 if not os.path.exists(img_folder):

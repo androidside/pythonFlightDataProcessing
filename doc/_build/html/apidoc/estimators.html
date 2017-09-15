@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>estimators package &#8212; Python Flight Data Processing 1 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <title>estimators package &#8212; Python Flight Data Processing 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1',
+        VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="modules.html" title="src"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">src</a> &#187;</li> 
       </ul>
     </div>  
@@ -59,13 +59,16 @@
 </div>
 <div class="section" id="module-estimators.estimators">
 <span id="estimators-estimators-module"></span><h2>estimators.estimators module<a class="headerlink" href="#module-estimators.estimators" title="Permalink to this headline">¶</a></h2>
-<p>Created on 29 may. 2017</p>
-<p>&#64;author: Marc Casalprim</p>
+<p>Provides estimator classes that behave similarly and can estimate
+the attitude using the gyroscopes and star cameras information.</p>
 <dl class="class">
 <dt id="estimators.estimators.Estimator">
 <em class="property">class </em><code class="descclassname">estimators.estimators.</code><code class="descname">Estimator</code><span class="sig-paren">(</span><em>gyros</em>, <em>sc</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Class describing an estimator.</p>
+<p>Class describing an estimator.
+The dataframes must follow the following formats:
+:param gyros: columns needed: gyroX,gyroY,gyroZ
+:param sc:    columns needed: qI2G,ra_err,dec_err,roll_err</p>
 <dl class="attribute">
 <dt id="estimators.estimators.Estimator.EST_FILENAME">
 <code class="descname">EST_FILENAME</code><em class="property"> = 'est_dataframe'</em><a class="headerlink" href="#estimators.estimators.Estimator.EST_FILENAME" title="Permalink to this definition">¶</a></dt>
@@ -97,7 +100,7 @@ All the subclasses will implement this “abstract” method, adding the desired
 <dl class="method">
 <dt id="estimators.estimators.Estimator.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>save_folder=None</em>, <em>time_label='Time (frame number)'</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the estimated attitude and biases</p>
+<dd><p>Plot the estimated attitude. If there are biases and/or P matrices, it will plot them too.</p>
 </dd></dl>
 
 <dl class="method">
@@ -171,6 +174,9 @@ All the subclasses will implement this “abstract” method, adding the desired
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bettii_logo.png" alt="Logo"/>
+            </a></p>
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">estimators package</a><ul>
@@ -223,7 +229,7 @@ All the subclasses will implement this “abstract” method, adding the desired
         <li class="right" >
           <a href="modules.html" title="src"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li> 
       </ul>
     </div>

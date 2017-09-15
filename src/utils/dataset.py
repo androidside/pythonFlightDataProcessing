@@ -1,6 +1,6 @@
-'''Created on 28 abr. 2017
-
-Conatins useful functions to read and plot the fields archived by Aurora. The DataSet class reads and creates a ``pandas.Dataframe`` object containing the desired fields.
+'''
+Conatins useful functions to read and plot the fields archived by Aurora.
+The DataSet class reads and creates a :class:`pandas.DataFrame` object containing the desired fields.
 
 @author: Marc Casalprim
 '''
@@ -13,14 +13,14 @@ from thermometers import unwrapCounter
 
 
 def load_single_field(filename, datatype, nValues=None, start=None):
-    """Reads a binary file. It uses the ``np.fromfile`` function.
+    """Reads a binary file. It uses the :mod:`numpy.fromfile` function.
     
     :param filename: complete filename of the field to read
     :param datatype: data type of the binary file (eg. int32 -> 'i4')
     :param nValues: number of values we want to read (if None, all of them)
     :param start: value from where we start counting nValues (if None, starting from the end of file)
     :return: values of the field
-    :rtype: np.array
+    :rtype: `ndarray`
     
     """
     type_str_native = ">" + datatype
@@ -54,8 +54,8 @@ def load_fields(fieldsList, folder=None, nValues=None, start=None):
     :param folder: folder where the fields will be read
     :param nValues: number of values we want to read (if None, all of them)
     :param start: value from where we start counting nValues (if None, starting from the end of file)
-    :return: dictionary of ``np.array`` keyed by the field's label
-    :rtype: dict
+    :return: dictionary of :class:`numpy.ndarray` objects keyed by the field's label
+    :rtype: `dict`
     
     """
     df = {}
@@ -65,14 +65,14 @@ def load_fields(fieldsList, folder=None, nValues=None, start=None):
     return df
         
 def genQuaternions(dataframe, quats={'qest':['qi', 'qj', 'qk', 'qr'], 'qI2G':['qi_sc', 'qj_sc', 'qk_sc', 'qr_sc'], 'qI2S':['ra_sc', 'dec_sc', 'roll_sc']}, norm=False, filter=False):
-    '''Generates a dictionary of lists of ``:meth:~`utils.quat.Quat``` objects using the columns of the dataframe defined by the quats dictionary values.
-    The returned dictionary will have the same keys as quats
+    '''Generates a dictionary of lists of :class:`~utils.quat.Quat` objects using the columns of the dataframe defined by the quats dictionary values.
+    The returned dictionary will have the same keys as ``quats``
     
-    :param dataframe: pandas.DataFrame object, with
-    :param quats: dictionary defining the columns to read that will be passed to the :meth:`utils.quat.Quat` contructor
+    :param dataframe: :class:`pandas.DataFrame` object
+    :param quats: dictionary defining the columns to read that will be passed to the :class:`~utils.quat.Quat` constructor
     :param norm: normalize quaternion?
     :param filter: filter the quaternions?
-    :return: dictionary of utils.Quat lists, keyed by quats keys.
+    :return: dictionary of :class:`~utils.quat.Quat` lists, keyed by the keys of ``quats``.
     '''
     lists = {}
     matrices = {}
@@ -101,13 +101,14 @@ def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], 
     '''Returns three dataframes with the Groscopes, Starcamera and Estimator data respectively.
     Synchronizes the Starcamera with the triggers. Useful for the Estimator classes.
     
-    the dataframe must contain, at least: the following columns: ['qI2G', 'qI2S','dec_sc', 'ra_sc', 'roll_sc','qi', 'qj', 'qk', 'qr','gyroX', 'gyroY', 'gyroZ','biasX','biasY','biasZ','P00','P01','P02','P10','P11','P12','P20','P21','P22']
+    The dataframe must contain, at least, the following columns: ['qI2G', 'qI2S','dec_sc', 'ra_sc', 'roll_sc','qi', 'qj', 'qk', 'qr','gyroX', 'gyroY', 'gyroZ','biasX','biasY','biasZ','P00','P01','P02','P10','P11','P12','P20','P21','P22']
     
-    :param dataframe: pandas dataframe containing all the infromation to extract
+    :param dataframe: a :class:`~pandas.DataFrame` object containing all the infromation to extract
     :param labels_gyros: columns of the dataframe that contain the gyroscopes information
     :param label_triggers: column of the dataframe that contains the triggers information
     :param labels_scerrors: columns of the dataframe that contain the star camera uncertainties information
-    :return: gyros,sc,est: pandas dataframes with the gyroscopes, star camera and estimator data respectively.
+    :return: gyros,sc,est: dataframes with the gyroscopes, star camera and estimator data respectively.
+    :rtype: ( :class:`pandas.DataFrame`, :class:`pandas.DataFrame`, :class:`pandas.DataFrame` )
     '''
     labels_sc = ['qI2G', 'qI2S']
     labels_biases=['biasX','biasY','biasZ']
@@ -140,8 +141,9 @@ def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], 
     return gyros, sc, est
 def extractPs(dataframe):
     '''Generates a 3x3 covariance matrix from the columns ['P00','P01','P02','P10','P11','P12','P20','P21','P22'] of the ``dataframe``
-    :param dataframe: a pandas.Dataframe with at least 9 columns
-    :rtype: 3x3 ``np.matrix``
+    
+    :param dataframe: a :class:`pandas.DataFrame` object with at least the 9 columns listed
+    :rtype: 3x3 :class:`~numpy.ndarray`
      '''
     data=dataframe[['P00','P01','P02','P10','P11','P12','P20','P21','P22']]
     L=len(data.P00)
@@ -237,9 +239,9 @@ class DataSet():
         if rpeaks:  # remove return to 0 peaks
             self.df = self.df.loc[(self.df.abs() >= 1).any(1)]  # remove rows were all fields have a value <1
     def readField(self, field, folder=None, rpeaks=True, verbose=False, nValues=None, start=None, timeIndex=False):
-        '''Reads a single field and updates the dataframe df accordingly.
+        '''Reads a single field and updates the dataframe `df` accordingly.
         
-        :param field: utils.field.Field object to read
+        :param field: a :class:`~utils.field.Field` object to read
         :param folder: folder where the fileds are located (if None, uses self.folder)
         :param rpeaks: remove peaks? (where all the values are zero)
         :param verbose: print progress?
@@ -322,12 +324,12 @@ class DataSet():
             print 'ERROR reading ' + field.fieldName + ':', e
     
     def readMultipleFolders(self, fieldsList, foldersList, rpeaks=False, verbose=False, timeIndex=True):
-        """Stores in self.df a new pd.DatFrame object containing
-        the fieldsList data from all the folders in foldersList.
-        The indexing of the DataFrame is a DatetimeIndex by default
-        (timeIndex=True), using the date and time of the folder name.
+        """Stores in self.df a new :class:`~pandas.DataFrame` object containing
+        the ``fieldsList`` information from all the folders in ``foldersList``.
+        The indexing of the :class:`~pandas.DataFrame` is a ``DatetimeIndex`` by default
+        (``timeIndex=True``), using the date and time of the folder name.
         
-        :param fieldsList: list of utils.field.Field objects
+        :param fieldsList: list of :class:`~utils.field.Field` objects
         :param foldersList: list of folders where the fields are located
         :param rpeaks: remove peaks? (where all the values are zero)
         :param verbose: print progress?
@@ -585,15 +587,13 @@ class DataSet():
 
 def toTimeIndex(dataframe, folder, freq=400.):
     """Returns the same dataframe but with the indices in DateTime format.
-    The input dataframe must have mceFrameNumber indices.
+    The input ``dataframe`` must have mceFrameNumber indices.
     The time in the folder is considered as the starting time for the first mce frame number.   
     
-    :param dataframe: pd.Dataframe object
+    :param dataframe: a :class:`~pd.DataFrame` object
     :param folder: folder name
     :param freq: frequency of the index (default 400 Hz)
-    :return: dataframe with DateTime indices
-    :rtype: pd.Dataframe
-    
+    :return: a dataframe with ``DateTime`` indices    
     """
     text = folder.split('/')[-2]
     ftime_str = text[0:8] + ' ' + text[9:17].replace('_', ':')  # foldertime
@@ -605,14 +605,14 @@ def toTimeIndex(dataframe, folder, freq=400.):
     return dataframe   
 
 def plotColumns(df, units='', xlabel='Index', ylabels=None,ncols=1):
-    """Plot the N columns of the pd.Dataframe df in a subplots layout with ncols columns
+    """Plot all the columns of the :class:`~pd.DataFrame` object ``df`` in a subplots layout with ``ncols`` columns
     
-    :param df: pd.Dataframe object
+    :param df: a :class:`~pd.DataFrame` object
     :param units: string to add at the end of the ylabels
     :param xlabel: label of the x axis
     :param ylabels: labels of the y axis (if None, ylabels=df.columns)
     :param ncols: number of columns of the subplots layout
-    :return: figure
+    :rtype: :class:`matplotlib.figure.Figure`
     """
     data = df.dropna()
     N = len(data.columns)
@@ -641,8 +641,7 @@ def plotQuaternions(df, time_label='Palestine Time', labels=None, styles=['b', '
     :param styles: plot styles or kwargs of every column
     :param legend: show legend?
     :param xlim: limits of the x axis [xmin,xmax]
-    :return: figure
-    :rtype: matplotlib.figure
+    :rtype: :class:`matplotlib.figure.Figure`
     '''
     N = len(df.columns)
     fig, (axRA, axDEC, axROLL) = plt.subplots(3, 1, sharex=True, sharey=True)
@@ -685,8 +684,7 @@ def plotInnovations(ests,sc, time_label='Palestine Time', units='arcsec', conv=l
     :param xlim: limits of the x axis [xmin,xmax]
     :param sync: plot synchronized with time?
     :param rotation: compute the errors in the SC reference frame?
-    :return: figure
-    :rtype: matplotlib.figure    
+    :rtype: :class:`matplotlib.figure.Figure`    
     '''
     index=sc.index[2:]
     t=index
@@ -737,7 +735,6 @@ def plotCovs(df, time_label='Palestine Time', ylabels=None, labels=None, styles=
     '''Plot the first three diagonal elements of the matrices in the dataframe df in a 3x1 subplots layout (P11,P22,P33)
     
     :param df: a pd.Dataframe containing exclusively columns of np.matrix objects greater than 3x3
-    :ptype: ``pd.Dataframe``
     :param time_label: label of the x axis
     :param ylabels: y axis labels of the three subplots, in order top-bottom
     :param labels: legend labels of every column (if None, use df.columns as labels)
@@ -746,8 +743,7 @@ def plotCovs(df, time_label='Palestine Time', ylabels=None, labels=None, styles=
     :param xlim: limits of the x axis [xmin,xmax]
     :param function: function to be passed at every diagonal element
     :param rotate: rotate the covariance matrix -46 degrees? (represent in SC reference frame)
-    :return: figure
-    :rtype: matplotlib.figure
+    :rtype: :class:`matplotlib.figure.Figure`
     '''
     
     N = len(df.columns)
@@ -795,13 +791,13 @@ def plotCovs(df, time_label='Palestine Time', ylabels=None, labels=None, styles=
     fig.tight_layout()
     return fig
 def filterArray(x, N=200, R=0.9):
-    '''Smoothes peaks of the np.array x.
+    '''Smoothes peaks of the `ndarray` x.
     
-    :param x: np.array to filter
+    :param x: `ndarray` to filter
     :param N: width of the peaks to remove
     :param R: overlapping ratio of the gliding window [0,1]
-    :return: a filtered np.array with the same dimensions as x
-    :rtype: np.array
+    :return: a filtered `ndarray` with the same dimensions as x
+    :rtype: `ndarray`
     '''
     x=np.array(x)
     ic = N / 2  # central index
