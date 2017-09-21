@@ -45,7 +45,7 @@ if __name__ == '__main__':
         fieldsList.append(Field('bettii.Magnetometer.PitchDeg', label='mPitch'))
         fieldsList.append(Field('bettii.Magnetometer.RollDeg', label='mRoll'))
     
-    if momdump: fieldsList.append(Field('bettii.PIDOutputMomDump.ut', conversion=0.01)) #lambda function=np.sqrt or if you want to do something more complex  function=lambda x: np.sqrt(x) +3 I can also do it in the dataframe, see below or Thesis postEstimation.py
+    if momdump: fieldsList.append(Field('bettii.PIDOutputMomDump.ut', conversion=100*200*64)) # 100*200*64 lambda function=np.sqrt or if you want to do something more complex  function=lambda x: np.sqrt(x) +3 I can also do it in the dataframe, see below or Thesis postEstimation.py
     if thermometers:
         therm = []
         therm.append(Field('bettii.ThermometersDemuxedCelcius.J3L28', label='Rotator', range=100))
@@ -161,7 +161,7 @@ if __name__ == '__main__':
         print "Plotting rotator data..."
         fig = plt.figure()
         if titles: fig.suptitle("Rotator output", fontsize=15, y=1)
-        ax = plt.subplot(111, xlabel=time_label, ylabel='Command [counts/s]')
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Command [rev/s]')
         data = ds.df.ut.dropna() #.apply(lambda x: np.sqrt(x) +3)
         data.plot(ax=ax, style='b+', markersize=1.0)
         fig.tight_layout()
@@ -186,7 +186,7 @@ if __name__ == '__main__':
         fig.tight_layout()
         fig.savefig(img_folder + "gyroscopes_temps.png", dpi=300)
     if altitude:
-        print "Plotting altitude data..."
+        print "Plotting altitude data..." 
         fig = plt.figure()
         ax = plt.subplot(111, xlabel=time_label, ylabel='Altitude [m]')
         data = ds.df.altitude.dropna()

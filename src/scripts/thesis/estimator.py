@@ -16,7 +16,7 @@ if __name__ == '__main__':
     folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
     
     
-    read=False #read again the files?
+    read=True #read again the files?
     estimated=True
     
     ti=20389100
