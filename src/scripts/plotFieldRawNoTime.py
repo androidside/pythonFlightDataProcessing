@@ -1,9 +1,4 @@
-'''
-Created on Jun 22, 2017
-
-Plot raw data from a field. Without time. Useful when the archive ended abruptly and the dimensions do not match. Merging archives if we want.
-
-@author: Marc Casalprim
+'''Plot raw data from a field. Without time. Useful when the archive ended abruptly and the dimensions do not match. Merging archives if we want.
 '''
 print 'Imports...'
 from utils.config import flightDisksFolders,plt

@@ -20,7 +20,9 @@ if __name__ == '__main__':
     for folder in folders:
         d=load_single_field(folder+field,datatype='i4')
         d=d[d>0]
-        d.sort()
-        print d[:10]
+        #=======================================================================
+        # d.sort()
+        # print d[:10]
+        #=======================================================================
         name=folder.split('/')[-2]
-        #print name+":\t"+str(d[0])+"       \t"+str(d[-1])
+        print name+":\t"+str(d[0])+"       \t"+str(d[-1])

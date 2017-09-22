@@ -1,10 +1,6 @@
-'''
-Created on 28 May 2017
+'''Code to debug the delay in the estimated target RA,DEC crossings seen on Fort Summer.
 
-Code to debug the delay in the estimated target RA,DEC crossings seen on Fort Summer.
-It's already been solved!
-
-@author: Marc Casalprim
+Solved! Bad converesion from arcseconds to degrees in LabView
 '''
 print 'Imports...'
 
@@ -23,8 +19,6 @@ if __name__ == '__main__':
     
     
     folder='X:/16-09-28_21_58_34-/'
-    folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-21_01_42_03\\"
-    folder='Z:/17-06-07_01_23_52-/'
     
     Field.DTYPES=getDtypes(folder)
     
@@ -55,18 +49,11 @@ if __name__ == '__main__':
     
     #fieldsList = getFieldsRegex('bettii.[U-Z]+',folder)
     
-    #target 1
-    
-    #===========================================================================
-    # initial_time=None #in frame number
-    # final_time = None #in frame number
-    #===========================================================================
-    
+    #target 1   
     initial_time=5145000 #in frame number
     final_time = 5149000 #in frame number
     
     #target 2
-    
     initial_time=6301000 #in frame number
     final_time = 6303000 #in frame number
     

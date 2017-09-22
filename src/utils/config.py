@@ -3,8 +3,7 @@ Module that configures the :mod:`matplotlib` module.
 It also contains some common variables that are useful for the scripts:
 
     * ``save_folder`` folder where the txt and pickle files can be saved
-    * ``img_folder`` folder where the figures can be saved
-    
+    * ``img_folder`` folder where the figures can be saved    
     * ``flightDisksFolders`` List of Aurora archive folders (full path) where there is the SSDs information.
     * ``flightTelemetryFolders`` List of Aurora archive folders (full path) where there is the information from the telemetry (Rubble)."
 
@@ -20,7 +19,7 @@ use('seaborn-bright') #style
 
 mpl.rcParams['axes.grid']=True
 #plt.rc('font', family='serif') #Serif font, more Latex-like
-mpl.rcParams['date.autoformatter.hour']  = '%b %d at %H:%M' #format of the date axes when the autoformatter decides it should be in hour precision
+mpl.rcParams['date.autoformatter.hour']  = '%H:%M' #format of the date axes when the autoformatter decides it should be in hour precision
 #mpl.rcParams['date.autoformatter.hour']  = '%H:%M' 
 mpl.rcParams['date.autoformatter.minute']  = '%H:%M:%S' #format of the date axes when the autoformatter decides it should be in minute precision
 

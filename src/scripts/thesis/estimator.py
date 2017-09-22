@@ -26,7 +26,7 @@ if __name__ == '__main__':
     else:
         gyros,sc,est=openPickles(folder,openEst=True)
     
-
+    #sc.index=sc.triggers.values
     kal3=Estimator6(gyros,sc)
     kal3.est=est
     

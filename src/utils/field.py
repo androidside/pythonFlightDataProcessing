@@ -9,8 +9,7 @@ import os
 
 class Field(object):
     '''
-    Class describing a field located in an Aurora archive.
-    
+    Class describing a field located in an Aurora archive.  
             
     :param fieldName: name of the field, the whole file name
     :param dtype: string describing the datatype of the field (ie. 'f8' is a 64 bit float)
@@ -23,7 +22,6 @@ class Field(object):
     '''
     # DTYPES is a dictionary mapping each fieldName to a datatype
     # It can be generated using the getDtypes(folder) function
-    DTYPES = dict()
     DTYPES = {'error_r11_c3': 'i8', 'error_r11_c2': 'i8', 'error_r11_c1': 'i8',
     'sq1fb_r17_c20': 'i8', 'error_r11_c7': 'i8', 'error_r11_c6': 'i8',
     'error_r11_c5': 'i8', 'error_r11_c4': 'i8', 'error_r11_c9': 'i8',
@@ -1142,7 +1140,7 @@ class Field(object):
             label = fieldName
             dtype = indexType
             indexName = fieldName
-        if self.DTYPES is None or fieldName not in self.DTYPES: self.dtype = dtype 
+        if self.DTYPES is None or fieldName not in self.DTYPES or dtype is not 'f8': self.dtype = dtype 
         else: self.dtype = self.DTYPES[fieldName]
         self.fieldName = fieldName  # filename of the field
         self.function = function  # function to apply on the field data
@@ -1155,7 +1153,15 @@ class Field(object):
 
 
 def getFieldsContaining(substring, folder, indexName=None, dtype='f8'):
-    """ Return a list of fields in the folder containing substring """
+    """Return a list of fields in the folder containing a substring
+    
+    :param substring: string we are looking for
+    :param folder: folder containing the files we want to search
+    :param indexName: name of the indexing field for the fields found
+    :param dtype: numpy Array-protocol type string (ie. INT64 should be 'i4')
+    :return: list of :class:~`utilsfield.Field` objects
+    :rtype: `list`   
+    """
     print 'Generating fields list...'
     fieldsList = []
     for filename in os.listdir(folder):
@@ -1166,7 +1172,14 @@ def getFieldsContaining(substring, folder, indexName=None, dtype='f8'):
     return fieldsList
 
 def getFieldsRegex(regex, folder):
-    """ Return a list of fields in the folder matching the regular expression regex """
+    """Return a list of fields in the folder matching the regular expression regex.
+    It uses the function :mod:`re.match`.
+    
+    :param regex: regular expression
+    :param folder: folder where we want to search the fields
+    :return: list of :class:~`utilsfield.Field` objects
+    :rtype: `list`
+    """
     import re
     print 'Generating fields list...'
     fieldsList = []
@@ -1178,7 +1191,13 @@ def getFieldsRegex(regex, folder):
     return fieldsList
 
 def getFormat(fieldName, folder):
-    """ Return the dtype of the fieldName using the format file in folder """
+    """Return the data type of the fieldName using the format file in folder
+    
+    :param fieldName: full name of the field file
+    :param folder: folder where the ``format`` file is located
+    :return: numpy Array-protocol type string (ie. INT64 should be 'i4')
+    :rtype: `str`
+    """
     formatFile = open(folder + 'format')
     dic = {'INT32':'i4',
          'INT64':'i8',
@@ -1194,7 +1213,12 @@ def getFormat(fieldName, folder):
     finally:
         formatFile.close()
 def getDtypes(folder):
-    """ Return the dtypes of all fieldNames using the format file in folder """
+    """Return the data types of all fieldNames using the format file in folder
+    
+    :param folder: folder where the file ``format`` is located
+    :return: dictionary of type strings keyed by fieldName
+    :rtype: `dict`
+    """
     formatFile = open(folder + 'format')
     dic = {'INT32':'i4',
          'INT64':'i8',

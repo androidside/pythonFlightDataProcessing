@@ -1,9 +1,5 @@
 '''
-Created on Jun 22, 2017
-
-Plot data from a field, using DataSet class. Merging archives if we want.
-
-@author: Marc Casalprim
+Plot temporal signal of the htree gyroscopes, using DataSet class. Merging archives.
 '''
 print 'Imports...'
 from utils.config import flightDisksFolders,plt

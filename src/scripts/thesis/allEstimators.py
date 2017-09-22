@@ -24,7 +24,7 @@ if __name__ == '__main__':
     if read: 
         gyros,sc,quats=readAndSave(folder)
     else:
-        gyros,sc,quats=openPickles(folder,ests=True)
+        gyros,sc,quats=openPickles(folder,openEst=True)
     kal15=Estimator15(gyros,sc)
     kalOrg=Estimator6(gyros,sc)
     if not estimated:

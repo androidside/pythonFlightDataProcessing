@@ -72,6 +72,7 @@ def readAndSave(folder,initial_time=1000,final_time = None):
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasXarcsec',label='biasX'))
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasYarcsec',label='biasY')) 
     fieldsList.append(Field('bettii.RTHighPriority.estimatedBiasZarcsec',label='biasZ'))
+    fieldsList.append(Field('bettii.RTHighPriority.StarCameraTriggerStatus',label='tstatus',range=400))
     
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=-0.0006304))
     fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=-0.0006437))
