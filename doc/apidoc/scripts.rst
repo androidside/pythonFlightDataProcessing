@@ -14,126 +14,24 @@ Subpackages
 Submodules
 ----------
 
-scripts.FortSummerProblem module
---------------------------------
+.. toctree::
 
-.. automodule:: scripts.FortSummerProblem
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.altitude module
------------------------
-
-.. automodule:: scripts.altitude
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.delayLines module
--------------------------
-
-.. automodule:: scripts.delayLines
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.gyrosPSD module
------------------------
-
-.. automodule:: scripts.gyrosPSD
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.gyrosRMS module
------------------------
-
-.. automodule:: scripts.gyrosRMS
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.idCcmgs module
-----------------------
-
-.. automodule:: scripts.idCcmgs
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.mceArchives module
---------------------------
-
-.. automodule:: scripts.mceArchives
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.plotField module
-------------------------
-
-.. automodule:: scripts.plotField
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.plotFieldFiltered module
---------------------------------
-
-.. automodule:: scripts.plotFieldFiltered
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.plotFieldNoTime module
-------------------------------
-
-.. automodule:: scripts.plotFieldNoTime
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.plotFieldRaw module
----------------------------
-
-.. automodule:: scripts.plotFieldRaw
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.plotFlightArchivesMerged module
----------------------------------------
-
-.. automodule:: scripts.plotFlightArchivesMerged
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.telescopeRADEC module
------------------------------
-
-.. automodule:: scripts.telescopeRADEC
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thermometersByNumberCharacterized module
-------------------------------------------------
-
-.. automodule:: scripts.thermometersByNumberCharacterized
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thermometersCubicSpline module
---------------------------------------
-
-.. automodule:: scripts.thermometersCubicSpline
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   scripts.FortSummerProblem
+   scripts.altitude
+   scripts.delayLines
+   scripts.gyros
+   scripts.gyrosPSD
+   scripts.gyrosRMS
+   scripts.idCcmgs
+   scripts.mceArchives
+   scripts.plotField
+   scripts.plotFieldRaw
+   scripts.plotFieldRawFiltered
+   scripts.plotFieldRawNoTime
+   scripts.plotFlightArchivesMerged
+   scripts.telescopeRADEC
+   scripts.thermometersByNumberCharacterized
+   scripts.thermometersCubicSpline
 
 Module contents
 ---------------

@@ -5,8 +5,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Introduction &#8212; Python Flight Data Processing 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <title>Welcome &#8212; Python Flight Data Processing 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="An Introductory Example" href="intro.html" /> 
+    <link rel="next" title="Tutorial" href="tuto.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -36,7 +36,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="intro.html" title="An Introductory Example"
+          <a href="tuto.html" title="Tutorial"
              accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">Python Flight Data Processing 0.1 documentation</a> &#187;</li> 
       </ul>
@@ -47,31 +47,28 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>Welcome to Python Flight Data Processing’s documentation! This project is intended to make the life
-easier when plotting and analyzing some data of the Aurora archives.</p>
+  <div class="section" id="welcome">
+<h1>Welcome<a class="headerlink" href="#welcome" title="Permalink to this headline">¶</a></h1>
+<p>Welcome to Python Flight Data Processing’s documentation! This project eases the process of plotting the flight data of BETTII.</p>
 <p>The three main classes that were created for this project are:</p>
 <ul class="simple">
-<li><a class="reference internal" href="apidoc/utils.html#utils.field.Field" title="utils.field.Field"><code class="xref py py-class docutils literal"><span class="pre">Field</span></code></a>, describes a field</li>
-<li><a class="reference internal" href="apidoc/utils.html#utils.dataset.DataSet" title="utils.dataset.DataSet"><code class="xref py py-class docutils literal"><span class="pre">DataSet</span></code></a>, implements the process of reading a list of fields from a folder or a list of folders</li>
-<li><a class="reference internal" href="apidoc/estimators.html#estimators.estimators.Estimator" title="estimators.estimators.Estimator"><code class="xref py py-class docutils literal"><span class="pre">Estimator</span></code></a>, estimates the attitude using the sensors data and has methods to plot the results</li>
+<li><a class="reference internal" href="apidoc/utils.field.html#utils.field.Field" title="utils.field.Field"><code class="xref py py-class docutils literal"><span class="pre">Field</span></code></a>, describes a field</li>
+<li><a class="reference internal" href="apidoc/utils.dataset.html#utils.dataset.DataSet" title="utils.dataset.DataSet"><code class="xref py py-class docutils literal"><span class="pre">DataSet</span></code></a>, implements the process of reading a list of fields from a folder or a list of folders</li>
+<li><a class="reference internal" href="apidoc/estimators.estimators.html#estimators.estimators.Estimator" title="estimators.estimators.Estimator"><code class="xref py py-class docutils literal"><span class="pre">Estimator</span></code></a>, estimates the attitude using the sensors data and has methods to plot the results</li>
 </ul>
-<p>Another common class is <a class="reference internal" href="apidoc/utils.html#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-class docutils literal"><span class="pre">Quat</span></code></a>, that provides easy  manipulation of quaternion objects. This project also relays heavily on the <a class="reference external" href="https://matplotlib.org/index.html">matplotlib</a> for the plots and on the <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/">pandas</a> modules, as it uses the <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code> data structure to store the time-series information.</p>
+<p>Another common class is <a class="reference internal" href="apidoc/utils.quat.html#utils.quat.Quat" title="utils.quat.Quat"><code class="xref py py-class docutils literal"><span class="pre">Quat</span></code></a>, that provides easy  manipulation of quaternion objects. This project also relies heavily on the <a class="reference external" href="https://matplotlib.org/index.html">matplotlib</a> for the plots and on the <a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/">pandas</a> modules, as it uses the <code class="xref py py-class docutils literal"><span class="pre">pandas.DataFrame</span></code> data structure to store the time-series information.</p>
 </div>
 <div class="section" id="contents">
 <h1>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">An Introductory Example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#bad-values">Bad values</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#peaks">Peaks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#bad-mce-frame-numbers">Bad mce frame numbers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="intro.html#example">Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tuto.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tuto.html#an-introductory-example">An Introductory Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tuto.html#bad-values">Bad values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tuto.html#external-documentation">External documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html#external-documentation">External documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="apidoc/modules.html">src</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="apidoc/modules.html">Sources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="apidoc/estimators.html">estimators package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="apidoc/scripts.html">scripts package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="apidoc/tests.html">tests package</a></li>
@@ -89,14 +86,6 @@ easier when plotting and analyzing some data of the Aurora archives.</p>
 <li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
 </ul>
 </div>
-<div class="section" id="external-documentation">
-<h1>External documentation<a class="headerlink" href="#external-documentation" title="Permalink to this headline">¶</a></h1>
-<p>For more information about the libraries used:</p>
-<ul class="simple">
-<li><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/">Pandas Documentation</a></li>
-<li><a class="reference external" href="https://matplotlib.org/users/tutorials.html">Matplotlib Tutorials</a></li>
-</ul>
-</div>
 
 
           </div>
@@ -109,15 +98,14 @@ easier when plotting and analyzing some data of the Aurora archives.</p>
             </a></p>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Introduction</a></li>
+<li><a class="reference internal" href="#">Welcome</a></li>
 <li><a class="reference internal" href="#contents">Contents</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-<li><a class="reference internal" href="#external-documentation">External documentation</a></li>
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="intro.html"
-                        title="next chapter">An Introductory Example</a></p>
+  <p class="topless"><a href="tuto.html"
+                        title="next chapter">Tutorial</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -149,7 +137,7 @@ easier when plotting and analyzing some data of the Aurora archives.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="intro.html" title="An Introductory Example"
+          <a href="tuto.html" title="Tutorial"
              >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">Python Flight Data Processing 0.1 documentation</a> &#187;</li> 
       </ul>

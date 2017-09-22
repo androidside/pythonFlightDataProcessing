@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>scripts.old package &#8212; Python Flight Data Processing 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="scripts.optimization package" href="scripts.optimization.html" />
+    <link rel="next" title="scripts.old.RaDecDebugOptim module" href="scripts.old.RaDecDebugOptim.html" />
     <link rel="prev" title="scripts package" href="scripts.html" /> 
   </head>
   <body>
@@ -37,13 +37,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="scripts.optimization.html" title="scripts.optimization package"
+          <a href="scripts.old.RaDecDebugOptim.html" title="scripts.old.RaDecDebugOptim module"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="scripts.html" title="scripts package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Sources</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="scripts.html" accesskey="U">scripts package</a> &#187;</li> 
       </ul>
     </div>  
@@ -57,176 +57,35 @@
 <h1>scripts.old package<a class="headerlink" href="#scripts-old-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.RaDecDebugOptim.html">scripts.old.RaDecDebugOptim module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.RaDecDebugTPA.html">scripts.old.RaDecDebugTPA module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.SCDebug.html">scripts.old.SCDebug module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.SC_Est.html">scripts.old.SC_Est module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.SC_Est_errors.html">scripts.old.SC_Est_errors module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.Starcam2GyrosShow.html">scripts.old.Starcam2GyrosShow module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.ThermometersByNumber.html">scripts.old.ThermometersByNumber module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.ThermometersDale.html">scripts.old.ThermometersDale module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.ThermometersPiper.html">scripts.old.ThermometersPiper module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.ThermometersPiper2.html">scripts.old.ThermometersPiper2 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.ThermometersPiper3.html">scripts.old.ThermometersPiper3 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.covs.html">scripts.old.covs module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.kalman.html">scripts.old.kalman module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.kalman15.html">scripts.old.kalman15 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.kalman2.html">scripts.old.kalman2 module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.plotArchivesMerged.html">scripts.old.plotArchivesMerged module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.plotGondolaArchivesMerged.html">scripts.old.plotGondolaArchivesMerged module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.plotPastArchive.html">scripts.old.plotPastArchive module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.plotThermoFN.html">scripts.old.plotThermoFN module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.plotThermometersArchivesMerged.html">scripts.old.plotThermometersArchivesMerged module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.propagation.html">scripts.old.propagation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.qPropagation.html">scripts.old.qPropagation module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.quatDebug.html">scripts.old.quatDebug module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.starcamkalman.html">scripts.old.starcamkalman module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scripts.old.starcamkalman2.html">scripts.old.starcamkalman2 module</a></li>
+</ul>
 </div>
-<div class="section" id="module-scripts.old.RaDecDebugOptim">
-<span id="scripts-old-radecdebugoptim-module"></span><h2>scripts.old.RaDecDebugOptim module<a class="headerlink" href="#module-scripts.old.RaDecDebugOptim" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 May 2017</p>
-<p>Code to debug the delay in the estimated target RA,DEC crossings seen on Fort Summer.
-Trying to obtain via optimization the effective griffin angle used to get the telescope RA,DEC of the telemtry.</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.RaDecDebugTPA">
-<span id="scripts-old-radecdebugtpa-module"></span><h2>scripts.old.RaDecDebugTPA module<a class="headerlink" href="#module-scripts.old.RaDecDebugTPA" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 May 2017</p>
-<p>Code to debug the delay in the estimated target RA,DEC crossings seen on Fort Summer. Using the TPA values instead of griffinBAngleDegrees.</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.SCDebug">
-<span id="scripts-old-scdebug-module"></span><h2>scripts.old.SCDebug module<a class="headerlink" href="#module-scripts.old.SCDebug" title="Permalink to this headline">¶</a></h2>
-<p>Created on 23 May 2017</p>
-<p>Plotting of:
-Estimator-SC errors in SC ref. frame
-Estimator-SC errors in Gondola ref. frame
-Biases</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.SC_Est">
-<span id="scripts-old-sc-est-module"></span><h2>scripts.old.SC_Est module<a class="headerlink" href="#module-scripts.old.SC_Est" title="Permalink to this headline">¶</a></h2>
-<p>Created on 23 May 2017</p>
-<p>Plotting of:
-Estimator-SC errors in SC ref. frame
-Estimator-SC errors in Gondola ref. frame
-Biases</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.SC_Est_errors">
-<span id="scripts-old-sc-est-errors-module"></span><h2>scripts.old.SC_Est_errors module<a class="headerlink" href="#module-scripts.old.SC_Est_errors" title="Permalink to this headline">¶</a></h2>
-<p>Created on 23 May 2017</p>
-<p>Plotting of:
-Estimator-SC errors in SC ref. frame
-Estimator-SC errors in Gondola ref. frame
-Biases</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.Starcam2GyrosShow">
-<span id="scripts-old-starcam2gyrosshow-module"></span><h2>scripts.old.Starcam2GyrosShow module<a class="headerlink" href="#module-scripts.old.Starcam2GyrosShow" title="Permalink to this headline">¶</a></h2>
-<p>Created on 24 abr. 2017</p>
-<p>Script to show the impact of an error in roll.</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.ThermometersByNumber">
-<span id="scripts-old-thermometersbynumber-module"></span><h2>scripts.old.ThermometersByNumber module<a class="headerlink" href="#module-scripts.old.ThermometersByNumber" title="Permalink to this headline">¶</a></h2>
-<p>Created on 10 jul. 2017</p>
-<p>Script for plotting thermometers data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.ThermometersDale">
-<span id="scripts-old-thermometersdale-module"></span><h2>scripts.old.ThermometersDale module<a class="headerlink" href="#module-scripts.old.ThermometersDale" title="Permalink to this headline">¶</a></h2>
-<p>Created on 10 jul. 2017</p>
-<p>Script for plotting thermometers data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-<dl class="function">
-<dt id="scripts.old.ThermometersDale.flatness">
-<code class="descclassname">scripts.old.ThermometersDale.</code><code class="descname">flatness</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#scripts.old.ThermometersDale.flatness" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</div>
-<div class="section" id="module-scripts.old.ThermometersPiper">
-<span id="scripts-old-thermometerspiper-module"></span><h2>scripts.old.ThermometersPiper module<a class="headerlink" href="#module-scripts.old.ThermometersPiper" title="Permalink to this headline">¶</a></h2>
-<p>Created on 10 jul. 2017</p>
-<p>Script for plotting thermometers data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.ThermometersPiper2">
-<span id="scripts-old-thermometerspiper2-module"></span><h2>scripts.old.ThermometersPiper2 module<a class="headerlink" href="#module-scripts.old.ThermometersPiper2" title="Permalink to this headline">¶</a></h2>
-<p>Created on 10 jul. 2017</p>
-<p>Script for plotting thermometers data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.ThermometersPiper3">
-<span id="scripts-old-thermometerspiper3-module"></span><h2>scripts.old.ThermometersPiper3 module<a class="headerlink" href="#module-scripts.old.ThermometersPiper3" title="Permalink to this headline">¶</a></h2>
-<p>Created on 10 jul. 2017</p>
-<p>Script for plotting thermometers data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.covs">
-<span id="scripts-old-covs-module"></span><h2>scripts.old.covs module<a class="headerlink" href="#module-scripts.old.covs" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 May 2017</p>
-<p>Plotting of the estimated biases and the diagonal values of the covariance matrix P
-In addition, a plot of the diagonal values of the P rotated by the qGyros2Starcam.</p>
-<p>See <code class="docutils literal"><span class="pre">utils.dataset.plotCovs()</span></code> to obtain similar results</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.kalman">
-<span id="scripts-old-kalman-module"></span><h2>scripts.old.kalman module<a class="headerlink" href="#module-scripts.old.kalman" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 abr. 2017</p>
-<p>Main script</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.kalman15">
-<span id="scripts-old-kalman15-module"></span><h2>scripts.old.kalman15 module<a class="headerlink" href="#module-scripts.old.kalman15" title="Permalink to this headline">¶</a></h2>
-<p>Created on 3 june 2017</p>
-<p>Main script</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.kalman2">
-<span id="scripts-old-kalman2-module"></span><h2>scripts.old.kalman2 module<a class="headerlink" href="#module-scripts.old.kalman2" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 abr. 2017</p>
-<p>Main script</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.plotArchivesMerged">
-<span id="scripts-old-plotarchivesmerged-module"></span><h2>scripts.old.plotArchivesMerged module<a class="headerlink" href="#module-scripts.old.plotArchivesMerged" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 jun. 2017</p>
-<p>Script for scripts simultaneously data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.plotGondolaArchivesMerged">
-<span id="scripts-old-plotgondolaarchivesmerged-module"></span><h2>scripts.old.plotGondolaArchivesMerged module<a class="headerlink" href="#module-scripts.old.plotGondolaArchivesMerged" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 jun. 2017</p>
-<p>Script for scripts simultaneously data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.plotPastArchive">
-<span id="scripts-old-plotpastarchive-module"></span><h2>scripts.old.plotPastArchive module<a class="headerlink" href="#module-scripts.old.plotPastArchive" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 jun. 2017</p>
-<p>Script for scripts simultaneously data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.plotThermoFN">
-<span id="scripts-old-plotthermofn-module"></span><h2>scripts.old.plotThermoFN module<a class="headerlink" href="#module-scripts.old.plotThermoFN" title="Permalink to this headline">¶</a></h2>
-<p>Created on Jun 22, 2017</p>
-<p>Plot raw data from a field. Merging archives if we want.</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.plotThermometersArchivesMerged">
-<span id="scripts-old-plotthermometersarchivesmerged-module"></span><h2>scripts.old.plotThermometersArchivesMerged module<a class="headerlink" href="#module-scripts.old.plotThermometersArchivesMerged" title="Permalink to this headline">¶</a></h2>
-<p>Created on 10 jul. 2017</p>
-<p>Script for plotting thermometers data from different archives</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.propagation">
-<span id="scripts-old-propagation-module"></span><h2>scripts.old.propagation module<a class="headerlink" href="#module-scripts.old.propagation" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 abr. 2017</p>
-<p>Propagates the gyroscopes applying to them only a matrix M (no bias).
-Plots the comparison between the Propagation, the Starcamera and the estimated by Boop.
-&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.qPropagation">
-<span id="scripts-old-qpropagation-module"></span><h2>scripts.old.qPropagation module<a class="headerlink" href="#module-scripts.old.qPropagation" title="Permalink to this headline">¶</a></h2>
-<p>Created on 23 May 2017</p>
-<p>Plotting of the gyroscopes propagation, starting from the first Starcamera solution.
-Comparing with Starcamera and Estimator in Gyros ref frame.</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.quatDebug">
-<span id="scripts-old-quatdebug-module"></span><h2>scripts.old.quatDebug module<a class="headerlink" href="#module-scripts.old.quatDebug" title="Permalink to this headline">¶</a></h2>
-<p>Created on 17 may. 2017</p>
-<p>Generates the quaternions from the archive and three possible qSC2G rotations (old,mid,new).
-Useful to play with them after in a n interactive console, to see if the math is correct and debug.</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.starcamkalman">
-<span id="scripts-old-starcamkalman-module"></span><h2>scripts.old.starcamkalman module<a class="headerlink" href="#module-scripts.old.starcamkalman" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 abr. 2017</p>
-<p>Main script</p>
-<p>&#64;author: Marc Casalprim</p>
-</div>
-<div class="section" id="module-scripts.old.starcamkalman2">
-<span id="scripts-old-starcamkalman2-module"></span><h2>scripts.old.starcamkalman2 module<a class="headerlink" href="#module-scripts.old.starcamkalman2" title="Permalink to this headline">¶</a></h2>
-<p>Created on 28 abr. 2017</p>
-<p>Main script</p>
-<p>&#64;author: Marc Casalprim</p>
 </div>
 <div class="section" id="module-scripts.old">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-scripts.old" title="Permalink to this headline">¶</a></h2>
@@ -246,31 +105,6 @@ Useful to play with them after in a n interactive console, to see if the math is
   <ul>
 <li><a class="reference internal" href="#">scripts.old package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-scripts.old.RaDecDebugOptim">scripts.old.RaDecDebugOptim module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.RaDecDebugTPA">scripts.old.RaDecDebugTPA module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.SCDebug">scripts.old.SCDebug module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.SC_Est">scripts.old.SC_Est module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.SC_Est_errors">scripts.old.SC_Est_errors module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.Starcam2GyrosShow">scripts.old.Starcam2GyrosShow module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.ThermometersByNumber">scripts.old.ThermometersByNumber module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.ThermometersDale">scripts.old.ThermometersDale module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.ThermometersPiper">scripts.old.ThermometersPiper module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.ThermometersPiper2">scripts.old.ThermometersPiper2 module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.ThermometersPiper3">scripts.old.ThermometersPiper3 module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.covs">scripts.old.covs module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.kalman">scripts.old.kalman module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.kalman15">scripts.old.kalman15 module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.kalman2">scripts.old.kalman2 module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.plotArchivesMerged">scripts.old.plotArchivesMerged module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.plotGondolaArchivesMerged">scripts.old.plotGondolaArchivesMerged module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.plotPastArchive">scripts.old.plotPastArchive module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.plotThermoFN">scripts.old.plotThermoFN module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.plotThermometersArchivesMerged">scripts.old.plotThermometersArchivesMerged module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.propagation">scripts.old.propagation module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.qPropagation">scripts.old.qPropagation module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.quatDebug">scripts.old.quatDebug module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.starcamkalman">scripts.old.starcamkalman module</a></li>
-<li><a class="reference internal" href="#module-scripts.old.starcamkalman2">scripts.old.starcamkalman2 module</a></li>
 <li><a class="reference internal" href="#module-scripts.old">Module contents</a></li>
 </ul>
 </li>
@@ -280,8 +114,8 @@ Useful to play with them after in a n interactive console, to see if the math is
   <p class="topless"><a href="scripts.html"
                         title="previous chapter">scripts package</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="scripts.optimization.html"
-                        title="next chapter">scripts.optimization package</a></p>
+  <p class="topless"><a href="scripts.old.RaDecDebugOptim.html"
+                        title="next chapter">scripts.old.RaDecDebugOptim module</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -313,13 +147,13 @@ Useful to play with them after in a n interactive console, to see if the math is
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="scripts.optimization.html" title="scripts.optimization package"
+          <a href="scripts.old.RaDecDebugOptim.html" title="scripts.old.RaDecDebugOptim module"
              >next</a> |</li>
         <li class="right" >
           <a href="scripts.html" title="scripts package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Sources</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="scripts.html" >scripts package</a> &#187;</li> 
       </ul>
     </div>

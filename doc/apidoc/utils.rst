@@ -4,69 +4,17 @@ utils package
 Submodules
 ----------
 
-utils.calibrator module
------------------------
+.. toctree::
 
-.. automodule:: utils.calibrator
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-utils.config module
--------------------
-
-.. automodule:: utils.config
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-utils.dataset module
---------------------
-
-.. automodule:: utils.dataset
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-utils.detector module
----------------------
-
-.. automodule:: utils.detector
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-utils.estimator module
-----------------------
-
-.. automodule:: utils.estimator
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-utils.field module
-------------------
-
-.. automodule:: utils.field
-    :members:
-    :show-inheritance:
-
-utils.quat module
------------------
-
-.. automodule:: utils.quat
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-utils.thermometers module
--------------------------
-
-.. automodule:: utils.thermometers
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   utils.calibrator
+   utils.config
+   utils.dataset
+   utils.detector
+   utils.estimator
+   utils.field
+   utils.jordiTests
+   utils.quat
+   utils.thermometers
 
 Module contents
 ---------------

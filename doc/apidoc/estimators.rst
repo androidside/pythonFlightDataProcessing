@@ -4,14 +4,9 @@ estimators package
 Submodules
 ----------
 
-estimators.estimators module
-----------------------------
+.. toctree::
 
-.. automodule:: estimators.estimators
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   estimators.estimators
 
 Module contents
 ---------------

@@ -1,6 +1,6 @@
 An Introductory Example
 =======================
-A good start to understand better how all of this works is with a simple example. The following code is available at :mod:`scripts.plotGyros` and plots directly the gyroscopes data::
+A good start to understand better how all of this works is with a simple example. The following code is available at :mod:`scripts.gyros` and plots directly the gyroscopes data::
 
 	from utils.config import flightDisksFolders,plt
 	from utils.dataset import DataSet,pd, plotColumns
@@ -113,8 +113,6 @@ In addition, note how we can obtain similar results just using the functionaliti
 
 Bad values
 ==========
-Peaks
------
 Some fields show peaks, specially the ones at bettii.RTLowPriority and bettii.RTHighPrioirty
 The peaks are classified in two types:
 * sudden returns to values close to 0. These peaks seem to be synchronized, they affect almost all the fields at the same time.
@@ -122,17 +120,20 @@ The peaks are classified in two types:
 
 To solve this issues, two main solutions are proposed.
 
-The first and easiest one is to use the ``rpeaks`` flag in the DataSet constructor. When ``rpeaks`` is ``True``, all the rows with all the values below to 1 will be removed.
+The first and easiest one is to use the ``rpeaks`` flag in the DataSet constructor. When ``rpeaks`` is ``True``, all the rows with all the values below to 1 will be removed. The same result is achieved if we use exclusively the pandas library::
+	
+	df = df.loc[(df.abs() >= 1).any(1)]
+
 The fields range attribute is useful to remove undesired parsing errors. This parameter defines a valid range for the field data. Then, the readField function will remove any data point of the field that is not contained in the +-range interval.
 Once we have constructed our dataset, it is possible that we still have some residual errors. To remove them, a hard filtering technique can be applied with the filterArray function. We can also filter an entire Dataframe with filterDataframe.
 
 Bad mce frame numbers
 -----------------------------
-When a new Aurora archive is created, some of the fields start with leading low values and have 0 values once every two samples at least. The mceFramenumber fields are also affected by the peaks issues commented above. To solve these problems, the readField function -- that is called when we create a DataSet object -- will remove any invalid frame number (zero values and values inferior to the first frame number will be discarded). Also, to avoid possible parsing peaks, a maximum default value of 22880070 frame counts is used.
+When a new Aurora archive is created, some of the fields start with leading low values and have 0 values once every two samples at least. The mceFramenumber fields are also affected by the peaks issues commented above. To solve these problems, the readField function -- that is called when we create a new DataSet object -- will remove any invalid frame number (zero values and values inferior to the first frame number will be discarded). Also, to avoid possible parsing peaks, a maximum default value of 22880070 frame counts is used. This number is the highest mceFrameNumber achieved during the flight.
 
 Example
 --------
-As an example of the problem, here we show the raw values of the `bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered` field. The script plotFieldRaw was used::
+As an example of the problem, here we show the raw values of the `bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered` field. The script :mod:`scripts.plotFieldRaw` was used::
 
     folders=flightDisksFolders
     
@@ -165,7 +166,7 @@ As an example of the problem, here we show the raw values of the `bettii.RTLowPr
 | .. image:: ./images/raw.png         | .. image:: ./images/raw_100.png            |
 |    :height: 400                     |    :height: 400                            |
 |                                     |                                            |
-| Raw values of the field             | One of every 100 raw values of the field   |
+| *Raw values of the field*           | *One of every 100 raw values of the field* |
 +-------------------------------------+--------------------------------------------+
 
 We can see how the majority of bad values dissapear if we downsample the raw values by a factor of 100. A better option will be to use the DataSet class together with the filterDataframe function::

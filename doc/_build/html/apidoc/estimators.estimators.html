@@ -1,34 +1,32 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>estimators.estimators module &mdash; Python Flight Data Processing 1 documentation</title>
-    
+    <title>estimators.estimators module &#8212; Python Flight Data Processing 0.1 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1',
+        VERSION:     '0.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="Python Flight Data Processing 1 documentation" href="../index.html" />
-    <link rel="up" title="estimators package" href="estimators.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="scripts package" href="scripts.html" />
     <link rel="prev" title="estimators package" href="estimators.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -44,9 +42,9 @@
         <li class="right" >
           <a href="estimators.html" title="estimators package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 1 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &raquo;</li>
-          <li class="nav-item nav-item-2"><a href="estimators.html" accesskey="U">estimators package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Sources</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="estimators.html" accesskey="U">estimators package</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -57,13 +55,16 @@
             
   <div class="section" id="module-estimators.estimators">
 <span id="estimators-estimators-module"></span><h1>estimators.estimators module<a class="headerlink" href="#module-estimators.estimators" title="Permalink to this headline">¶</a></h1>
-<p>Created on 29 may. 2017</p>
-<p>&#64;author: Marc Casalprim</p>
+<p>Provides estimator classes that behave similarly and can estimate
+the attitude using the gyroscopes and star cameras information.</p>
 <dl class="class">
 <dt id="estimators.estimators.Estimator">
 <em class="property">class </em><code class="descclassname">estimators.estimators.</code><code class="descname">Estimator</code><span class="sig-paren">(</span><em>gyros</em>, <em>sc</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Class describing an estimator.</p>
+<p>Class describing an estimator.
+The dataframes must follow the following formats:
+:param gyros: columns needed: gyroX,gyroY,gyroZ
+:param sc:    columns needed: qI2G,ra_err,dec_err,roll_err</p>
 <dl class="attribute">
 <dt id="estimators.estimators.Estimator.EST_FILENAME">
 <code class="descname">EST_FILENAME</code><em class="property"> = 'est_dataframe'</em><a class="headerlink" href="#estimators.estimators.Estimator.EST_FILENAME" title="Permalink to this definition">¶</a></dt>
@@ -89,13 +90,13 @@
 <code class="descname">estimate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator.estimate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fills the self.est dataframe with the estimated data.
 self.est will have, at least, the columns RA,DEC,ROLL,biasX,biasY,biasZ
-All the subclasses will implement this &#8220;abstract&#8221; method, adding the desired parameters.</p>
+All the subclasses will implement this “abstract” method, adding the desired parameters.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="estimators.estimators.Estimator.plot">
 <code class="descname">plot</code><span class="sig-paren">(</span><em>save_folder=None</em>, <em>time_label='Time (frame number)'</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the estimated attitude and biases</p>
+<dd><p>Plot the estimated attitude. If there are biases and/or P matrices, it will plot them too.</p>
 </dd></dl>
 
 <dl class="method">
@@ -165,6 +166,9 @@ All the subclasses will implement this &#8220;abstract&#8221; method, adding the
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bettii_logo.png" alt="Logo"/>
+            </a></p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="estimators.html"
                         title="previous chapter">estimators package</a></p>
@@ -174,21 +178,18 @@ All the subclasses will implement this &#8220;abstract&#8221; method, adding the
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/apidoc/estimators.estimators.txt"
+      <li><a href="../_sources/apidoc/estimators.estimators.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -210,14 +211,14 @@ All the subclasses will implement this &#8220;abstract&#8221; method, adding the
         <li class="right" >
           <a href="estimators.html" title="estimators package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 1 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &raquo;</li>
-          <li class="nav-item nav-item-2"><a href="estimators.html" >estimators package</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >Sources</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="estimators.html" >estimators package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2017, Marc Casalprim.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+        &#169; Copyright 2017, Marc Casalprim.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

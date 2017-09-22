@@ -1,89 +1,21 @@
-scripts.thesis package
-======================
+scripts\.thesis package
+=======================
 
 Submodules
 ----------
 
-scripts.thesis.allEstimators module
------------------------------------
+.. toctree::
 
-.. automodule:: scripts.thesis.allEstimators
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.brakeMomDump module
-----------------------------------
-
-.. automodule:: scripts.thesis.brakeMomDump
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.covs module
---------------------------
-
-.. automodule:: scripts.thesis.covs
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.estimator module
--------------------------------
-
-.. automodule:: scripts.thesis.estimator
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.fiveThermometers module
---------------------------------------
-
-.. automodule:: scripts.thesis.fiveThermometers
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.gyros module
----------------------------
-
-.. automodule:: scripts.thesis.gyros
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.inertia module
------------------------------
-
-.. automodule:: scripts.thesis.inertia
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.postEstimation module
-------------------------------------
-
-.. automodule:: scripts.thesis.postEstimation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.tableQuats module
---------------------------------
-
-.. automodule:: scripts.thesis.tableQuats
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.thesis.telemetryComparison module
------------------------------------------
-
-.. automodule:: scripts.thesis.telemetryComparison
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   scripts.thesis.allEstimators
+   scripts.thesis.brakeMomDump
+   scripts.thesis.covs
+   scripts.thesis.estimator
+   scripts.thesis.fiveThermometers
+   scripts.thesis.gyros
+   scripts.thesis.inertia
+   scripts.thesis.postEstimation
+   scripts.thesis.tableQuats
+   scripts.thesis.telemetryComparison
 
 Module contents
 ---------------

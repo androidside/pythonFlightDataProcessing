@@ -1,89 +1,21 @@
-scripts.realtime package
-========================
+scripts\.realtime package
+=========================
 
 Submodules
 ----------
 
-scripts.realtime.Jordi_session1 module
---------------------------------------
+.. toctree::
 
-.. automodule:: scripts.realtime.Jordi_session1
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.Jordi_session2 module
---------------------------------------
-
-.. automodule:: scripts.realtime.Jordi_session2
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.Jordi_session3 module
---------------------------------------
-
-.. automodule:: scripts.realtime.Jordi_session3
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.SC_Est_errorRT module
---------------------------------------
-
-.. automodule:: scripts.realtime.SC_Est_errorRT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.biasRT module
-------------------------------
-
-.. automodule:: scripts.realtime.biasRT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.covsRT module
-------------------------------
-
-.. automodule:: scripts.realtime.covsRT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.detectorsRT module
------------------------------------
-
-.. automodule:: scripts.realtime.detectorsRT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.processDataRT module
--------------------------------------
-
-.. automodule:: scripts.realtime.processDataRT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.starcamRT module
----------------------------------
-
-.. automodule:: scripts.realtime.starcamRT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-scripts.realtime.starcamkalmanRT module
----------------------------------------
-
-.. automodule:: scripts.realtime.starcamkalmanRT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   scripts.realtime.Jordi_session1
+   scripts.realtime.Jordi_session2
+   scripts.realtime.Jordi_session3
+   scripts.realtime.SC_Est_errorRT
+   scripts.realtime.biasRT
+   scripts.realtime.covsRT
+   scripts.realtime.detectorsRT
+   scripts.realtime.processDataRT
+   scripts.realtime.starcamRT
+   scripts.realtime.starcamkalmanRT
 
 Module contents
 ---------------

@@ -4,22 +4,10 @@ tests package
 Submodules
 ----------
 
-tests.extractSCTest module
---------------------------
+.. toctree::
 
-.. automodule:: tests.extractSCTest
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tests.getIndexTest module
--------------------------
-
-.. automodule:: tests.getIndexTest
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   tests.extractSCTest
+   tests.getIndexTest
 
 Module contents
 ---------------

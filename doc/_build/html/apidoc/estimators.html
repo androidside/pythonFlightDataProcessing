@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>estimators package &#8212; Python Flight Data Processing 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -23,8 +23,8 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="scripts package" href="scripts.html" />
-    <link rel="prev" title="src" href="modules.html" /> 
+    <link rel="next" title="estimators.estimators module" href="estimators.estimators.html" />
+    <link rel="prev" title="Sources" href="modules.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -37,13 +37,13 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="scripts.html" title="scripts package"
+          <a href="estimators.estimators.html" title="estimators.estimators module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="src"
+          <a href="modules.html" title="Sources"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">src</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">Sources</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -56,112 +56,11 @@
 <h1>estimators package<a class="headerlink" href="#estimators-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="estimators.estimators.html">estimators.estimators module</a></li>
+</ul>
 </div>
-<div class="section" id="module-estimators.estimators">
-<span id="estimators-estimators-module"></span><h2>estimators.estimators module<a class="headerlink" href="#module-estimators.estimators" title="Permalink to this headline">¶</a></h2>
-<p>Provides estimator classes that behave similarly and can estimate
-the attitude using the gyroscopes and star cameras information.</p>
-<dl class="class">
-<dt id="estimators.estimators.Estimator">
-<em class="property">class </em><code class="descclassname">estimators.estimators.</code><code class="descname">Estimator</code><span class="sig-paren">(</span><em>gyros</em>, <em>sc</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Class describing an estimator.
-The dataframes must follow the following formats:
-:param gyros: columns needed: gyroX,gyroY,gyroZ
-:param sc:    columns needed: qI2G,ra_err,dec_err,roll_err</p>
-<dl class="attribute">
-<dt id="estimators.estimators.Estimator.EST_FILENAME">
-<code class="descname">EST_FILENAME</code><em class="property"> = 'est_dataframe'</em><a class="headerlink" href="#estimators.estimators.Estimator.EST_FILENAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="estimators.estimators.Estimator.GYROS_FILENAME">
-<code class="descname">GYROS_FILENAME</code><em class="property"> = 'gyros_dataframe'</em><a class="headerlink" href="#estimators.estimators.Estimator.GYROS_FILENAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="estimators.estimators.Estimator.QUATS_FILENAME">
-<code class="descname">QUATS_FILENAME</code><em class="property"> = 'quats_dataframe'</em><a class="headerlink" href="#estimators.estimators.Estimator.QUATS_FILENAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="estimators.estimators.Estimator.SC_FILENAME">
-<code class="descname">SC_FILENAME</code><em class="property"> = 'sc_dataframe'</em><a class="headerlink" href="#estimators.estimators.Estimator.SC_FILENAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="estimators.estimators.Estimator.estimate">
-<code class="descname">estimate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator.estimate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fills the self.est dataframe with the estimated data.
-self.est will have, at least, the columns RA,DEC,ROLL,biasX,biasY,biasZ
-All the subclasses will implement this “abstract” method, adding the desired parameters.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="estimators.estimators.Estimator.plot">
-<code class="descname">plot</code><span class="sig-paren">(</span><em>save_folder=None</em>, <em>time_label='Time (frame number)'</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the estimated attitude. If there are biases and/or P matrices, it will plot them too.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="estimators.estimators.Estimator.save">
-<code class="descname">save</code><span class="sig-paren">(</span><em>folder='./'</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator.save" title="Permalink to this definition">¶</a></dt>
-<dd><p>Save the dataframes in pickle files</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="estimators.estimators.Estimator15">
-<em class="property">class </em><code class="descclassname">estimators.estimators.</code><code class="descname">Estimator15</code><span class="sig-paren">(</span><em>gyros</em>, <em>sc</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator15" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#estimators.estimators.Estimator" title="estimators.estimators.Estimator"><code class="xref py py-class docutils literal"><span class="pre">estimators.estimators.Estimator</span></code></a></p>
-<p>Class implementing the 15 state Kalman filter.</p>
-<dl class="attribute">
-<dt id="estimators.estimators.Estimator15.EST_FILENAME">
-<code class="descname">EST_FILENAME</code><em class="property"> = 'est_dataframe15'</em><a class="headerlink" href="#estimators.estimators.Estimator15.EST_FILENAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="estimators.estimators.Estimator15.estimate">
-<code class="descname">estimate</code><span class="sig-paren">(</span><em>P0=None, b0=array([ 0.,  0.,  0.]), k0=array([ 0.,  0.,  0.]), m0=array([ 0.,  0.,  0.,  0.,  0.,  0.]), SCg=5, q0=None, Qd=array([[ 1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,  0.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  1.,          0.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,          1.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,          0.,  1.]]), ts=None, te=None, progress=False</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator15.estimate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="estimators.estimators.Estimator3">
-<em class="property">class </em><code class="descclassname">estimators.estimators.</code><code class="descname">Estimator3</code><span class="sig-paren">(</span><em>gyros</em>, <em>sc</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#estimators.estimators.Estimator" title="estimators.estimators.Estimator"><code class="xref py py-class docutils literal"><span class="pre">estimators.estimators.Estimator</span></code></a></p>
-<p>Class implementing the a 3 states Kalman filter.</p>
-<dl class="attribute">
-<dt id="estimators.estimators.Estimator3.EST_FILENAME">
-<code class="descname">EST_FILENAME</code><em class="property"> = 'est_dataframe3'</em><a class="headerlink" href="#estimators.estimators.Estimator3.EST_FILENAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="estimators.estimators.Estimator3.estimate">
-<code class="descname">estimate</code><span class="sig-paren">(</span><em>P0=None, q0=None, Qd=array([[ 1.,  0.,  0.],        [ 0.,  1.,  0.],        [ 0.,  0.,  1.]]), SCg=5, ts=None, te=None, progress=False</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator3.estimate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="estimators.estimators.Estimator6">
-<em class="property">class </em><code class="descclassname">estimators.estimators.</code><code class="descname">Estimator6</code><span class="sig-paren">(</span><em>gyros</em>, <em>sc</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator6" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#estimators.estimators.Estimator" title="estimators.estimators.Estimator"><code class="xref py py-class docutils literal"><span class="pre">estimators.estimators.Estimator</span></code></a></p>
-<p>Class implementing the original 6 state Kalman filter.</p>
-<dl class="attribute">
-<dt id="estimators.estimators.Estimator6.EST_FILENAME">
-<code class="descname">EST_FILENAME</code><em class="property"> = 'est_dataframe6'</em><a class="headerlink" href="#estimators.estimators.Estimator6.EST_FILENAME" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="estimators.estimators.Estimator6.estimate">
-<code class="descname">estimate</code><span class="sig-paren">(</span><em>P0=None, b0=array([ 0.,  0.,  0.]), q0=None, Qd=array([[ 1.,  0.,  0.,  0.,  0.,  0.],        [ 0.,  1.,  0.,  0.,  0.,  0.],        [ 0.,  0.,  1.,  0.,  0.,  0.],        [ 0.,  0.,  0.,  1.,  0.,  0.],        [ 0.,  0.,  0.,  0.,  1.,  0.],        [ 0.,  0.,  0.,  0.,  0.,  1.]]), SCg=5, ts=None, te=None, progress=False</em><span class="sig-paren">)</span><a class="headerlink" href="#estimators.estimators.Estimator6.estimate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 </div>
 <div class="section" id="module-estimators">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-estimators" title="Permalink to this headline">¶</a></h2>
@@ -181,7 +80,6 @@ All the subclasses will implement this “abstract” method, adding the desired
   <ul>
 <li><a class="reference internal" href="#">estimators package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-estimators.estimators">estimators.estimators module</a></li>
 <li><a class="reference internal" href="#module-estimators">Module contents</a></li>
 </ul>
 </li>
@@ -189,10 +87,10 @@ All the subclasses will implement this “abstract” method, adding the desired
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="modules.html"
-                        title="previous chapter">src</a></p>
+                        title="previous chapter">Sources</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="scripts.html"
-                        title="next chapter">scripts package</a></p>
+  <p class="topless"><a href="estimators.estimators.html"
+                        title="next chapter">estimators.estimators module</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -224,13 +122,13 @@ All the subclasses will implement this “abstract” method, adding the desired
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="scripts.html" title="scripts package"
+          <a href="estimators.estimators.html" title="estimators.estimators module"
              >next</a> |</li>
         <li class="right" >
-          <a href="modules.html" title="src"
+          <a href="modules.html" title="Sources"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Python Flight Data Processing 0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >Sources</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

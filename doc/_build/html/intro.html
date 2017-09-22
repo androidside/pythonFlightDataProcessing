@@ -53,7 +53,7 @@
             
   <div class="section" id="an-introductory-example">
 <h1>An Introductory Example<a class="headerlink" href="#an-introductory-example" title="Permalink to this headline">¶</a></h1>
-<p>A good start to understand better how all of this works is with a simple example. The following code is available at <code class="xref py py-mod docutils literal"><span class="pre">scripts.plotGyros</span></code> and plots directly the gyroscopes data:</p>
+<p>A good start to understand better how all of this works is with a simple example. The following code is available at <a class="reference internal" href="apidoc/scripts.gyros.html#module-scripts.gyros" title="scripts.gyros"><code class="xref py py-mod docutils literal"><span class="pre">scripts.gyros</span></code></a> and plots directly the gyroscopes data:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">utils.config</span> <span class="k">import</span> <span class="n">flightDisksFolders</span><span class="p">,</span><span class="n">plt</span>
 <span class="kn">from</span> <span class="nn">utils.dataset</span> <span class="k">import</span> <span class="n">DataSet</span><span class="p">,</span><span class="n">pd</span><span class="p">,</span> <span class="n">plotColumns</span>
 <span class="kn">from</span> <span class="nn">utils.field</span> <span class="k">import</span> <span class="n">Field</span>
@@ -100,7 +100,7 @@
 </pre></div>
 </div>
 <p>The goal of these imports is to load in our environment some names that will be used later.
-When we execute the first line, the module <a class="reference internal" href="apidoc/utils.html#module-utils.config" title="utils.config"><code class="xref py py-mod docutils literal"><span class="pre">utils.config</span></code></a> runs and we keep the variables <code class="docutils literal"><span class="pre">flightDisksFolders</span></code>– a list of Archive folder names– and <code class="docutils literal"><span class="pre">plt</span></code> – a matplotlib.pyplot object already configured.</p>
+When we execute the first line, the module <a class="reference internal" href="apidoc/utils.config.html#module-utils.config" title="utils.config"><code class="xref py py-mod docutils literal"><span class="pre">utils.config</span></code></a> runs and we keep the variables <code class="docutils literal"><span class="pre">flightDisksFolders</span></code>– a list of Archive folder names– and <code class="docutils literal"><span class="pre">plt</span></code> – a matplotlib.pyplot object already configured.</p>
 <p>After the imports, a list of fields is generated:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">fieldsList</span><span class="o">=</span><span class="p">[]</span>
 <span class="n">fieldsList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Field</span><span class="p">(</span><span class="s1">&#39;bettii.GyroReadings.angularVelocityX&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Gyro X&#39;</span><span class="p">,</span><span class="n">conversion</span><span class="o">=</span><span class="mf">0.0006304</span><span class="p">))</span>
@@ -135,7 +135,7 @@ If we only read from a single folder, the <code class="docutils literal"><span c
 </pre></div>
 </div>
 <p>Here, we are getting the data that is only between 2017/06/08 13:00 and 2017/06/09 10:00.</p>
-<p>To generate the plots, the function <a class="reference internal" href="apidoc/utils.html#utils.dataset.plotColumns" title="utils.dataset.plotColumns"><code class="xref py py-meth docutils literal"><span class="pre">utils.dataset.plotColumns()</span></code></a> is used. This function plots all the columns of the dataframe in a single figure. The <code class="docutils literal"><span class="pre">ncols</span></code> parameter determines the number of columns of the subplots layout. If ncols is set to 0, there will be a single subplot with all the lines overlapped.</p>
+<p>To generate the plots, the function <a class="reference internal" href="apidoc/utils.dataset.html#utils.dataset.plotColumns" title="utils.dataset.plotColumns"><code class="xref py py-meth docutils literal"><span class="pre">utils.dataset.plotColumns()</span></code></a> is used. This function plots all the columns of the dataframe in a single figure. The <code class="docutils literal"><span class="pre">ncols</span></code> parameter determines the number of columns of the subplots layout. If ncols is set to 0, there will be a single subplot with all the lines overlapped.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="s2">&quot;Plotting..&quot;</span>
 <span class="n">plotColumns</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="n">time_label</span><span class="p">)</span>
 <span class="n">plotColumns</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">df</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="n">time_label</span><span class="p">,</span><span class="n">ylabels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Angular velocity&#39;</span><span class="p">],</span><span class="n">ncols</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -155,24 +155,24 @@ If we only read from a single folder, the <code class="docutils literal"><span c
 </div>
 <div class="section" id="bad-values">
 <h1>Bad values<a class="headerlink" href="#bad-values" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="peaks">
-<h2>Peaks<a class="headerlink" href="#peaks" title="Permalink to this headline">¶</a></h2>
 <p>Some fields show peaks, specially the ones at bettii.RTLowPriority and bettii.RTHighPrioirty
 The peaks are classified in two types:
 * sudden returns to values close to 0. These peaks seem to be synchronized, they affect almost all the fields at the same time.
 * jumps to high values. Probably due to parsing errors.</p>
 <p>To solve this issues, two main solutions are proposed.</p>
-<p>The first and easiest one is to use the <code class="docutils literal"><span class="pre">rpeaks</span></code> flag in the DataSet constructor. When <code class="docutils literal"><span class="pre">rpeaks</span></code> is <code class="docutils literal"><span class="pre">True</span></code>, all the rows with all the values below to 1 will be removed.
-The fields range attribute is useful to remove undesired parsing errors. This parameter defines a valid range for the field data. Then, the readField function will remove any data point of the field that is not contained in the +-range interval.
-Once we have constructed our dataset, it is possible that we still have some residual errors. To remove them, a hard filtering technique can be applied with the filterArray function. We can also filter an entire Dataframe with filterDataframe.</p>
+<p>The first and easiest one is to use the <code class="docutils literal"><span class="pre">rpeaks</span></code> flag in the DataSet constructor. When <code class="docutils literal"><span class="pre">rpeaks</span></code> is <code class="docutils literal"><span class="pre">True</span></code>, all the rows with all the values below to 1 will be removed. The same result is achieved if we use exclusively the pandas library:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">df</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+</pre></div>
 </div>
+<p>The fields range attribute is useful to remove undesired parsing errors. This parameter defines a valid range for the field data. Then, the readField function will remove any data point of the field that is not contained in the +-range interval.
+Once we have constructed our dataset, it is possible that we still have some residual errors. To remove them, a hard filtering technique can be applied with the filterArray function. We can also filter an entire Dataframe with filterDataframe.</p>
 <div class="section" id="bad-mce-frame-numbers">
 <h2>Bad mce frame numbers<a class="headerlink" href="#bad-mce-frame-numbers" title="Permalink to this headline">¶</a></h2>
-<p>When a new Aurora archive is created, some of the fields start with leading low values and have 0 values once every two samples at least. The mceFramenumber fields are also affected by the peaks issues commented above. To solve these problems, the readField function – that is called when we create a DataSet object – will remove any invalid frame number (zero values and values inferior to the first frame number will be discarded). Also, to avoid possible parsing peaks, a maximum default value of 22880070 frame counts is used.</p>
+<p>When a new Aurora archive is created, some of the fields start with leading low values and have 0 values once every two samples at least. The mceFramenumber fields are also affected by the peaks issues commented above. To solve these problems, the readField function – that is called when we create a new DataSet object – will remove any invalid frame number (zero values and values inferior to the first frame number will be discarded). Also, to avoid possible parsing peaks, a maximum default value of 22880070 frame counts is used. This number is the highest mceFrameNumber achieved during the flight.</p>
 </div>
 <div class="section" id="example">
 <h2>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h2>
-<p>As an example of the problem, here we show the raw values of the <cite>bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered</cite> field. The script plotFieldRaw was used:</p>
+<p>As an example of the problem, here we show the raw values of the <cite>bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered</cite> field. The script <a class="reference internal" href="apidoc/scripts.plotFieldRaw.html#module-scripts.plotFieldRaw" title="scripts.plotFieldRaw"><code class="xref py py-mod docutils literal"><span class="pre">scripts.plotFieldRaw</span></code></a> was used:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">folders</span><span class="o">=</span><span class="n">flightDisksFolders</span>
 
 <span class="n">field</span><span class="o">=</span><span class="s1">&#39;bettii.RTLowPriority.RawStarcameraMceFrameNumberWhenSCTriggered&#39;</span>
@@ -208,10 +208,10 @@ Once we have constructed our dataset, it is possible that we still have some res
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="first reference internal image-reference" href="_images/raw.png"><img alt="_images/raw.png" src="_images/raw.png" style="height: 400px;" /></a>
-<p class="last">Raw values of the field</p>
+<p class="last"><em>Raw values of the field</em></p>
 </td>
 <td><a class="first reference internal image-reference" href="_images/raw_100.png"><img alt="_images/raw_100.png" src="_images/raw_100.png" style="height: 400px;" /></a>
-<p class="last">One of every 100 raw values of the field</p>
+<p class="last"><em>One of every 100 raw values of the field</em></p>
 </td>
 </tr>
 </tbody>
@@ -261,7 +261,6 @@ Once we have constructed our dataset, it is possible that we still have some res
   <ul>
 <li><a class="reference internal" href="#">An Introductory Example</a></li>
 <li><a class="reference internal" href="#bad-values">Bad values</a><ul>
-<li><a class="reference internal" href="#peaks">Peaks</a></li>
 <li><a class="reference internal" href="#bad-mce-frame-numbers">Bad mce frame numbers</a></li>
 <li><a class="reference internal" href="#example">Example</a></li>
 </ul>
