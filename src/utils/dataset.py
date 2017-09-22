@@ -887,7 +887,7 @@ def paintModes(ax,modes,alpha=0.3,printText=True):
     :param alpha: transparency of the colors, in the [0,1] range
     :param printText: show the text of the modes?
     '''
-    color={0:'0.2',1:'y',2:'g',3:'b',4:'r'}
+    color={0:'0.5',1:'y',2:'g',3:'b',4:'r'}
     label={0:'safe',1:'manual',2:'track',3:'slew',4:'brake'}
     dm=np.diff(modes.values)
     m0=modes.iloc[0]
