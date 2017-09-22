@@ -16,12 +16,12 @@ if __name__ == '__main__':
     folder = "C:/LocalAuroraArchive/17-05-30_19_44_12/"
     #Flags    
     #data to read and plot
-    ccmg = True
-    momdump = True
-    steppergalil=False
+    ccmg = False
+    momdump = False
+    wheelsangle=False
     gyros=False
     azimuth=False #measured and desired azimuth position and velocity
-    radec = False #telescopeRaDec, GondolaRaDec, StarcameraRaDec
+    radec = True #telescopeRaDec, GondolaRaDec, StarcameraRaDec
     griffins = False    
     
     titles=True #show titles on the figures
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     if ccmg:
         fieldsList.append(Field('bettii.PIDOutputCCMG.ut',label='ccmg_ut'))
         fieldsList.append(Field('bettii.PIDOutputCCMG.et',label='ccmg_et'))
-        fieldsList.append(Field('bettii.PIDOutputCCMG.proportional',label='P CCMG'))   #To remove very highbalues
+        fieldsList.append(Field('bettii.PIDOutputCCMG.proportional',label='P CCMG', range=1e6))   #range =3e6 To remove very highbalues
         fieldsList.append(Field('bettii.PIDOutputCCMG.integral',label='I CCMG'))
         fieldsList.append(Field('bettii.PIDOutputCCMG.derivative',label='D CCMG'))                
     if momdump:
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         fieldsList.append(Field('bettii.PIDOutputMomDump.proportional',label='P MomDump'))   
         fieldsList.append(Field('bettii.PIDOutputMomDump.integral',label='I MomDump'))
         fieldsList.append(Field('bettii.PIDOutputMomDump.derivative',label='D MomDump'))        
-    if steppergalil: fieldsList.append(Field('bettii.StepperGalil.wheelsAngle',label='wheels_angle'))        
+    if wheelsangle: fieldsList.append(Field('bettii.StepperGalil.wheelsAngle',label='wheels_angle'))        
     if gyros:
         fieldsList.append(Field('bettii.GyroReadings.angularVelocityX',label='gyroX',dtype='i4',conversion=0.0006304))
         fieldsList.append(Field('bettii.GyroReadings.angularVelocityY',label='gyroY',dtype='i4',conversion=0.0006437))
@@ -64,9 +64,9 @@ if __name__ == '__main__':
     if griffins:
          fieldsList.append(Field('bettii.GriffinsGalil.griffinAAngleDegrees',label='gangle'))
     
-    ds = DataSet(fieldsList=fieldsList, folder=folder, verbose=True, rpeaks=False,timeIndex=True)
+    ds = DataSet(fieldsList=fieldsList, folder=folder, verbose=True, rpeaks=True,timeIndex=True)
     #optional Filter
-    filterDataframe(ds.df, 3, 0.9)#N remove peaks inferior at 3 samples, with 0.9 advances 10% 
+    #filterDataframe(ds.df, 3, 0.9)#N remove peaks inferior at 3 samples, with 0.9 advances 10% 
     M=1
     data = ds.df.iloc[::M] #ie: ds.df.iloc[:-1000:M] do not plot the last 1000 samples (fn are too high). M downsample
     time_label = 'Palestine Time'
@@ -125,18 +125,118 @@ if __name__ == '__main__':
         data.plot(ax=ax, style='b', markersize=1.0)
         fig.tight_layout()
         fig.savefig(img_folder + "mom_ut.png")
-
-
+    
+    if wheelsangle:
+        fig = plt.figure()
+        if titles: fig.suptitle("Wheels Angle", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Angle Degrees')
+        data = ds.df.wheels_angle.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "wheelsangle.png")
+    
+    if gyros:
+        print "Plotting gyroscopes data..."
+        fig = plt.figure()
+        if titles: fig.suptitle("Gyroscopes Raw", fontsize=15, y=1)
+        ax1 = plt.subplot(311, xlabel=time_label, ylabel='Raw gyro X [arcsec/s]')
+        data = ds.df.gyroX.dropna()
+        data.plot(ax=ax1, style=['r'], markersize=1.0)
+        ax2 = plt.subplot(312, xlabel=time_label, ylabel='Raw gyro Y [arcsec/s]',sharex=ax1)
+        data = ds.df.gyroY.dropna()
+        data.plot(ax=ax2, style=['g'], markersize=1.0)
+        ax3 = plt.subplot(313, xlabel=time_label, ylabel='Raw gyro Z [arcsec/s]',sharex=ax1)
+        data = ds.df.gyroZ.dropna()
+        data.plot(ax=ax3, style=['b'], markersize=1.0)        
+        fig.tight_layout()
+        fig.savefig(img_folder + "gyroscopesraw.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("Gyroscopes Estimated", fontsize=15, y=1)
+        ax1 = plt.subplot(311, xlabel=time_label, ylabel='Estimated gyro X [arcsec/s]')
+        data = ds.df.estimatedgyroX.dropna()
+        data.plot(ax=ax1, style=['r'], markersize=1.0)
+        ax2 = plt.subplot(312, xlabel=time_label, ylabel='Estimated gyro Y [arcsec/s]',sharex=ax1)
+        data = ds.df.estimatedgyroY.dropna()
+        data.plot(ax=ax2, style=['g'], markersize=1.0)
+        ax3 = plt.subplot(313, xlabel=time_label, ylabel='Estimated gyro Z [arcsec/s]',sharex=ax1)
+        data = ds.df.estimatedgyroZ.dropna()
+        data.plot(ax=ax3, style=['b'], markersize=1.0)        
+        fig.tight_layout()
+        fig.savefig(img_folder + "gyroscopesestimated.png")
+    
+    if azimuth:
+        print "Plotting azimuth data..."
+        fig = plt.figure()
+        if titles: fig.suptitle("Position Target vs Measured", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Position [arcsec]')
+        data = ds.df[['ptarget', 'pmeas']].dropna()
+        data.plot(ax=ax, style=['r', 'g'], markersize=1.0)
+        plt.legend(markerscale=3, numpoints=20)
+        fig.tight_layout()
+        fig.savefig(img_folder + "position.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("Velocity Target vs Measured", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Velocity [arcsec/s]')
+        data = ds.df[['vtarget', 'vmeas']].dropna()
+        data.plot(ax=ax, style=['r', 'g'], markersize=1.0)
+        plt.legend(markerscale=3, numpoints=20)
+        fig.tight_layout()
+        fig.savefig(img_folder + "velocity.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("Target Ra & Dec", fontsize=15, y=1)
+        ax1 = plt.subplot(211, xlabel=time_label, ylabel='Target Ra')
+        data = ds.df.targetra.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax1, style='b', markersize=1.0)
+        ax2 = plt.subplot(212, xlabel=time_label, ylabel='Target Dec',sharex=ax1)
+        data = ds.df.targetdec.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax2, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "Target Ra&Dec.png")
          
+    if radec:
+        fig = plt.figure()
+        if titles: fig.suptitle("Telescope Ra & Dec", fontsize=15, y=1)
+        ax1 = plt.subplot(211, xlabel=time_label, ylabel='Telescope Ra')
+        data = ds.df[['tra','tdec']].dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data = data.loc[(data.abs() >= 1).any(1)]  # remove rows were all fields have a value <1. #.any(1) any row (data with the same fn)
+        #data=filterDataframe(data, 3, 0.9)#N remove peaks inferior at 3 samples, with 0.9 advances 10% 
+        data.tra.plot(ax=ax1, style='b', markersize=1.0)
+        ax2 = plt.subplot(212, xlabel=time_label, ylabel='Telescope Dec',sharex=ax1)
+        data.tdec.plot(ax=ax2, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "Telescope Ra&Dec.png")
+             
+        fig = plt.figure()
+        if titles: fig.suptitle("Gondola Ra & Dec", fontsize=15, y=1)
+        ax1 = plt.subplot(211, xlabel=time_label, ylabel='Gondola Ra')
+        data = ds.df[['gra','gdec']].dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data = data.loc[(data.abs() >= 1).any(1)]  # remove rows were all fields have a value <1. #.any(1) any row (data with the same fn)
+        #data=filterDataframe(data, 3, 0.9)#N remove peaks inferior at 3 samples, with 0.9 advances 10% 
+        data.gra.plot(ax=ax1, style='b', markersize=1.0)
+        ax2 = plt.subplot(212, xlabel=time_label, ylabel='Gondola Dec',sharex=ax1)
+        data.gdec.plot(ax=ax2, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "Telescope Ra&Dec.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("Star Camera Ra & Dec", fontsize=15, y=1)
+        ax1 = plt.subplot(211, xlabel=time_label, ylabel='Star Camera Ra')
+        data = ds.df[['sra','sdec']].dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data = data.loc[(data.abs() >= 1).any(1)]  # remove rows were all fields have a value <1. #.any(1) any row (data with the same fn)
+        #data=filterDataframe(data, 3, 0.9)#N remove peaks inferior at 3 samples, with 0.9 advances 10% 
+        data.sra.plot(ax=ax1, style='b', markersize=1.0)
+        ax2 = plt.subplot(212, xlabel=time_label, ylabel='Star Camera Dec',sharex=ax1)
+        data.sdec.plot(ax=ax2, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "Star Camera Ra&Dec.png")
+        
+        
          
     #===========================================================================
-    # if momdump:
-    # if steppergalil:
-    # if gyros:
-    #     
-    #    
-    # if azimuth:
-    # if radec:
+    # 
     # if griffins:
     #===========================================================================
 

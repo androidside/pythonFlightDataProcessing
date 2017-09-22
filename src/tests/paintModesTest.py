@@ -7,7 +7,7 @@ from utils.dataset import DataSet,pd,plotColumns, filterDataframe, paintModes
 from utils.field import Field
 
 if __name__ == '__main__':
-    folder = "F:/LocalAuroraArchive/17-05-30_19_44_12/"
+    folder = "C:/LocalAuroraArchive/17-05-30_19_44_12/"
     fieldsList=[]
     fieldsList.append(Field('bettii.PIDOutputCCMG.ut',label='ccmg_ut'))
     fieldsList.append(Field('bettii.PIDOutputCCMG.et',label='ccmg_et'))
