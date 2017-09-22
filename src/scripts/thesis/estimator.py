@@ -16,7 +16,7 @@ if __name__ == '__main__':
     folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
     
     
-    read=True #read again the files?
+    read=False #read again the files?
     estimated=True
     
     ti=20389100
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     if read: 
         gyros,sc,est=readAndSave(folder,initial_time=ti,final_time=None)
     else:
-        gyros,sc,est=openPickles(folder,ests=True)
+        gyros,sc,est=openPickles(folder,openEst=True)
     
 
     kal3=Estimator6(gyros,sc)

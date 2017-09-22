@@ -23,7 +23,7 @@ if __name__ == '__main__':
     #Flags    
     #data to read and plot
     gyros = False
-    momdump = True
+    momdump = False
     magnetometer = False
     thermometers = False
     currentSensors = False
