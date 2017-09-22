@@ -1,8 +1,6 @@
 '''
 Conatins useful functions to read and plot the fields archived by Aurora.
 The DataSet class reads and creates a :class:`pandas.DataFrame` object containing the desired fields.
-
-@author: Marc Casalprim
 '''
 import pandas as pd
 import numpy as np
@@ -114,6 +112,8 @@ def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], 
     labels_biases=['biasX','biasY','biasZ']
     print "Creating Starcam dataframe..."
     triggers = dataframe[label_triggers].drop_duplicates()
+    status=dataframe.tstatus[abs(dataframe.tstatus)<500].dropna()
+    status=status[status>50]
     L = 1e300
     while (L - len(triggers)) > 0:
         L = len(triggers)
@@ -122,7 +122,9 @@ def extractGyrosAndStarcam(dataframe, labels_gyros=['gyroX', 'gyroY', 'gyroZ'], 
     index = triggers.loc[subdf.index].index  # values #here we can index the sc dataframe with the triggers (using .values instead of .index), they dont seem to be
     sc = pd.DataFrame(genQuaternions(subdf, norm=True, filter=True), index=index)[labels_sc].dropna()
     if labels_scerrors is not None: sc[labels_scerrors] = dataframe[labels_scerrors].loc[sc.index]
-    sc[label_triggers] = triggers.loc[subdf.index]
+    triggers2=[status.loc[:mceFN].index[-1] for mceFN in sc.index]
+    sc[label_triggers] = triggers2#triggers.loc[subdf.index]
+    sc=sc.drop_duplicates(subset=label_triggers)
     print "Number of solutions: %s" % len(sc)
     print "Generating estimator quaternions..."
     quats = genQuaternions(dataframe, quats={'qest':['qi', 'qj', 'qk', 'qr']}, norm=True)['qest']
@@ -286,7 +288,7 @@ class DataSet():
                 if verbose: print label + ' already in dataframe.'
             else:
                 indmin = 3  # minimum index, frame number (the archives start with low mceframenumbers and then jump to the actual frame n umber)
-                if field.fieldName == 'bettii.GpsReadings.altitudeMeters' or 'PiperThermo' in field.fieldName:  # its PIPER or GPS data (theres no mceframenumber)
+                if 'GpsReadings' in field.fieldName or 'PiperThermo' in field.fieldName:  # its PIPER or GPS data (theres no mceframenumber)
                     time = self.times['bettii.RTLowPriority.mceFrameNumber']  # get another mceFN vector of this archive
                     L = len(field_data)
                     time = time[time > indmin]
@@ -304,10 +306,11 @@ class DataSet():
                 df_tmp = df_tmp[~df_tmp.index.duplicated(keep='first')]  # remove values with duplicated index
                 df_tmp = df_tmp[np.abs(df_tmp[label].as_matrix()) <= field.range]  # keep only the ones that are within fields range.
                 df_tmp = df_tmp[df_tmp.index > indmin]  # keep only meaningful index (a FN less than indmin is impossible)
-                df_tmp = df_tmp[df_tmp.index >= df_tmp.index[0]]  # keep only meaningful index (a FN less than the first index is impossible)
-                if False and not df_tmp.empty: #disabled part of the code to remove outliers
-                    z = (np.abs(df_tmp.index) - np.mean(df_tmp.index)) / np.std(df_tmp.index)
-                    df_tmp = df_tmp[z < 2]  # keep only meaningful index (drop outliers >2sigmas), seems dangerous but there are always bad mceFN that mess the entire plot
+                if not df_tmp.empty:
+                    df_tmp = df_tmp[df_tmp.index >= df_tmp.index[0]]  # keep only meaningful index (a FN less than the first index is impossible)
+                    if False: #disabled part of the code to remove outliers
+                        z = (np.abs(df_tmp.index) - np.mean(df_tmp.index)) / np.std(df_tmp.index)
+                        df_tmp = df_tmp[z < 2]  # keep only meaningful index (drop outliers >2sigmas), seems dangerous but there are always bad mceFN that mess the entire plot
                 if timeIndex and len(df_tmp.index) > 0: #time index conversion, using the folder name as the time at df_tmp.index[0]
                     text = folder.split('/')[-2]
                     ftime_str = text[0:8] + ' ' + text[9:17].replace('_', ':').replace('-', '')  # foldertime
@@ -347,7 +350,7 @@ class DataSet():
                 i = i + 1
                 if verbose: print str(100 * i / len(foldersList) / len(fieldsList)) + '%',
                 self.readField(field, folder=folder, rpeaks=rpeaks, verbose=verbose, timeIndex=False)
-            if verbose: print "Sorting index..."
+            #if verbose: print "Sorting index..."
             self.df = self.df.dropna(axis=0, how='all').sort_index()
             self.df = self.df.loc[self.min:self.max, :]
             # if True, change mceFN indexing to a DatetimeIndex
@@ -596,7 +599,7 @@ def toTimeIndex(dataframe, folder, freq=400.):
     :param dataframe: a :class:`~pd.DataFrame` object
     :param folder: folder name
     :param freq: frequency of the index (default 400 Hz)
-    :return: a dataframe with ``DateTime`` indices    
+    :return: a dataframe with a :class:`~pd.DatetimeIndex` as index    
     """
     text = folder.split('/')[-2]
     ftime_str = text[0:8] + ' ' + text[9:17].replace('_', ':')  # foldertime
@@ -710,7 +713,7 @@ def plotInnovations(ests,sc, time_label='Palestine Time', units='arcsec', conv=l
             qsc=sc.qI2G.loc[ind]
             if rotation:
                 qsc=sc.qI2S.loc[ind] #solution in SC reference frame
-                qG2S=qsc*sc.qI2G.loc[ind].inv() #rotation between the two reference frames (Gyros and Starcam)
+                qG2S=qsc*(sc.qI2G.loc[ind].inv()) #rotation between the two reference frames (Gyros and Starcam)
                 #print qG2S            
                 qest=qG2S*qest #qest in SC reference frame
             dRA[j]=conv(qest.ra-qsc.ra)
@@ -725,7 +728,7 @@ def plotInnovations(ests,sc, time_label='Palestine Time', units='arcsec', conv=l
             axRA.plot(t, dRA, **style)
             axDEC.plot(t, dDEC, **style)
             axROLL.plot(t, dROLL, **style)
-    if labels is None: labels = map(chr, range(ord('0'), ord('0')+M+1))
+    if labels is None: labels = map(chr, range(ord('0'), ord('0')+M+1)) #numerate the estimators if legend labels are not defined
     if xlim is not None:
         axRA.set_xlim(xlim)
         axDEC.set_xlim(xlim)
@@ -764,7 +767,7 @@ def plotCovs(df, time_label='Palestine Time', ylabels=None, labels=None, styles=
     else:
         fig, axRA = plt.subplots(1, 1, sharex=True, sharey=True)
         axDEC=axRA;axROLL=axRA;
-        if labels is None: labels=[r'$P_{00}$',r'$P_{11}$',r'$P_{22}$']
+        if labels is None: labels=[r'$P_{22}$',r'$P_{11}$',r'$P_{11}$']
         styles=[{}]
     axROLL.set_xlabel(time_label)
     M = np.matrix([[0.693865, 0, 0.720106], [0, 1, 0], [-0.720106, 0, 0.693865]])
@@ -876,3 +879,24 @@ def extractDuplicates(df, th=1e-3):
                 i0 = i
     df = df.loc[toExtract] #we keep the first appearance of every different value            
     return df
+def paintModes(ax,modes,alpha=0.3,printText=True):
+    '''
+    Paint the ax with the modes information available in the modes pandas Series
+    :param ax: Matplotlib.Axes object where we will paint the changes of mode
+    :param modes: pd.Series with the modes
+    :param alpha: transparency of the colors, in the [0,1] range
+    :param printText: show the text of the modes?
+    '''
+    color={0:'0.2',1:'y',2:'g',3:'b',4:'r'}
+    label={0:'safe',1:'manual',2:'track',3:'slew',4:'brake'}
+    dm=np.diff(modes.values)
+    m0=modes.iloc[0]
+    i0=modes.index[0]
+    changeOfModes=(modes.iloc[1:])[abs(dm)>0.9]
+    ylim=ax.get_ylim()
+    for ind in changeOfModes.index:
+        if m0 in color:
+            ax.axvspan(i0,ind,facecolor=color[m0],alpha=alpha)
+            if printText:ax.text(i0+(ind-i0)/2,ylim[0]+0.9*(ylim[1]-ylim[0]),label[m0],horizontalalignment='center')
+        m0=changeOfModes.loc[ind]
+        i0=ind
