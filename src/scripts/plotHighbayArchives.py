@@ -13,7 +13,8 @@ from utils.field import Field
 
 if __name__ == '__main__':
 
-    folder = "C:/LocalAuroraArchive/17-05-30_19_44_12/"
+    folder = "A:/BettiiDataAnalysis/GondolaFlightArchive/17-05-30_19_44_12/"
+    #folder = "C:/LocalAuroraArchive/17-05-30_19_44_12/"
     #Flags    
     #data to read and plot
     ccmg = False

@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     folders=flightDisksFolders
     
-    field='bettii.RTLowPriority.RawStarcameraRaDeg'
+    field='bettii.GyroReadings.angularVelocityZ'
     time_field='bettii.RTLowPriority.mceFrameNumber'
 
     print "Folder name      \t"+field

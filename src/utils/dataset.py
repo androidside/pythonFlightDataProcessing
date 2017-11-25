@@ -189,7 +189,7 @@ class DataSet():
         self.max = max
         if len(foldersList) < 2:
             if len(foldersList) == 1: self.folder = foldersList[0]
-            self.readListFields(fieldsList, rpeaks=rpeaks, nValues=nValues, start=start, verbose=verbose, timeIndex=timeIndex)
+            self.readListFields(fieldsList, rpeaks=rpeaks, nValues=nValues, start=start, verbose=verbose, timeIndex=True)
         else:
             self.folder = foldersList[0]
             self.readMultipleFolders(fieldsList, foldersList, rpeaks=rpeaks, verbose=verbose, timeIndex=True)
@@ -204,12 +204,12 @@ class DataSet():
             self.df = self.df.drop(droplist)
             if rpeaks:  # remove return to 0 peaks
                 self.df = self.df.loc[(self.df.abs() >= 1).any(1)]  # remove rows were ALL fields have a value <1           
-            # self.df = self.df.loc[self.min:self.max,:]
+                #self.df = self.df.loc[self.min:self.max,:]
                 
         if folder_export == None: self.folder_export = self.folder.split('/')[-1]
         else: self.folder_export = folder_export
         
-    def readListFields(self, fieldsList, folder=None, rpeaks=True, verbose=False, nValues=None, start=None, timeIndex=False):
+    def readListFields(self, fieldsList, folder=None, rpeaks=True, verbose=False, nValues=None, start=None, timeIndex=True):
         '''Reads a list of fields and stores the new fields in the df attribute
         
         :param fieldsList: list of utils.field.Field objects
@@ -226,7 +226,7 @@ class DataSet():
         for field in fieldsList:
             i = i + 1
             if verbose: print str(100 * i / len(fieldsList)) + '%',
-            self.readField(field, folder=folder, rpeaks=rpeaks, verbose=verbose, nValues=nValues, start=start)
+            self.readField(field, folder=folder, rpeaks=rpeaks, verbose=verbose, nValues=nValues, start=start, timeIndex=False)
         if verbose: print ''
         self.df = self.df.dropna(axis=0, how='all').sort_index()
         self.df = self.df.loc[self.min:self.max, :]
@@ -308,9 +308,11 @@ class DataSet():
                 df_tmp = df_tmp[df_tmp.index > indmin]  # keep only meaningful index (a FN less than indmin is impossible)
                 if not df_tmp.empty:
                     df_tmp = df_tmp[df_tmp.index >= df_tmp.index[0]]  # keep only meaningful index (a FN less than the first index is impossible)
-                    if False: #disabled part of the code to remove outliers
+                    if True: #disabled part of the code to remove outliers
                         z = (np.abs(df_tmp.index) - np.mean(df_tmp.index)) / np.std(df_tmp.index)
                         df_tmp = df_tmp[z < 2]  # keep only meaningful index (drop outliers >2sigmas), seems dangerous but there are always bad mceFN that mess the entire plot
+                        z = (np.abs(df_tmp.index) - np.mean(df_tmp.index)) / np.std(df_tmp.index)
+                        df_tmp = df_tmp[z > -2] 
                 if timeIndex and len(df_tmp.index) > 0: #time index conversion, using the folder name as the time at df_tmp.index[0]
                     text = folder.split('/')[-2]
                     ftime_str = text[0:8] + ' ' + text[9:17].replace('_', ':').replace('-', '')  # foldertime

@@ -11,7 +11,7 @@ if __name__ == '__main__':
     folders=flightDisksFolders
 
 
-    field='bettii.ThermometersDemuxedCelcius.mceFrameNumber'
+    field='bettii.GyroReadings.angularVelocityZ'
     data=[]
     
     print "Folder name      \t"+field

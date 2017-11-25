@@ -22,18 +22,18 @@ if __name__ == '__main__':
         
     #Flags    
     #data to read and plot
-    gyros = False
+    gyros = True
     momdump = False
     magnetometer = False
     thermometers = False
     currentSensors = False
     altitude = False
     
-    titles=False #show titles on the figures
+    titles=True #show titles on the figures
         
     fieldsList = []
     if gyros:
-        fieldsList.append(Field('bettii.GyroReadings.angularVelocityX', label='Gyro X', conversion=0.0006304))
+        fieldsList.append(Field('bettii.GyroReadings.angularVelocityX', label='Gyro X', conversion=0.0006304, range=2e5))
         fieldsList.append(Field('bettii.GyroReadings.angularVelocityY', label='Gyro Y', conversion=0.0006437, range=2e5))
         fieldsList.append(Field('bettii.GyroReadings.angularVelocityZ', label='Gyro Z', conversion=0.0006324, range=2e5))
       
@@ -79,10 +79,10 @@ if __name__ == '__main__':
             field.range = 10
         fieldsList = fieldsList + l1 + l2 + lv
           
-    ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False)
+    ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False, timeIndex=True)
     #ds.df = ds.df.iloc[:-1000]
-    M = 1  # downsample factor
-    ds.df = ds.df.iloc[:-100:M] #ie: ds.df.iloc[:-1000:M] do not plot the last 1000 samples (fn are too high)
+    M = 1 # downsample factor
+    ds.df = ds.df.iloc[:-100:M] #ie: ds.df.iloc[:-1000:M] do not plot the last 1000 samples (fn are too high)  (from:to:step)
     
     print "Converting to Palestine Time..."
     ds.df.index = ds.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)
@@ -90,6 +90,7 @@ if __name__ == '__main__':
     time_label = 'Palestine Time'
     
     print "Generating plots.."
+    
     
     if gyros:
         print "Plotting gyroscopes data..."

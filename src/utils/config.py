@@ -24,7 +24,7 @@ mpl.rcParams['date.autoformatter.hour']  = '%H:%M' #format of the date axes when
 mpl.rcParams['date.autoformatter.minute']  = '%H:%M:%S' #format of the date axes when the autoformatter decides it should be in minute precision
 
 #Useful variables
-save_folder='C:/Users/bettii/flightData/' #folders where the files will be stored by default
+save_folder='A:/BettiiDataAnalysis/generatedPlots/flightData/' #folders where the files will be stored by default
 img_folder=save_folder+'plots/' #folders where the figures will be stored by default
 #check if the folders exist. If not, make them.
 if not os.path.exists(save_folder):
@@ -33,22 +33,23 @@ if not os.path.exists(img_folder):
     os.makedirs(img_folder)
 
 #flight data folders
-root_folder='F:/GondolaFlightArchive/' #disks data
+root_folder='A:/BettiiDataAnalysis/gondolaArchive/flightArchive/all/' #disks data
+#root_folder='A:/2ndcopy/LocalAuroraArchive/FlightData/' #disks 
 subdirs=next(os.walk(root_folder))[1]
 flightDisksFolders=[root_folder+subdir+'/' for subdir in subdirs]
 
-flightTelemetryFolders=[]
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-08_17_07_45-/') #telemetry data
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-08_20_43_41-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-08_20_54_26-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-08_22_09_44-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-08_22_19_34-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_00_27_01-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_01_54_43-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_02_12_33-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_02_40_53-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_02_59_03-/')
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_04_11_03-/')
+# flightTelemetryFolders=[]
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-08_17_07_45-/') #telemetry data
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-08_20_43_41-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-08_20_54_26-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-08_22_09_44-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-08_22_19_34-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-09_00_27_01-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-09_01_54_43-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-09_02_12_33-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-09_02_40_53-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-09_02_59_03-/')
+# flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-09_04_11_03-/')
 
 #==========================EMPTY Archives===================================
 #  flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_04_16_13-/')
@@ -58,4 +59,4 @@ flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_04_11_03-/')
 # flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_04_28_38-/')
 # flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_04_41_34-/')
 #===========================================================================
-flightTelemetryFolders.append('F:/LocalBettiiArchive/17-06-09_06_29_36-/')
+#flightTelemetryFolders.append('A:/BettiiDataAnalysis/LocalBettiiArchive/17-06-09_06_29_36-/')
