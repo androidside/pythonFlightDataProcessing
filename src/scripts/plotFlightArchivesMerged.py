@@ -22,12 +22,13 @@ if __name__ == '__main__':
         
     #Flags    
     #data to read and plot
-    gyros = True
-    momdump = False
-    magnetometer = False
+    #missing items: PID Gains, Delay Lines, Timings RT, etc.
+    gyros = False
+    momdump = False 
+    magnetometer = False    
     thermometers = False
-    currentSensors = False
-    altitude = False
+    currentSensors = True
+    altitude = True
     
     titles=True #show titles on the figures
         

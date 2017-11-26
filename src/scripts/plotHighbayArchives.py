@@ -12,18 +12,17 @@ from utils.field import Field
 
 
 if __name__ == '__main__':
-
-    folder = "A:/BettiiDataAnalysis/GondolaFlightArchive/17-05-30_19_44_12/"
+    folder = 'A:/2ndcopy/LocalAuroraArchive/17-05-30_19_44_12/'
     #folder = "C:/LocalAuroraArchive/17-05-30_19_44_12/"
     #Flags    
     #data to read and plot
-    ccmg = False
-    momdump = False
-    wheelsangle=False
-    gyros=False
-    azimuth=False #measured and desired azimuth position and velocity
+    ccmg = True
+    momdump = True
+    wheelsangle=True
+    gyros=True
+    azimuth=True #measured and desired azimuth position and velocity
     radec = True #telescopeRaDec, GondolaRaDec, StarcameraRaDec
-    griffins = False    
+    griffins = True    
     
     titles=True #show titles on the figures
     
