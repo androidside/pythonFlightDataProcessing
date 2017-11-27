@@ -14,9 +14,9 @@ from timeit import default_timer as timer
 
 if __name__ == '__main__':
 
-    folder='F:/GondolaFlightArchive/17-06-09_01_51_04/'
-    folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
-    save_folder='C:/Users/bettii/thesis/'
+    folder= 'A:/BettiiDataAnalysis/gondolaArchive/flightArchive/all/17-06-09_01_51_04/'
+    folder='A:/BettiiDataAnalysis/gondolaArchive/flightArchive/all/17-06-09_07_09_25/'
+    save_folder='A:/BettiiDataAnalysis/generatedPlots/flightData/'
     img_folder=save_folder+'plots/delaylines/'
     savefilename='DelayLines.pkl'
     
@@ -76,14 +76,14 @@ if __name__ == '__main__':
         data=df[[DL+'posTarget',DL+'posMeasurement']].dropna()
         ax=data.plot()
         ax.set_xlabel(time_label)
-        
+         
         data=df[[DL+'velTarget',DL+'velMeasurement']].dropna()
         ax=data.plot()
-        
+         
         data=df[DL+'ut'].dropna()
         ax=data.plot()
         ax.set_xlabel(time_label)
-        
+         
         data=df[DL+'et'].dropna()
         ax=data.plot()
         ax.set_xlabel(time_label)

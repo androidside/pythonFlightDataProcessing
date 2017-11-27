@@ -5,6 +5,7 @@ Script for scripts simultaneously data from different archives
 
 @author: Marc Casalprim
 '''
+from scripts import delayLines
 print 'Imports...'
 import re
 from utils.config import os,flightDisksFolders,plt,save_folder,img_folder
@@ -29,6 +30,7 @@ if __name__ == '__main__':
     thermometers = False
     currentSensors = True
     altitude = True
+    
     
     titles=True #show titles on the figures
         
