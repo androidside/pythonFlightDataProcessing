@@ -14,6 +14,7 @@ from utils.field import Field, getFieldsContaining
 
 
 
+
 if __name__ == '__main__':
     folders=flightDisksFolders
     
@@ -28,8 +29,10 @@ if __name__ == '__main__':
     momdump = False 
     magnetometer = False    
     thermometers = False
-    currentSensors = True
-    altitude = True
+    currentSensors = False
+    altitude = False
+    timingsRT = True
+    timingsFPGA = False
     
     
     titles=True #show titles on the figures
@@ -81,13 +84,33 @@ if __name__ == '__main__':
         for field in l1 + l2 + lv:
             field.range = 10
         fieldsList = fieldsList + l1 + l2 + lv
-          
+    if timingsRT:
+        timingsRT = []
+        timingsRT.append(Field('bettii.RTHighPriority.TimingRTLoopDuration', label='TimingRTLoopDuration',range=20000))
+        timingsRT.append(Field('bettii.RTHighPriority.TimingRTCounterOver10ms', label='TimingRTCounterOver10ms',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTBetweenLoops', label='TimingRTBetweenLoops',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTFPGAInOut', label='TimingRTFPGAInOut',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTGenerateGyroVel', label='TimingRTGenerateGyroVel',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTPropagateTrueSC', label='TimingRTPropagateTrueSC',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTGenerateSC', label='TimingRTGenerateSC',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTEKFPropagate', label='TimingRTEKFPropagate',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTEKFUpdate', label='TimingRTEKFUpdate',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTRotateTarget', label='TimingRTRotateTarget',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTPlotGyroVelocities', label='TimingRTPlotGyroVelocities',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTModeManager', label='TimingRTModeManager',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTPlotSetpoints', label='TimingRTPlotSetpoints',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTMatrices', label='TimingRTMatrices',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTPlotsRaDec', label='TimingRTPlotsRaDec',range=20000))
+        timingsRT.append(Field('bettii.RTLowPriority.TimingRTSendToAurora', label='TimingRTSendToAurora',range=20000))
+        timingsRT_labels = [field.label for field in timingsRT]
+        fieldsList = fieldsList + timingsRT        
+       
     ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False, timeIndex=True)
     #ds.df = ds.df.iloc[:-1000]
-    M = 1 # downsample factor
+    M = 10 # downsample factor
     ds.df = ds.df.iloc[:-100:M] #ie: ds.df.iloc[:-1000:M] do not plot the last 1000 samples (fn are too high)  (from:to:step)
     
-    print "Converting to Palestine Time..."
+    print 'Converting to Palestine Time...'
     ds.df.index = ds.df.index - pd.Timedelta(hours=5)  # Palestine time conversion (Archives folder names are in UTC)
 
     time_label = 'Palestine Time'
@@ -105,9 +128,7 @@ if __name__ == '__main__':
         plt.legend(markerscale=3, numpoints=20)
         fig.tight_layout()
         fig.savefig(img_folder + "gyroscopes.png")
-        
-
-    
+            
     if magnetometer:
         print "Plotting magnetometer data..."
         fig = plt.figure()
@@ -223,5 +244,40 @@ if __name__ == '__main__':
         plt.legend(markerscale=3, numpoints=20)
         fig.tight_layout()
         fig.savefig(img_folder + "voltages5V.png")
+    
+    if timingsRT:
+        print "Plotting timings RT data..."
+        for label in timingsRT_labels:
+            fig = plt.figure()
+            if titles: fig.suptitle(label, fontsize=15, y=1)
+            ax = plt.subplot(111, xlabel=time_label, ylabel='Time (microsec)')
+            data = ds.df[label].dropna() #.apply(lambda x: np.sqrt(x) +3)
+            data = data[data > 0]
+            data.plot(ax=ax, style='b+', markersize=1.0)
+            fig.tight_layout()
+            fig.savefig(img_folder + label+".png")
+        
+#         fig = plt.figure()
+#         if titles: fig.suptitle("TimingRTCounterOver10ms", fontsize=15, y=1)
+#         ax = plt.subplot(111, xlabel=time_label, ylabel='Time (microsec)')
+#         data = ds.df.TimingRTCounterOver10ms.dropna() #.apply(lambda x: np.sqrt(x) +3)
+#         data = data[data> 0]
+#         data.plot(ax=ax, style='b+', markersize=1.0)
+#         fig.tight_layout()
+#         fig.savefig(img_folder + "TimingRTCounterOver10ms.png")
+#         
+#         
+#         print "Plotting thermometers data..."
+#         fig = plt.figure()
+#         if titles: fig.suptitle("Thermometers", fontsize=15, y=0.999)
+#         ax = plt.subplot(111, xlabel=time_label, ylabel='Temperature [Celsius]')
+#         data = ds.df[therm_labels].dropna(how='all').interpolate(method='time')
+#         data.plot(ax=ax, style='.', markersize=2.0)
+#         plt.legend(markerscale=3, numpoints=20)
+#         fig.tight_layout()
+#         fig.savefig(img_folder + "thermometers.png")
+        
+        
+    
     print "Show..."
     plt.show()
