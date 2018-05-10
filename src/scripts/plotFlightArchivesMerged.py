@@ -31,8 +31,9 @@ if __name__ == '__main__':
     thermometers = False
     currentSensors = False
     altitude = False
-    timingsRT = True
+    timingsRT = False
     timingsFPGA = False
+    griffins = True
     
     
     titles=True #show titles on the figures
@@ -103,7 +104,15 @@ if __name__ == '__main__':
         timingsRT.append(Field('bettii.RTLowPriority.TimingRTPlotsRaDec', label='TimingRTPlotsRaDec',range=20000))
         timingsRT.append(Field('bettii.RTLowPriority.TimingRTSendToAurora', label='TimingRTSendToAurora',range=20000))
         timingsRT_labels = [field.label for field in timingsRT]
-        fieldsList = fieldsList + timingsRT        
+        fieldsList = fieldsList + timingsRT
+        
+    if griffins:
+        fieldsList.append(Field('bettii.GriffinsGalil.TPA', label='TPA', range=1e9))
+        fieldsList.append(Field('bettii.GriffinsGalil.TPB', label='TPB', range=1e9))
+        fieldsList.append(Field('bettii.GriffinsGalil.TPC', label='TPC', range=1e9))
+        fieldsList.append(Field('bettii.GriffinsGalil.griffinAAngleDegrees', label='griffinAAngleDegrees', range=1e3))
+        fieldsList.append(Field('bettii.GriffinsGalil.griffinBAngleDegrees', label='griffinBAngleDegrees', range=1e3))
+        fieldsList.append(Field('bettii.GriffinsGalil.griffinCAngleDegrees', label='griffinCAngleDegrees', range=1e3))        
        
     ds = DataSet(fieldsList=fieldsList, foldersList=folders, verbose=True, rpeaks=False, timeIndex=True)
     #ds.df = ds.df.iloc[:-1000]
@@ -277,6 +286,25 @@ if __name__ == '__main__':
 #         fig.tight_layout()
 #         fig.savefig(img_folder + "thermometers.png")
         
+    if griffins:
+        print "Plotting griffins data..."
+        fig = plt.figure()
+        if titles: fig.suptitle("Griffins Absolute Position Encoder", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Griffins Absolute Position')
+        data = ds.df[['TPA', 'TPB', 'TPC']].dropna()
+        data.plot(ax=ax, style=['r+', 'g+', 'b+'], markersize=1.0)
+        plt.legend(markerscale=3, numpoints=20)
+        fig.tight_layout()
+        fig.savefig(img_folder + "TPA_TPB_TPC.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("Griffins Angle Degree", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Griffins Absolute Angle')
+        data = ds.df[['griffinAAngleDegrees', 'griffinBAngleDegrees', 'griffinCAngleDegrees']].dropna()
+        data.plot(ax=ax, style=['r+', 'g+', 'b+'], markersize=1.0)
+        plt.legend(markerscale=3, numpoints=20)
+        fig.tight_layout()
+        fig.savefig(img_folder + "GriffinsAngle.png")
         
     
     print "Show..."

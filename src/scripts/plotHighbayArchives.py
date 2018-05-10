@@ -5,6 +5,7 @@ Plot data from a field, using DataSet class. Merging archives if we want.
 
 @author: Jordi Vila Vila
 '''
+from wtforms.fields.core import FieldList
 print 'Imports...'
 from utils.config import flightDisksFolders,plt,save_folder,img_folder
 from utils.dataset import DataSet,pd,plotColumns, filterDataframe
@@ -12,17 +13,20 @@ from utils.field import Field
 
 
 if __name__ == '__main__':
-    folder = 'A:/2ndcopy/LocalAuroraArchive/17-05-30_19_44_12/'
+#    folder = 'A:/2ndcopy/LocalAuroraArchive/17-05-30_19_44_12/'
+    folder = 'A:/2ndcopy/LocalAuroraArchive/17-05-30_22_39_21/'
     #folder = "C:/LocalAuroraArchive/17-05-30_19_44_12/"
     #Flags    
     #data to read and plot
-    ccmg = True
-    momdump = True
-    wheelsangle=True
-    gyros=True
-    azimuth=True #measured and desired azimuth position and velocity
-    radec = True #telescopeRaDec, GondolaRaDec, StarcameraRaDec
-    griffins = True    
+    ccmg = False
+    momdump = False
+    wheelsangle=False
+    gyros=False
+    azimuth=False #measured and desired azimuth position and velocity
+    radec = False #telescopeRaDec, GondolaRaDec, StarcameraRaDec
+    griffins = False   
+    tiptilts = True 
+    anglesensor = True
     
     titles=True #show titles on the figures
     
@@ -63,6 +67,17 @@ if __name__ == '__main__':
         fieldsList.append(Field('bettii.RTLowPriority.RawStarcameraDecDeg',label='sdec'))        
     if griffins:
          fieldsList.append(Field('bettii.GriffinsGalil.griffinAAngleDegrees',label='gangle'))
+    if tiptilts:
+        fieldsList.append(Field('bettii.CommandedTipTilts.KX',label='kx'))
+        fieldsList.append(Field('bettii.CommandedTipTilts.KY',label='ky'))
+        fieldsList.append(Field('bettii.CommandedTipTilts.WDLX',label='wdlx'))
+        fieldsList.append(Field('bettii.CommandedTipTilts.WDLY',label='wdly'))
+    if anglesensor:
+        fieldsList.append(Field('bettii.AngleSensorOutput.KXOffsetPixels',label='kxoffset'))
+        fieldsList.append(Field('bettii.AngleSensorOutput.KYOffsetPixels',label='kyoffset'))
+        fieldsList.append(Field('bettii.AngleSensorOutput.WDLXOffsetPixels',label='wdlxoffset'))
+        fieldsList.append(Field('bettii.AngleSensorOutput.WDLYOffsetPixels',label='wdlyoffset'))
+    
     
     ds = DataSet(fieldsList=fieldsList, folder=folder, verbose=True, rpeaks=True,timeIndex=True)
     #optional Filter
@@ -233,7 +248,72 @@ if __name__ == '__main__':
         fig.tight_layout()
         fig.savefig(img_folder + "Star Camera Ra&Dec.png")
         
+    if tiptilts:
+        fig = plt.figure()
+        if titles: fig.suptitle("TipTilts Kx", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Tip Tilts Kx')
+        data = ds.df.kx.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "tiptiltskx.png")
         
+        fig = plt.figure()
+        if titles: fig.suptitle("TipTilts Ky", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Tip Tilts Ky')
+        data = ds.df.ky.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "tiptiltsky.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("TipTilts wdlx", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Tip Tilts wdlx')
+        data = ds.df.wdlx.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "tiptiltswdlx.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("TipTilts wdly", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Tip Tilts wdly')
+        data = ds.df.wdly.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "tiptiltswdly.png")
+            
+    if anglesensor:
+        fig = plt.figure()
+        if titles: fig.suptitle("Angle Sensor Output Kx", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Angle Sensor Output Kx')
+        data = ds.df.kxoffset.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "anglesensoroutputkx.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("Angle Sensor Output Ky", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Angle Sensor Output Ky')
+        data = ds.df.kyoffset.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "anglesensoroutputky.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("Angle Sensor Output wdlx", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Angle Sensor Output wdlx')
+        data = ds.df.wdlxoffset.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "anglesensoroutputwdlx.png")
+        
+        fig = plt.figure()
+        if titles: fig.suptitle("Angle Sensor Output wdly", fontsize=15, y=1)
+        ax = plt.subplot(111, xlabel=time_label, ylabel='Angle Sensor Output wdly')
+        data = ds.df.wdlyoffset.dropna() #.apply(lambda x: np.sqrt(x) +3)
+        data.plot(ax=ax, style='b', markersize=1.0)
+        fig.tight_layout()
+        fig.savefig(img_folder + "anglesensoroutputwdly.png")
+
          
     #===========================================================================
     # 
