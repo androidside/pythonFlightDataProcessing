@@ -9,11 +9,14 @@ print 'Imports...'
 from utils.dataset import DataSet,plt,pd
 from utils.field import Field,getDtypes
 from utils.quat import Quat
+from utils.config import flightDisksFolders,plt,save_folder,img_folder
+
 
 
 if __name__ == '__main__':
     folder = "C:/17-05-17_00_36_34/"
     folder = "\\\\GS66-WHITE\\LocalAuroraArchive\\17-05-24_02_06_18\\"
+    
     
     Field.DTYPES=getDtypes(folder)
 

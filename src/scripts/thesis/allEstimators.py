@@ -16,6 +16,7 @@ from estimators.estimators import Estimator15,Estimator6,pd
 
 if __name__ == '__main__':
     folder="F:/GondolaFlightArchive/17-06-09_01_51_04/"
+    folder = 'A:/BettiiDataAnalysis/gondolaArchive/flightArchive/all/17-06-09_01_51_04/'      #disks data
     save_folder=folder
     
     read=False

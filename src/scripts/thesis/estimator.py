@@ -9,11 +9,12 @@ print 'Imports...'
 from utils.estimator import readAndSave,openPickles
 from estimators.estimators import Estimator6
 from utils.dataset import plt,pd,np,plotQuaternions,plotCovs,plotInnovations
-from utils.config import save_folder,img_folder
+from utils.config import save_folder,img_folder, flightDisksFolders
 
 
 if __name__ == '__main__':
-    folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
+#    folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
+    folder='A:/BettiiDataAnalysis/gondolaArchive/flightArchive/all/17-06-09_07_09_25/'
     
     
     read=False #read again the files?
@@ -56,7 +57,7 @@ if __name__ == '__main__':
     
     df=pd.merge(kal3.est,sc,how='outer',left_index=True,right_index=True)
     print 'Dataframe shape:', df.shape
-    styles=['b.',{'color':'g','linestyle':'None','marker':'*','ms':10}]
+    styles=[{'color':'b', 'linewidth':4.0},{'color':'g','linestyle':'None','marker':'*','ms':20}]
     f=plotQuaternions(df[['qest','qI2G']],styles=styles,legend=True,labels=['Estimator','Starcamera'], time_label=time_label)
     f.savefig(save_folder+"estimator.png")
      

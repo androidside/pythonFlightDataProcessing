@@ -7,6 +7,8 @@ import numpy as np
 from quat import Quat
 from config import os,plt
 from thermometers import unwrapCounter
+from matplotlib.pyplot import xticks, subplot
+from matplotlib.axes._subplots import Subplot
 
 
 
@@ -161,7 +163,7 @@ class DataSet():
     '''Class containing useful methods to read and generate a pandas dataframe containing the desired fields.
     Derived from Maxime's original codes. The dataframe is stored as the attribute df.
     '''
-    def __init__(self, folder=None, freq=400., min=None, max=22880070, folder_export=None, nValues=None, start=None, verbose=False, rpeaks=False, estimator=False, starcam=False, fieldsList=[], foldersList=[], droplist=[], timeIndex=False):
+    def __init__(self, folder=None, freq=400., min=None, max=22880070, folder_export=None, nValues=None, start=None, verbose=False, rpeaks=False, estimator=False, starcam=False, fieldsList=[], foldersList=[], droplist=[], timeIndex=True):
         '''Constructs a DataSet object
         Loads a list of fields fieldsList, the estimator data or the starcamera data dpeending on the correct parameters
         
@@ -189,10 +191,10 @@ class DataSet():
         self.max = max
         if len(foldersList) < 2:
             if len(foldersList) == 1: self.folder = foldersList[0]
-            self.readListFields(fieldsList, rpeaks=rpeaks, nValues=nValues, start=start, verbose=verbose, timeIndex=True)
+            self.readListFields(fieldsList, rpeaks=rpeaks, nValues=nValues, start=start, verbose=verbose, timeIndex=timeIndex)
         else:
             self.folder = foldersList[0]
-            self.readMultipleFolders(fieldsList, foldersList, rpeaks=rpeaks, verbose=verbose, timeIndex=True)
+            self.readMultipleFolders(fieldsList, foldersList, rpeaks=rpeaks, verbose=verbose, timeIndex=timeIndex)
         
         if estimator:
             self.readEstimator()
@@ -209,7 +211,7 @@ class DataSet():
         if folder_export == None: self.folder_export = self.folder.split('/')[-1]
         else: self.folder_export = folder_export
         
-    def readListFields(self, fieldsList, folder=None, rpeaks=True, verbose=False, nValues=None, start=None, timeIndex=True):
+    def readListFields(self, fieldsList, folder=None, rpeaks=True, verbose=False, nValues=None, start=None, timeIndex=False):
         '''Reads a list of fields and stores the new fields in the df attribute
         
         :param fieldsList: list of utils.field.Field objects
@@ -329,7 +331,7 @@ class DataSet():
             raise
             print 'ERROR reading ' + field.fieldName + ':', e
     
-    def readMultipleFolders(self, fieldsList, foldersList, rpeaks=False, verbose=False, timeIndex=True):
+    def readMultipleFolders(self, fieldsList, foldersList, rpeaks=False, verbose=False, timeIndex=False):
         """Stores in self.df a new :class:`~pandas.DataFrame` object containing
         the ``fieldsList`` information from all the folders in ``foldersList``.
         The indexing of the :class:`~pandas.DataFrame` is a ``DatetimeIndex`` by default
@@ -651,12 +653,32 @@ def plotQuaternions(df, time_label='Palestine Time', labels=None, styles=['b', '
     :param xlim: limits of the x axis [xmin,xmax]
     :rtype: :class:`matplotlib.figure.Figure`
     '''
+    font = {'family' : 'normal',
+        'weight' : 'bold',
+        'size'   : 22}
+    
     N = len(df.columns)
-    fig, (axRA, axDEC, axROLL) = plt.subplots(3, 1, sharex=True, sharey=True)
-    axRA.set_ylabel('RA (deg)')
-    axDEC.set_ylabel('DEC (deg)')
-    axROLL.set_ylabel('ROLL (deg)')
-    axROLL.set_xlabel(time_label)
+    fig, axs = plt.subplots(3, 1, sharex=True, sharey=True)
+   
+    
+    for ax in axs.reshape(-1):
+        plt.sca(ax) 
+        plt.yticks(fontsize=36)
+    
+    axRA = axs [0]
+    axDEC = axs[1]
+    axROLL = axs[2]  
+    plt.rc('font', **font)
+    axRA.set_ylabel('RA (deg)', fontsize=38)
+    axDEC.set_ylabel('DEC (deg)',fontsize=38)
+    axROLL.set_ylabel('ROLL (deg)',fontsize=38)
+    
+    
+    
+#     axROLL.set_xlabel(time_label, fontsize=14)
+#     axRA.plot.set_xticklabels(fontsize=24)
+    
+    
     for i in range(N):
         column = df.columns[i]
         data = df[column].dropna()
@@ -675,8 +697,8 @@ def plotQuaternions(df, time_label='Palestine Time', labels=None, styles=['b', '
         axDEC.set_xlim(xlim)
         axROLL.set_xlim(xlim)
     if legend:
-        axRA.legend(labels, loc=0, markerscale=2, numpoints=1)
-    fig.tight_layout()
+        axRA.legend(labels, loc=0, markerscale=2, numpoints=1,fontsize = 20)
+#     fig.tight_layout()
     return fig
 def plotInnovations(ests,sc, time_label='Palestine Time', units='arcsec', conv=lambda x : abs(x)*3600, labels=None, styles=['b', 'r', 'g', 'k'], legend=False, xlim=None, sync=False, rotation=True):
     '''Plot the errors between the estimated attitudes in the list of dataframes ests and the star camera solutions in the dataframe sc

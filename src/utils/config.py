@@ -34,6 +34,7 @@ if not os.path.exists(img_folder):
 
 #flight data folders
 root_folder='A:/BettiiDataAnalysis/gondolaArchive/flightArchive/all/' #disks data
+#root_folder='A:/BettiiDataAnalysis/gondolaArchive/flightArchive/b34presentation/' #disks data
 #root_folder='A:/2ndcopy/LocalAuroraArchive/FlightData/' #disks 
 subdirs=next(os.walk(root_folder))[1]
 flightDisksFolders=[root_folder+subdir+'/' for subdir in subdirs]

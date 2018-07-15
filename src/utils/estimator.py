@@ -80,7 +80,7 @@ def readAndSave(folder,initial_time=1000,final_time = None):
     
 
     
-    ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=True)
+    ds = DataSet(folder,fieldsList=fieldsList,estimator=False,starcam=False,min=initial_time,max=final_time,verbose=True, timeIndex=False)
     #ds.df=ds.df.interpolate(method='values').dropna()
 
     print 'Dataframe shape:', ds.df.shape       

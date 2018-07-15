@@ -7,7 +7,7 @@ Script for plotting thermometers data from different archives. The thermometers 
 '''
 
 print 'Imports...'
-from utils.config import flightDisksFolders
+from utils.config import flightDisksFolders, img_folder
 from utils.dataset import DataSet,plt,np,pd
 from utils.field import getFieldsContaining
 from utils.thermometers import ThermometerNumber,ThermometerLocationByNumber
@@ -21,8 +21,8 @@ if __name__ == '__main__':
 
     folders=flightDisksFolders
 
-    save_folder='C:/Users/bettii/thermometers/'
-    img_folder=save_folder+"plotsByTempAndFlatness/"
+    save_folder='A:/BettiiDataAnalysis/plots/thermometers/'
+    
     
     folder=folders[0]
     fieldsList=getFieldsContaining('bettii.ThermometersDemuxedCelcius.J',folder)
@@ -42,7 +42,7 @@ if __name__ == '__main__':
     
     print "Converting to Palestine Time..."
     ds.df.index=ds.df.index-pd.Timedelta(hours=5) #Palestine time conversion (Archives folder names are in UTC)
-    ds.df=ds.df.ix[pd.to_datetime('06/09/2017 00:00:00'):pd.to_datetime('06/09/2017 04:00:00')] #slicing
+    ds.df=ds.df.ix[pd.to_datetime('06/08/2017 14:00:00'):pd.to_datetime('06/09/2017 07:00:00')] #slicing
     ds.df=ds.df.dropna(axis=1,how='all').interpolate(method='time')
     ds.df.dropna(inplace=True)
     
@@ -88,7 +88,7 @@ if __name__ == '__main__':
             fig.savefig(img_folder+"thermometers_"+i+str(k)+".png")
     
     print "Saving CSV..."
-    ds.df.to_csv(save_folder+"thermometersByNumber.txt",sep='\t', float_format='%.2f', index_label='Palestine time  ', date_format="%Y-%m-%d %H:%M:%S")
+#     ds.df.to_csv(save_folder+"thermometersByNumber.txt",sep='\t', float_format='%.2f', index_label='Palestine time  ', date_format="%Y-%m-%d %H:%M:%S")
     print "Saved"
     
     print "Show..."

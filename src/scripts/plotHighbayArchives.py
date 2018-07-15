@@ -8,13 +8,14 @@ Plot data from a field, using DataSet class. Merging archives if we want.
 from wtforms.fields.core import FieldList
 print 'Imports...'
 from utils.config import flightDisksFolders,plt,save_folder,img_folder
-from utils.dataset import DataSet,pd,plotColumns, filterDataframe
+from utils.dataset import DataSet,pd,plotColumns, filterDataframe, paintModes
 from utils.field import Field
 
 
 if __name__ == '__main__':
-#    folder = 'A:/2ndcopy/LocalAuroraArchive/17-05-30_19_44_12/'
-    folder = 'A:/2ndcopy/LocalAuroraArchive/17-05-30_22_39_21/'
+#    
+    folder = 'A:/2ndcopy/LocalAuroraArchive/17-05-30_19_44_12/'
+    #folder = 'A:/2ndcopy/LocalAuroraArchive/17-05-30_22_39_21/'
     #folder = "C:/LocalAuroraArchive/17-05-30_19_44_12/"
     #Flags    
     #data to read and plot
@@ -22,11 +23,12 @@ if __name__ == '__main__':
     momdump = False
     wheelsangle=False
     gyros=False
-    azimuth=False #measured and desired azimuth position and velocity
+    azimuth=True #measured and desired azimuth position and velocity
     radec = False #telescopeRaDec, GondolaRaDec, StarcameraRaDec
     griffins = False   
-    tiptilts = True 
-    anglesensor = True
+    tiptilts = False 
+    anglesensor = False
+    modes= True #used to paint the modes on top
     
     titles=True #show titles on the figures
     
@@ -52,10 +54,10 @@ if __name__ == '__main__':
         fieldsList.append(Field('bettii.RTLowPriority.estimatedGyroYarcsec',label='estimatedgyroY',dtype='i4'))
         fieldsList.append(Field('bettii.RTLowPriority.estimatedGyroZarcsec',label='estimatedgyroZ',dtype='i4'))            
     if azimuth:        
-        fieldsList.append(Field('bettii.PIDInputCCMG.positionTarget',label='ptarget'))
-        fieldsList.append(Field('bettii.PIDInputCCMG.positionMeasurement',label='pmeas'))
-        fieldsList.append(Field('bettii.PIDInputCCMG.velocityTarget',label='vtarget'))
-        fieldsList.append(Field('bettii.PIDInputCCMG.velocityMeasurement',label='vmeas'))
+        fieldsList.append(Field('bettii.PIDInputCCMG.positionTarget',label='Position Target'))
+        fieldsList.append(Field('bettii.PIDInputCCMG.positionMeasurement',label='Position Measured'))
+        fieldsList.append(Field('bettii.PIDInputCCMG.velocityTarget',label='Velocity Target'))
+        fieldsList.append(Field('bettii.PIDInputCCMG.velocityMeasurement',label='Velocity Measured'))
         fieldsList.append(Field('bettii.RTHighPriority.targetRA',label='targetra'))
         fieldsList.append(Field('bettii.RTHighPriority.targetDEC',label='targetdec'))        
     if radec:
@@ -77,7 +79,8 @@ if __name__ == '__main__':
         fieldsList.append(Field('bettii.AngleSensorOutput.KYOffsetPixels',label='kyoffset'))
         fieldsList.append(Field('bettii.AngleSensorOutput.WDLXOffsetPixels',label='wdlxoffset'))
         fieldsList.append(Field('bettii.AngleSensorOutput.WDLYOffsetPixels',label='wdlyoffset'))
-    
+    if modes:
+        fieldsList.append(Field('bettii.FpgaState.state',label='modes',range=6))
     
     ds = DataSet(fieldsList=fieldsList, folder=folder, verbose=True, rpeaks=True,timeIndex=True)
     #optional Filter
@@ -185,21 +188,29 @@ if __name__ == '__main__':
         fig = plt.figure()
         if titles: fig.suptitle("Position Target vs Measured", fontsize=15, y=1)
         ax = plt.subplot(111, xlabel=time_label, ylabel='Position [arcsec]')
-        data = ds.df[['ptarget', 'pmeas']].dropna()
-        data.plot(ax=ax, style=['r', 'g'], markersize=1.0)
-        plt.legend(markerscale=3, numpoints=20)
+        plt.xlabel(time_label, fontsize = 38)
+        plt.ylabel("Position Target vs Measured", fontsize = 38)
+        plt.yticks(fontsize=310)
+        plt.xticks(fontsize=310)        
+        data = ds.df[['Position Target', 'Position Measured']].dropna()
+        data.plot(ax=ax, style=['r', 'g'], markersize=1.0, fontsize = 38)
+        plt.legend(markerscale=3, numpoints=20, fontsize = 38)
         fig.tight_layout()
         fig.savefig(img_folder + "position.png")
-        
+         
         fig = plt.figure()
         if titles: fig.suptitle("Velocity Target vs Measured", fontsize=15, y=1)
-        ax = plt.subplot(111, xlabel=time_label, ylabel='Velocity [arcsec/s]')
-        data = ds.df[['vtarget', 'vmeas']].dropna()
-        data.plot(ax=ax, style=['r', 'g'], markersize=1.0)
-        plt.legend(markerscale=3, numpoints=20)
+        ax3 = plt.subplot(111, xlabel=time_label, ylabel='Velocity [arcsec/s]')
+        plt.xlabel(time_label, fontsize = 38)
+        plt.ylabel("Velocity Target vs Measured", fontsize = 38)
+        plt.yticks(fontsize=310)
+        plt.xticks(fontsize=310)
+        data = ds.df[['Velocity Target', 'Velocity Measured']].dropna()
+        data.plot(ax=ax3, style=['r', 'g'], markersize=1.0, fontsize = 38)
+        plt.legend(markerscale=3, numpoints=20, fontsize = 38)
         fig.tight_layout()
         fig.savefig(img_folder + "velocity.png")
-        
+         
         fig = plt.figure()
         if titles: fig.suptitle("Target Ra & Dec", fontsize=15, y=1)
         ax1 = plt.subplot(211, xlabel=time_label, ylabel='Target Ra')
@@ -210,7 +221,18 @@ if __name__ == '__main__':
         data.plot(ax=ax2, style='b', markersize=1.0)
         fig.tight_layout()
         fig.savefig(img_folder + "Target Ra&Dec.png")
+ 
+   
          
+        if modes:
+            modes=ds.df.modes.dropna()
+            modes.plot()
+            print "Painting.."
+            paintModes(ax,modes)
+            paintModes(ax3,modes)
+            print "Show"   
+            plt.show() 
+          
     if radec:
         fig = plt.figure()
         if titles: fig.suptitle("Telescope Ra & Dec", fontsize=15, y=1)

@@ -13,9 +13,17 @@ from utils.dataset import plt,np,plotQuaternions,plotColumns,plotCovs,plotInnova
 
 
 if __name__ == '__main__':
-    folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
-    ti=20389100
-    tf=None#28700000
+    #folder='F:/GondolaFlightArchive/17-06-09_07_09_25/'
+#     folder='A:/BettiiDataAnalysis/gondolaArchive/flightArchive/all/17-06-09_07_09_25/'
+#     ti=20389100
+#     tf=None#28700000
+    
+    #===========================================================================
+    folder='A:/BettiiDataAnalysis/gondolaArchive/flightArchive/all/17-06-09_01_51_04/'
+    ti=18671200
+    tf=18884463
+    #===========================================================================
+
     #===========================================================================
     # folder='F:/GondolaFlightArchive/17-06-09_01_51_04/'
     # ti=18671200
@@ -27,10 +35,10 @@ if __name__ == '__main__':
         os.makedirs(img_folder)
     
     read=True
-    estimated=False
+    estimated=True
     
-    use3=False
-    use6=True
+    use3=True
+    use6=False
     use15=False
     
      
